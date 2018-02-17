@@ -21,7 +21,9 @@ uses
   SelecionaMesAno in '..\pas\SelecionaMesAno.pas' {frmSelecionaMesAno},
   ConfigurarCertificado in '..\pas\ConfigurarCertificado.pas' {frmConfigurarCertificado},
   udmESocial in '..\pas\udmESocial.pas' {dmESocial: TDataModule},
-  SelecionarCertificado in '..\pas\SelecionarCertificado.pas' {frmSelecionarCertificado};
+  SelecionarCertificado in '..\pas\SelecionarCertificado.pas' {frmSelecionarCertificado},
+  DialogoPadrao in '..\pas\DialogoPadrao.pas' {frmDialogoPadrao},
+  EnvioEventoTabela in '..\pas\EnvioEventoTabela.pas' {frmEnvioEventoTabela};
 
 {$R *.res}
 
@@ -29,7 +31,7 @@ begin
 
   Application.Initialize;
 
-  Application.Title := 'REMUNERATU$ - e-Social...';
+  Application.Title := 'Remuneratu$ - eSocial';
   Application.CreateForm(TdmPrincipal, dmPrincipal);
   Application.CreateForm(TfrmPrincipal, frmPrincipal);
   Application.CreateForm(TfrmSobre, frmSobre);
@@ -39,7 +41,6 @@ begin
   Application.CreateForm(TfrmAlteraSenha, frmAlteraSenha);
   Application.CreateForm(TfrmSelecionaMesAno, frmSelecionaMesAno);
   Application.CreateForm(TdmESocial, dmESocial);
-  Application.CreateForm(TfrmSelecionarCertificado, frmSelecionarCertificado);
   frmSobre.Show;
   frmSobre.Update;
 

@@ -36,7 +36,7 @@ uses
 type
   TfrmPrincipal = class(TForm)
     StatusBar1: TdxStatusBar;
-    MainMenu1: TMainMenu;
+    MainMenu: TMainMenu;
     Tabelas1: TMenuItem;
     imSair1: TMenuItem;
     imFerramentas: TMenuItem;
@@ -96,7 +96,7 @@ type
     imTrocarUsuario: TMenuItem;
     N31: TMenuItem;
     lblMsg1: TLabel;
-    cxImageList1: TcxImageList;
+    imgList24: TcxImageList;
     pnSubBarra: TPanel;
     Image2: TImage;
     Label1: TLabel;
@@ -108,6 +108,11 @@ type
     Image4: TImage;
     N1: TMenuItem;
     imConfigurarCertificado: TMenuItem;
+    mnEnvio: TMenuItem;
+    imEventoTabela: TMenuItem;
+    imEventoPeriodico: TMenuItem;
+    imEventoNaoPeriodico: TMenuItem;
+    imgList16: TcxImageList;
     procedure FormCreate(Sender: TObject);
     procedure FormActivate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
