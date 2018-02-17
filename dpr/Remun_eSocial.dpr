@@ -18,7 +18,10 @@ uses
   AlteraSenha in '..\pas\AlteraSenha.pas' {frmAlteraSenha},
   uESocial in '..\pas\uESocial.pas',
   VareSocial in 'VareSocial.pas',
-  SelecionaMesAno in '..\pas\SelecionaMesAno.pas' {frmSelecionaMesAno};
+  SelecionaMesAno in '..\pas\SelecionaMesAno.pas' {frmSelecionaMesAno},
+  ConfigurarCertificado in '..\pas\ConfigurarCertificado.pas' {frmConfigurarCertificado},
+  udmESocial in '..\pas\udmESocial.pas' {dmESocial: TDataModule},
+  SelecionarCertificado in '..\pas\SelecionarCertificado.pas' {frmSelecionarCertificado};
 
 {$R *.res}
 
@@ -35,6 +38,8 @@ begin
   Application.CreateForm(TfrmLogin, frmLogin);
   Application.CreateForm(TfrmAlteraSenha, frmAlteraSenha);
   Application.CreateForm(TfrmSelecionaMesAno, frmSelecionaMesAno);
+  Application.CreateForm(TdmESocial, dmESocial);
+  Application.CreateForm(TfrmSelecionarCertificado, frmSelecionarCertificado);
   frmSobre.Show;
   frmSobre.Update;
 

@@ -1704,9 +1704,9 @@ Begin
      sBaseDados := ini_le_secao('Ult_orgao');
 
   sPahtAplicacao := ExtractFilePath(ParamStr(0));
-  If FileExists(sPahtAplicacao+'REMUNERATUS.INI') Then
+  If FileExists(sPahtAplicacao + REMUNERATUS_INI) Then
   Begin
-     AssignFile(tfArq,sPahtAplicacao+'REMUNERATUS.INI');
+     AssignFile(tfArq,sPahtAplicacao + REMUNERATUS_INI);
      Reset(tfArq);
      while not eof(tfArq) do
      begin
@@ -2041,7 +2041,7 @@ begin
   sNomeSecao := '['+sNomeSecao+']';
   sPathExe := ExtractFilePath(Application.ExeName);
   sl1 := TStringList.Create;
-  sl1.LoadFromFile(sPathExe+'\REMUNERATUS.INI');
+  sl1.LoadFromFile(sPathExe + '\' + REMUNERATUS_INI);
   Result := '';
   for iConta := 0 to sl1.Count - 1 do
   begin

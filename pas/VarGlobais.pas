@@ -7,6 +7,8 @@ Const
                                       'MA','MG','MT','MS','PA','PB','PE','PI','PR',
                                       'RJ','RN','RR','RS','RO','SC','SP','SE','TO');
 
+  REMUNERATUS_INI = 'REMUNERATUS.INI';
+
 Var
    glb_hHND_Principal: THandle;
 

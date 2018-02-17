@@ -107,6 +107,7 @@ type
     lblAcessoRemoto: TLabel;
     Image4: TImage;
     N1: TMenuItem;
+    imConfigurarCertificado: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormActivate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
@@ -120,6 +121,7 @@ type
     procedure Image2Click(Sender: TObject);
     procedure lblWhatsAppLinkClick(Sender: TObject; const Link: string; LinkType: TSysLinkType);
     procedure lblAcessoRemotoClick(Sender: TObject);
+    procedure imConfigurarCertificadoClick(Sender: TObject);
 
   private
     pv_lPerguntaFechar,
@@ -148,9 +150,22 @@ var
 implementation
 
 uses
-  udmPrincipal, VarGlobais, gsLib, UtilsDb, uEditComandosSQL, uLogin, uSobre;
+  udmPrincipal, VarGlobais, gsLib, UtilsDb, uEditComandosSQL, uLogin, uSobre,
+  udmESocial;
 
 {$R *.dfm}
+
+procedure TfrmPrincipal.imConfigurarCertificadoClick(Sender: TObject);
+begin
+   if (MDIChildCount>0) then
+   begin
+      Mensagem('Você precisa Fechar todas as Janelas deste Programa, '+#13+
+               'antes de Executar essa Operação ...',
+               'Aviso !!!',MB_OK+MB_ICONEXCLAMATION);
+      Exit;
+   end;
+   dmESocial.ConfigurarCertificado(Self);
+end;
 
 procedure TfrmPrincipal.imEditComandSQLClick(Sender: TObject);
 begin
@@ -256,13 +271,13 @@ begin
    sStringList1 := TStringList.Create;
    sPathexe     := ExtractFilePath(ParamStr(0));
 
-   sStringList1.LoadFromFile(sPathexe+'\REMUNERATUS.INI');
+   sStringList1.LoadFromFile(sPathexe + '\' + REMUNERATUS_INI);
 
    lAlteraMes   := AlteraIni(sStringList1,'ULT_ANO_MES',glb_sAnoMesTrab+' '+glb_sParcela);
    lAlteraBanco := AlteraIni(sStringList1,'ULT_ORGAO',sBancoAtual);
 
    if (lAlteraMes or lAlteraBanco) then
-      sStringList1.SaveToFile(sPathexe+'\REMUNERATUS.INI');
+      sStringList1.SaveToFile(sPathexe + '\' + REMUNERATUS_INI);
 
    if (dmPrincipal.SConPrincipal.Connected) then
       dmPrincipal.SConPrincipal.Connected := False;

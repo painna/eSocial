@@ -1040,6 +1040,10 @@ object frmPrincipal: TfrmPrincipal
     end
     object imFerramentas: TMenuItem
       Caption = '&Sistema'
+      object imConfigurarCertificado: TMenuItem
+        Caption = 'Configurar Certificado'
+        OnClick = imConfigurarCertificadoClick
+      end
       object imEditComandSQL: TMenuItem
         Caption = 'Editor de Comandos SQL'
         OnClick = imEditComandSQLClick
