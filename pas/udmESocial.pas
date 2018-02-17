@@ -30,25 +30,59 @@ uses
   Forms,
   Dialogs,
 
-  System.SysUtils, System.Classes, Controls;
+  System.SysUtils, System.Classes, Controls, Vcl.StdCtrls, Vcl.Samples.Gauges,
+  Data.FMTBcd, Data.SqlExpr, Data.DB, Datasnap.DBClient, Datasnap.Provider;
 
 type
+  TTipoOperacao = (toInclusao, toAlteracao, toExclusao);
+//  TAnoMes = class
+//    private
+//      aAno : Integer;
+//      aMes : Integer;
+//    public
+//      property Ano : Integer read aAno write aAno;
+//      property Mes : Integer read aMes write aMes;
+//  end;
+
   TdmESocial = class(TDataModule)
     ACBrESocial: TACBreSocial;
     ACBrIntegrador: TACBrIntegrador;
     ACBrMail: TACBrMail;
+    dspTabela: TDataSetProvider;
+    cdsTabela: TClientDataSet;
+    qryTabela: TSQLQuery;
     procedure DataModuleCreate(Sender: TObject);
     procedure DataModuleDestroy(Sender: TObject);
     procedure btnSalvar(Sender: TObject);
   private
     { Private declarations }
     aForm : TfrmConfigurarCertificado;
-    procedure LerConfiguracao;
     procedure AtualizaSSLLibsCombo;
     procedure GravarConfiguracao;
+    procedure SetSQL(aSQL : TStringList);
   public
     { Public declarations }
+    procedure ListarCompetencias(aLista : TComboBox);
+    procedure LerConfiguracao;
+
+    function CertificadoInstalado : Boolean;
+    function CertificadoValido : Boolean;
+
+    // procedures eventos de tabela
+    function Gerar_eSocial1000(aCompetencia : String; aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge) : Boolean;
+    function Gerar_eSocial1005(aCompetencia : String; aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge) : Boolean; virtual; abstract;
+    function Gerar_eSocial1010(aCompetencia : String; aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge) : Boolean; virtual; abstract;
+    function Gerar_eSocial1020(aCompetencia : String; aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge) : Boolean; virtual; abstract;
+    function Gerar_eSocial1030(aCompetencia : String; aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge) : Boolean; virtual; abstract;
+    function Gerar_eSocial1035(aCompetencia : String; aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge) : Boolean; virtual; abstract;
+    function Gerar_eSocial1040(aCompetencia : String; aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge) : Boolean; virtual; abstract;
+    function Gerar_eSocial1050(aCompetencia : String; aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge) : Boolean; virtual; abstract;
+    function Gerar_eSocial1060(aCompetencia : String; aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge) : Boolean; virtual; abstract;
+    function Gerar_eSocial1070(aCompetencia : String; aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge) : Boolean; virtual; abstract;
+    function Gerar_eSocial1080(aCompetencia : String; aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge) : Boolean; virtual; abstract;
+
     function ConfigurarCertificado(const AOwner : TComponent) : Boolean;
+    function EventoEnviado_eSocial(aGrupo : TeSocialGrupo; aCompetencia : String; aLabel : TLabel; aProcesso : TGauge) : Boolean;
   end;
 
 var
@@ -95,6 +129,22 @@ begin
   end;
 end;
 
+function TdmESocial.CertificadoInstalado: Boolean;
+begin
+  if Assigned(ACBrESocial.Configuracoes.Certificados) then
+    Result := (Trim(ACBrESocial.Configuracoes.Certificados.NumeroSerie) <> EmptyStr)
+  else
+    Result := False;
+end;
+
+function TdmESocial.CertificadoValido: Boolean;
+begin
+  if Assigned(ACBrESocial.Configuracoes.Certificados) then
+    Result := ACBrESocial.Configuracoes.Certificados.VerificarValidade
+  else
+    Result := False;
+end;
+
 function TdmESocial.ConfigurarCertificado(const AOwner: TComponent): Boolean;
 begin
   if not Assigned(aForm) then
@@ -126,6 +176,140 @@ procedure TdmESocial.DataModuleDestroy(Sender: TObject);
 begin
   if Assigned(aForm) then
     FreeAndNil(aForm);
+end;
+
+function TdmESocial.EventoEnviado_eSocial(aGrupo: TeSocialGrupo;
+  aCompetencia: String; aLabel: TLabel; aProcesso: TGauge): Boolean;
+var
+  aRetorno : Boolean;
+begin
+  aRetorno := False;
+  try
+    ACBrESocial.Eventos.TipoEmpregador := ACBrESocial.Configuracoes.Geral.TipoEmpregador;
+    ACBrESocial.Eventos.GerarXMLs;
+    ACBrESocial.Eventos.SaveToFiles;
+    ACBrESocial.AssinarEventos;
+
+    aRetorno := ACBrESocial.Enviar(aGrupo);
+    Sleep(3000);
+  finally
+    Result := aRetorno;
+  end;
+end;
+
+function TdmESocial.Gerar_eSocial1000(aCompetencia: String; aModoLancamento : TModoLancamento;
+  aLabel: TLabel; aProcesso: TGauge): Boolean;
+var
+  aRetorno : Boolean;
+  aSQL : TStringList;
+begin
+  aRetorno := False;
+  aSQL := TStringList.Create;
+  try
+    aSQL.BeginUpdate;
+    aSQL.Clear;
+    aSQL.Add('Select *');
+    aSQL.Add('from CONFIG_ORGAO c');
+    aSQL.Add('where c.id = 1');
+    aSQL.EndUpdate;
+    SetSQL(aSQL);
+
+    cdsTabela.First;
+    while not cdsTabela.Eof do
+    begin
+      with ACBrESocial.Eventos.Iniciais.S1000.Add do
+      begin
+        // So tem na Versão 2.4.1
+        // taProducao, taProducaoRestrita
+        evtInfoEmpregador.Sequencial      := 0;
+        evtInfoEmpregador.IdeEvento.TpAmb := taProducaoRestrita;
+
+        evtInfoEmpregador.IdeEvento.ProcEmi := peAplicEmpregador;
+        evtInfoEmpregador.IdeEvento.VerProc := '1.0';
+
+        evtInfoEmpregador.IdeEmpregador.TpInsc := tiCNPJ;
+        evtInfoEmpregador.IdeEmpregador.NrInsc := Trim(aForm.edtIdEmpregador.Text);
+
+        evtInfoEmpregador.ModoLancamento := aModoLancamento;
+        evtInfoEmpregador.InfoEmpregador.IdePeriodo.IniValid := aCompetencia;
+        evtInfoEmpregador.InfoEmpregador.IdePeriodo.FimValid := '2099-12';
+
+        with evtInfoEmpregador.InfoEmpregador.InfoCadastro do
+        begin
+          NmRazao   := Criptografa(cdsTabela.FieldByName('RAZAO_SOCIAL').AsString, '2', 60);
+          ClassTrib := ct01;
+//          if Checb_ZeraBase.Checked then
+//          Begin
+//            NmRazao := 'RemoverEmpregadorDaBaseDeDadosDaProducaoRestrita';
+//            ClassTrib := ct00;
+//          End
+//          else
+//          Begin
+//            NmRazao := 'Empresa Teste';
+//            ClassTrib := ct01;
+//          End;
+//
+//          NatJurid    := '0001';
+//          IndCoop     := TpIndCoop(1);
+//          IndConstr   := TpIndConstr(2);
+//          IndDesFolha := TpIndDesFolha(1);
+//          IndOptRegEletron := TpIndOptRegEletron(1);
+//          IndEtt      := tpSimNao(1);
+//          nrRegEtt    := '';
+//
+//          InfoOp.nrSiafi := '12345';
+//
+//          InfoOp.infoEnte.nmEnte    := 'Ente federativo teste';
+//          InfoOp.infoEnte.uf        := tpuf(ufSP);
+//          InfoOp.infoEnte.vrSubteto := 100.00;
+//
+//          dadosIsencao.IdeMinLei    := 'Sigla Min';
+//          dadosIsencao.NrCertif     := '1111';
+//          dadosIsencao.DtEmisCertif := date;
+//          dadosIsencao.DtVencCertif := date;
+//          dadosIsencao.NrProtRenov  := '10';
+//          dadosIsencao.DtProtRenov  := date;
+//          dadosIsencao.DtDou        := date;
+//          dadosIsencao.PagDou       := '111';
+//
+//          Contato.NmCtt    := 'Contato 1';
+//          Contato.CpfCtt   := '00000222220';
+//          Contato.FoneFixo := '34335856';
+//          Contato.FoneCel  := '991524587';
+//          Contato.email    := 'testecontato@testecontato.com';
+//
+          InfoOrgInternacional.IndAcordoIsenMulta := iaiSemacordo;  // (iaiSemacordo, iaiComacordo);
+        end;
+
+        evtInfoEmpregador.InfoEmpregador.InfoCadastro.SoftwareHouse.Clear;
+
+        with evtInfoEmpregador.InfoEmpregador.InfoCadastro.SoftwareHouse.Add do
+        begin
+          CnpjSoftHouse := '11122050000168';
+          NmRazao  := 'GERASYS TECNOINFO LTDA - ME';
+          NmCont   := 'Gerson Farias';
+          Telefone := '94981194915';
+          email    := 'gerasys.ti.adm@gmail.com';
+        end;
+
+        with evtInfoEmpregador.InfoEmpregador.InfoCadastro.InfoComplementares do
+        begin
+          SituacaoPJ.IndSitPJ := isPJSitNormal;
+          SituacaoPF.IndSitPF := isPFSitNormal;
+        end;
+
+        evtInfoEmpregador.InfoEmpregador.NovaValidade.IniValid := aCompetencia;
+        evtInfoEmpregador.InfoEmpregador.NovaValidade.FimValid := '2099-12';
+      end;
+
+      cdsTabela.Next;
+    end;
+
+    aRetorno := True;
+  finally
+    aSQL.Free;
+    Result := aRetorno;
+  end;
 end;
 
 procedure TdmESocial.GravarConfiguracao;
@@ -334,6 +518,45 @@ begin
   finally
     Ini.Free;
     Screen.Cursor := crDefault;
+  end;
+end;
+
+procedure TdmESocial.ListarCompetencias(aLista: TComboBox);
+var
+  x ,
+  i : Integer;
+  s : String;
+begin
+  x := 0;
+  s := FormatDateTime('YYYY', Date);
+  aLista.Items.BeginUpdate;
+  aLista.Items.Clear;
+  try
+    for I := 1 to 12 do
+    begin
+      aLista.Items.Add(s + ' - ' + FormatFloat('00', I));
+      if (I = StrToInt(FormatDateTime('mm', Date)) ) then
+        x := aLista.Items.Count - 1;
+    end;
+  finally
+    aLista.Items.EndUpdate;
+    aLista.ItemIndex := x;
+  end;
+end;
+
+procedure TdmESocial.SetSQL(aSQL: TStringList);
+begin
+  if cdsTabela.Active then
+    cdsTabela.Close;
+
+  qryTabela.SQL.BeginUpdate;
+  qryTabela.SQL.Clear;
+  try
+    qryTabela.SQL.AddStrings(aSQL);
+  finally
+    qryTabela.SQL.EndUpdate;
+    cdsTabela.FetchParams;
+    cdsTabela.Open;
   end;
 end;
 

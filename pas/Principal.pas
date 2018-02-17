@@ -127,6 +127,7 @@ type
     procedure lblWhatsAppLinkClick(Sender: TObject; const Link: string; LinkType: TSysLinkType);
     procedure lblAcessoRemotoClick(Sender: TObject);
     procedure imConfigurarCertificadoClick(Sender: TObject);
+    procedure imEventoTabelaClick(Sender: TObject);
 
   private
     pv_lPerguntaFechar,
@@ -156,7 +157,9 @@ implementation
 
 uses
   udmPrincipal, VarGlobais, gsLib, UtilsDb, uEditComandosSQL, uLogin, uSobre,
-  udmESocial;
+
+  udmESocial,
+  EnvioEventoTabela;
 
 {$R *.dfm}
 
@@ -184,6 +187,21 @@ begin
    frmEditComandosSQL := TfrmEditComandosSQL.Create(Self);
    frmEditComandosSQL.ShowModal;
    FreeAndNil(frmEditComandosSQL);
+end;
+
+procedure TfrmPrincipal.imEventoTabelaClick(Sender: TObject);
+begin
+  if (MDIChildCount > 0) then
+    Mensagem('Você precisa Fechar todas as Janelas deste Programa, ' + #13 +
+             'antes de Executar essa Operação ...',
+             'Aviso !!!', MB_ICONEXCLAMATION)
+  else
+    try
+      frmEnvioEventoTabela := TfrmEnvioEventoTabela.Create(Self);
+      frmEnvioEventoTabela.ShowModal;
+    finally
+      FreeAndNil(frmEnvioEventoTabela);
+    end;
 end;
 
 procedure TfrmPrincipal.FormActivate(Sender: TObject);

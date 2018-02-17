@@ -1,5 +1,6 @@
 inherited frmEnvioEventoTabela: TfrmEnvioEventoTabela
-  Caption = 'eSocil - Enviar Eventos de Tabela'
+  Caption = 'eSocial - Enviar Eventos de Tabela'
+  OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
   inherited pnlControle: TPanel
@@ -11,51 +12,120 @@ inherited frmEnvioEventoTabela: TfrmEnvioEventoTabela
       ExplicitLeft = 584
     end
     inherited btnOk: TBitBtn
+      OnClick = btnOkClick
       ExplicitLeft = 490
     end
-    object Checb_ZeraBase: TCheckBox
-      Left = 12
+    object pnlProcesso: TPanel
+      Left = 0
       Top = 6
-      Width = 138
-      Height = 17
-      Caption = 'Zera Base Homologa'#231#227'o'
-      Enabled = False
+      Width = 484
+      Height = 30
+      Anchors = [akLeft, akRight, akBottom]
+      BevelOuter = bvNone
       TabOrder = 2
+      Visible = False
+      object gagProcesso: TGauge
+        Left = 0
+        Top = 13
+        Width = 484
+        Height = 17
+        Align = alTop
+        ForeColor = clBlue
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -11
+        Font.Name = 'Tahoma'
+        Font.Style = [fsBold]
+        ParentFont = False
+        Progress = 75
+        ExplicitTop = 24
+      end
+      object lblProcesso: TLabel
+        Left = 0
+        Top = 0
+        Width = 484
+        Height = 13
+        Align = alTop
+        Caption = 'Andamento do processo...'
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -11
+        Font.Name = 'Tahoma'
+        Font.Style = [fsBold]
+        ParentFont = False
+        ExplicitWidth = 146
+      end
     end
   end
   object gpbParametro: TGroupBox
     Left = 0
     Top = 0
     Width = 672
-    Height = 105
+    Height = 65
     Align = alTop
     Caption = 'Par'#226'metros de gera'#231#227'o do(s) arquivo(s) XML'
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -11
+    Font.Name = 'Tahoma'
+    Font.Style = [fsBold]
+    ParentFont = False
     TabOrder = 0
-    ExplicitTop = -6
+    DesignSize = (
+      672
+      65)
+    object lblAnoMes: TLabel
+      Left = 12
+      Top = 17
+      Width = 52
+      Height = 13
+      Caption = 'Ano/m'#234's'
+      FocusControl = cmbAnoMes
+    end
     object gpbOperacao: TRadioGroup
       AlignWithMargins = True
-      Left = 85
-      Top = 34
+      Left = 358
+      Top = 17
       Width = 308
-      Height = 47
+      Height = 40
+      Anchors = [akTop, akRight]
       Caption = 'Opera'#231#227'o'
       Columns = 3
       Items.Strings = (
         'Inclus'#227'o'
         'Altera'#231#227'o'
         'Exclus'#227'o')
+      TabOrder = 2
+    end
+    object cmbAnoMes: TComboBox
+      Left = 12
+      Top = 36
+      Width = 145
+      Height = 21
+      Style = csDropDownList
       TabOrder = 0
+    end
+    object Checb_ZeraBase: TCheckBox
+      Left = 163
+      Top = 38
+      Width = 178
+      Height = 17
+      Caption = 'Zera Base Homologa'#231#227'o'
+      Enabled = False
+      TabOrder = 1
     end
   end
   object gpbEvento: TGroupBox
     Left = 0
-    Top = 105
+    Top = 65
     Width = 672
-    Height = 178
+    Height = 218
     Align = alClient
     Caption = 'Eventos'
     TabOrder = 1
     ExplicitLeft = 8
+    ExplicitTop = 105
+    ExplicitHeight = 178
     object cbS1000: TCheckBox
       Left = 12
       Top = 20

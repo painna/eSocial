@@ -12,6 +12,7 @@ type
     pnlControle: TPanel;
     btnCancelar: TBitBtn;
     btnOk: TBitBtn;
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private
     { Private declarations }
   public
@@ -24,5 +25,12 @@ var
 implementation
 
 {$R *.dfm}
+
+procedure TfrmDialogoPadrao.FormClose(Sender: TObject;
+  var Action: TCloseAction);
+begin
+  inherited;
+  Action := caFree;
+end;
 
 end.

@@ -36,4 +36,126 @@ object dmESocial: TdmESocial
     Left = 64
     Top = 144
   end
+  object dspTabela: TDataSetProvider
+    DataSet = qryTabela
+    Exported = False
+    Options = [poAllowCommandText, poUseQuoteChar]
+    UpdateMode = upWhereKeyOnly
+    Left = 272
+    Top = 135
+  end
+  object cdsTabela: TClientDataSet
+    Aggregates = <>
+    FieldDefs = <
+      item
+        Name = 'ID'
+        Attributes = [faRequired]
+        DataType = ftInteger
+      end
+      item
+        Name = 'DATA_MOVIM'
+        DataType = ftDate
+      end
+      item
+        Name = 'HORA_MOVIM'
+        DataType = ftTime
+      end
+      item
+        Name = 'ID_USUARIO_LOGADO'
+        DataType = ftInteger
+      end
+      item
+        Name = 'ID_USUARIO_EXECUT'
+        DataType = ftInteger
+      end
+      item
+        Name = 'NOME_FORM1'
+        DataType = ftString
+        Size = 50
+      end
+      item
+        Name = 'NOME_FORM2'
+        DataType = ftString
+        Size = 50
+      end
+      item
+        Name = 'NOME_TABELA'
+        DataType = ftString
+        Size = 40
+      end
+      item
+        Name = 'OPERACAO'
+        Attributes = [faFixed]
+        DataType = ftString
+        Size = 1
+      end
+      item
+        Name = 'CAMPO_PK1'
+        DataType = ftString
+        Size = 40
+      end
+      item
+        Name = 'CAMPO_PK2'
+        DataType = ftString
+        Size = 40
+      end
+      item
+        Name = 'CAMPO_PK3'
+        DataType = ftString
+        Size = 40
+      end
+      item
+        Name = 'CAMPO_PK4'
+        DataType = ftString
+        Size = 40
+      end
+      item
+        Name = 'CAMPO_PK5'
+        DataType = ftString
+        Size = 40
+      end
+      item
+        Name = 'CAMPO_PK6'
+        DataType = ftString
+        Size = 40
+      end
+      item
+        Name = 'NOME_CAMPO'
+        DataType = ftMemo
+        Size = 1
+      end
+      item
+        Name = 'VAL_CAMPO_ANTER'
+        DataType = ftMemo
+        Size = 1
+      end
+      item
+        Name = 'VAL_CAMPO_NOVO'
+        DataType = ftMemo
+        Size = 1
+      end
+      item
+        Name = 'NOME_USUARIO'
+        DataType = ftString
+        Size = 40
+      end
+      item
+        Name = 'CARGO_USUARIO'
+        DataType = ftString
+        Size = 40
+      end>
+    IndexDefs = <>
+    Params = <>
+    ProviderName = 'dspTabela'
+    StoreDefs = True
+    Left = 272
+    Top = 183
+  end
+  object qryTabela: TSQLQuery
+    MaxBlobSize = -1
+    Params = <>
+    SQLConnection = dmPrincipal.SConPrincipal
+    Left = 272
+    Top = 96
+  end
 end

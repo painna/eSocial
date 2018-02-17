@@ -1048,6 +1048,7 @@ object frmPrincipal: TfrmPrincipal
       object imEventoTabela: TMenuItem
         Caption = 'Eventos de Tabela'
         ImageIndex = 0
+        OnClick = imEventoTabelaClick
       end
       object imEventoPeriodico: TMenuItem
         Caption = 'Eventos Peri'#243'dicos'
