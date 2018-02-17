@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>2017/05/02 19:47:48.000.624,D:\Fontes XE5\Folha de Ponto\pas\UPrincipal.pas=</Transaction>
+    <Transaction>2017/05/02 19:49:28.000.794,=D:\Fontes XE5\Folha de Ponto\pas\gsLib.pas</Transaction>
+    <Transaction>2017/05/02 19:49:29.000.220,=D:\Fontes XE5\Folha de Ponto\pas\UPrincipal.pas</Transaction>
+    <Transaction>2017/05/02 19:49:29.000.083,=D:\Fontes XE5\Folha de Ponto\pas\ULogin.pas</Transaction>
+    <Transaction>2017/05/02 19:49:29.000.256,=D:\Fontes XE5\Folha de Ponto\pas\UtilsDb.pas</Transaction>
+    <Transaction>2017/05/02 21:20:20.000.117,=D:\Fontes XE5\Folha de Ponto\pas\uVarGlobais.pas</Transaction>
+    <Transaction>2017/05/02 21:36:30.000.590,=D:\Fontes XE5\Folha de Ponto\pas\udmPrincipal.pas</Transaction>
+    <Transaction>2017/05/02 22:04:43.000.237,=D:\Fontes XE5\Folha de Ponto\pas\unBiblioteca.pas</Transaction>
+    <Transaction>2017/05/02 22:24:31.000.031,=D:\Fontes XE5\Folha de Ponto\pas\Login.pas</Transaction>
+    <Transaction>2017/05/02 22:25:03.000.910,=D:\Fontes XE5\Folha de Ponto\pas\Padrao1.pas</Transaction>
+    <Transaction>2017/05/15 19:32:27.000.835,=D:\Fontes XE5\Folha de Ponto\pas\AddEditUsuario.pas</Transaction>
+    <Transaction>2017/05/15 19:32:54.000.482,=D:\Fontes XE5\Folha de Ponto\pas\AddEditPadrao.pas</Transaction>
+    <Transaction>2017/05/15 21:16:12.000.050,=D:\Fontes XE5\Folha de Ponto\pas\TabUsuario.pas</Transaction>
+    <Transaction>2017/05/15 21:21:01.000.081,=D:\Fontes XE5\Folha de Ponto\pas\CadTabPadrao.pas</Transaction>
+    <Transaction>2017/05/19 15:47:59.000.769,=D:\Fontes XE5\Folha de Ponto\pas\CriaUsuarioBanco.pas</Transaction>
+    <Transaction>2017/05/25 08:57:55.000.602,D:\Fontes XE5\Folha de Ponto\pas\AddEditUsuario.pas=</Transaction>
+    <Transaction>2017/05/25 08:57:55.000.514,D:\Fontes XE5\Folha de Ponto\pas\TabUsuario.pas=</Transaction>
+    <Transaction>2017/05/25 08:58:58.000.538,D:\Fontes XE5\Folha de Ponto\pas\DeelBiblio.pas=D:\Fontes XE5\Folha de Ponto\pas\gsLib.pas</Transaction>
+    <Transaction>2017/05/25 08:59:17.000.421,D:\Fontes XE5\Folha de Ponto\pas\DeelBiblio.pas=</Transaction>
+    <Transaction>2017/05/25 08:59:31.000.922,=D:\Fontes XE5\Folha de Ponto\pas\DeelBiblio.pas</Transaction>
+    <Transaction>2017/05/25 09:21:38.000.191,=D:\Fontes XE5\Folha de Ponto\pas\AddEditUsuario.pas</Transaction>
+    <Transaction>2017/05/25 11:41:11.000.646,=D:\Fontes XE5\Folha de Ponto\pas\TabUsuario.pas</Transaction>
+  </Transactions>
+</BorlandProject>
