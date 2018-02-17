@@ -120,7 +120,6 @@ type
     procedure Image2Click(Sender: TObject);
     procedure lblWhatsAppLinkClick(Sender: TObject; const Link: string; LinkType: TSysLinkType);
     procedure lblAcessoRemotoClick(Sender: TObject);
-    procedure StatusBar1Panels1DblClick(Sender: TObject);
 
   private
     pv_lPerguntaFechar,
@@ -149,8 +148,7 @@ var
 implementation
 
 uses
-  udmPrincipal, VarGlobais, gsLib, UtilsDb, uEditComandosSQL, uLogin, uSobre,
-  SelecionaMesAno;
+  udmPrincipal, VarGlobais, gsLib, UtilsDb, uEditComandosSQL, uLogin, uSobre;
 
 {$R *.dfm}
 
@@ -389,7 +387,9 @@ begin
    StatusBar1.Panels[1].Text  := glb_sDescrMesAnoTrab+' - '+glb_sDescrParcela+' ('+iIf(MovimEncerradoMesAno(glb_sAnoMesTrab,glb_sParcela),'ENCERRADO)','EM ABERTO)');
    StatusBar1.Panels[3].Text := DateToStr(Date)+' ';
    sPathexe                  := ExtractFilePath(ParamStr(0));
-   Image1.Picture.LoadFromFile(sPathEXE+'\Wallpaper_GeraSys.Ti_02.jpg');
+
+   if FileExists(sPathEXE + '\Wallpaper_GeraSys.Ti_02.jpg') then
+    Image1.Picture.LoadFromFile(sPathEXE + '\Wallpaper_GeraSys.Ti_02.jpg');
 end;
 
 procedure TfrmPrincipal.FormShow(Sender: TObject);
@@ -417,17 +417,6 @@ begin
    frmSobre.btnOk.Visible := True;
    frmSobre.ShowModal;
    FreeAndNil(frmSobre);
-end;
-
-procedure TfrmPrincipal.StatusBar1Panels1DblClick(Sender: TObject);
-var
-  oForm: TForm;
-begin
-   oForm := TfrmSelecionaMesAno.Create(Self);
-   oForm.ShowModal;
-   StatusBar1.Panels[1].Text:=glb_sDescrMesAnoTrab+' - '+glb_sDescrParcela+' ('+
-   iIf(MovimEncerradoMesAno(glb_sAnoMesTrab,glb_sParcela), 'ENCERRADO)','EM ABERTO)');
-
 end;
 
 function TfrmPrincipal.JanelaExiste(Janela: TComponentName): Boolean;
@@ -508,6 +497,8 @@ Var
   iTemp: Integer;
 begin
   try
+    if (glb_sAnoMesTrava = EmptyStr) then glb_sAnoMesTrava := '201912'; // TEMP
+    
      iTemp := StrToInt(LeftStr(glb_sAnoMesTrava,4));
      if ((RightStr(glb_sAnoMesTrava,2) < '01') or
          (RightStr(glb_sAnoMesTrava,2) > '12')) then

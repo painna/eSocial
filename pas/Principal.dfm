@@ -77,7 +77,6 @@ object frmPrincipal: TfrmPrincipal
         PanelStyle.Font.Style = [fsBold]
         PanelStyle.ParentFont = False
         Width = 480
-        OnDblClick = StatusBar1Panels1DblClick
       end
       item
         PanelStyleClassName = 'TdxStatusBarTextPanelStyle'

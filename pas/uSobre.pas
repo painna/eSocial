@@ -77,8 +77,10 @@ begin
   sEmpresa := Criptografa(sEmpresa,'2',60);
   sCNPJ := Pesquisa('CONFIG_ORGAO','ID','1','CNPJ','');
   sCNPJ := Criptografa(sCNPJ,'2',14);
-  Image2.Picture.LoadFromFile(ExtractFilePath(Application.ExeName)+
-     '\GERASYS_Logo_2011.Jpg');
+
+  if FileExists(ExtractFilePath(Application.ExeName) + '\GERASYS_Logo_2011.Jpg') then
+    Image2.Picture.LoadFromFile(ExtractFilePath(Application.ExeName) + '\GERASYS_Logo_2011.Jpg');
+
   try
      sDtVerDb := Pesquisa('CONFIG_SISTEMA','ID','1','DT_VER_DB','');
   except
@@ -140,8 +142,7 @@ begin
   Screen.Cursor := crHourGlass;
   pb_lAtualizaExe := False;
 
-  sVersaoBackup := Versao_Executavel(ExtractFilePath(Application.ExeName)+
-     'BACKUP.EXE');
+  sVersaoBackup := Versao_Executavel(ExtractFilePath(Application.ExeName) + 'BACKUP.EXE');
   sUltimaVersao := GetUltmaVersao('BACKUP');
   if sUltimaVersao <> '' then
   begin

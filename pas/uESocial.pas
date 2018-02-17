@@ -17,8 +17,7 @@ Uses
 
 implementation
 
-uses udmPrincipal, VarGlobais, UtilsDb, Windows, gsLib, VareSocial,
-     eSocial_Conversao;
+uses udmPrincipal, VarGlobais, UtilsDb, Windows, gsLib, VareSocial;
 
 
 function fncvrSubteto1000(pAnoMesTrab:String; pConexao:TSQLConnection):String;
@@ -53,6 +52,7 @@ procedure prcS1000(pModoLancamento:String; pConexao:TSQLConnection);
 var
    oQry1: TSQLQuery;
 begin
+(*
    glb_iError:=0;
    try
       try
@@ -129,6 +129,7 @@ begin
    finally
       FreeAndNil(oQry1);
    end;
+*)
 end;
 
 
@@ -136,6 +137,7 @@ function fncRetornaUF(pUf:String):String;
 var
    vRet:String;
 begin
+(*
    vRet:=EmptyStr;
    case pUf of
          'AC': vRet:='ACRE';
@@ -167,6 +169,7 @@ begin
          'TO': vRet:='TOCANTINS';
    end;
    Result:=vRet;
+*)
 end;
 
 end.
