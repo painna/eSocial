@@ -25,15 +25,13 @@ object frmConfigurarCertificado: TfrmConfigurarCertificado
     Top = 3
     Width = 281
     Height = 470
-    ActivePage = tbsArquivos
+    ActivePage = tbsCertificado
     Align = alClient
     MultiLine = True
     TabOrder = 0
     object tbsGeral: TTabSheet
       Caption = 'Geral'
       ImageIndex = 1
-      ExplicitWidth = 271
-      ExplicitHeight = 480
       object GroupBox1: TGroupBox
         AlignWithMargins = True
         Left = 3
@@ -183,7 +181,6 @@ object frmConfigurarCertificado: TfrmConfigurarCertificado
         Align = alTop
         Caption = 'Dados Empresa'
         TabOrder = 1
-        ExplicitWidth = 263
         DesignSize = (
           267
           167)
@@ -236,8 +233,6 @@ object frmConfigurarCertificado: TfrmConfigurarCertificado
     end
     object tbsCertificado: TTabSheet
       Caption = 'Certificado'
-      ExplicitWidth = 497
-      ExplicitHeight = 480
       DesignSize = (
         273
         442)
@@ -523,8 +518,6 @@ object frmConfigurarCertificado: TfrmConfigurarCertificado
     object tbsWebService: TTabSheet
       Caption = 'WebService'
       ImageIndex = 2
-      ExplicitWidth = 497
-      ExplicitHeight = 480
       object GroupBox4: TGroupBox
         AlignWithMargins = True
         Left = 3
@@ -629,8 +622,6 @@ object frmConfigurarCertificado: TfrmConfigurarCertificado
         Align = alTop
         Caption = 'Proxy'
         TabOrder = 1
-        ExplicitLeft = 0
-        ExplicitWidth = 265
         DesignSize = (
           267
           104)
@@ -769,8 +760,6 @@ object frmConfigurarCertificado: TfrmConfigurarCertificado
     object tbsArquivos: TTabSheet
       Caption = 'Arquivos'
       ImageIndex = 4
-      ExplicitWidth = 497
-      ExplicitHeight = 480
       DesignSize = (
         273
         442)
@@ -922,9 +911,6 @@ object frmConfigurarCertificado: TfrmConfigurarCertificado
     ModalResult = 1
     NumGlyphs = 2
     TabOrder = 1
-    ExplicitLeft = 0
-    ExplicitTop = 471
-    ExplicitWidth = 153
   end
   object opdAbrir: TOpenDialog
     DefaultExt = '*-nfe.XML'

@@ -132,7 +132,9 @@ end;
 function TdmESocial.CertificadoInstalado: Boolean;
 begin
   if Assigned(ACBrESocial.Configuracoes.Certificados) then
-    Result := (Trim(ACBrESocial.Configuracoes.Certificados.NumeroSerie) <> EmptyStr)
+    Result :=
+      (Trim(ACBrESocial.Configuracoes.Certificados.NumeroSerie) <> EmptyStr) or
+      ((Trim(ACBrESocial.Configuracoes.Certificados.ArquivoPFX) <> EmptyStr) and (Trim(ACBrESocial.Configuracoes.Certificados.Senha) <> EmptyStr))
   else
     Result := False;
 end;
@@ -219,7 +221,7 @@ begin
     begin
       with ACBrESocial.Eventos.Iniciais.S1000.Add do
       begin
-        // So tem na Versão 2.4.1
+        // So tem na Versão 2.x4.1
         // taProducao, taProducaoRestrita
         evtInfoEmpregador.Sequencial      := 0;
         evtInfoEmpregador.IdeEvento.TpAmb := taProducaoRestrita;
@@ -271,13 +273,13 @@ begin
 //          dadosIsencao.DtProtRenov  := date;
 //          dadosIsencao.DtDou        := date;
 //          dadosIsencao.PagDou       := '111';
-//
-//          Contato.NmCtt    := 'Contato 1';
-//          Contato.CpfCtt   := '00000222220';
-//          Contato.FoneFixo := '34335856';
-//          Contato.FoneCel  := '991524587';
-//          Contato.email    := 'testecontato@testecontato.com';
-//
+
+          Contato.NmCtt    := 'Contato 1';
+          Contato.CpfCtt   := '00000222220';
+          Contato.FoneFixo := '34335856';
+          Contato.FoneCel  := '991524587';
+          Contato.email    := 'testecontato@testecontato.com';
+
           InfoOrgInternacional.IndAcordoIsenMulta := iaiSemacordo;  // (iaiSemacordo, iaiComacordo);
         end;
 
@@ -534,7 +536,7 @@ begin
   try
     for I := 1 to 12 do
     begin
-      aLista.Items.Add(s + ' - ' + FormatFloat('00', I));
+      aLista.Items.Add(s + '-' + FormatFloat('00', I));
       if (I = StrToInt(FormatDateTime('mm', Date)) ) then
         x := aLista.Items.Count - 1;
     end;

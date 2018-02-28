@@ -44,10 +44,8 @@ object frmPrincipal: TfrmPrincipal
     Height = 465
     Align = alClient
     Stretch = True
-    ExplicitLeft = 56
+    ExplicitLeft = 57
     ExplicitTop = 56
-    ExplicitWidth = 1213
-    ExplicitHeight = 642
   end
   object StatusBar1: TdxStatusBar
     Left = 0
@@ -108,8 +106,6 @@ object frmPrincipal: TfrmPrincipal
     Font.Style = [fsBold]
     ShowHint = False
     ParentShowHint = False
-    ExplicitTop = 704
-    ExplicitWidth = 1284
   end
   object pnBarraFerramentas: TPanel
     Left = 0
@@ -121,7 +117,6 @@ object frmPrincipal: TfrmPrincipal
     ParentBackground = False
     TabOrder = 0
     Visible = False
-    ExplicitHeight = 650
   end
   object pnSubBarra: TPanel
     Left = 0
@@ -139,12 +134,43 @@ object frmPrincipal: TfrmPrincipal
     ParentBackground = False
     ParentFont = False
     TabOrder = 6
-    ExplicitWidth = 1284
+    ExplicitTop = -6
+    object Bevel3: TBevel
+      AlignWithMargins = True
+      Left = 309
+      Top = 4
+      Width = 150
+      Height = 46
+      Align = alLeft
+      Shape = bsSpacer
+      ExplicitTop = 2
+    end
+    object Bevel1: TBevel
+      AlignWithMargins = True
+      Left = 57
+      Top = 4
+      Width = 150
+      Height = 46
+      Align = alLeft
+      Shape = bsSpacer
+    end
+    object Bevel2: TBevel
+      AlignWithMargins = True
+      Left = 526
+      Top = 4
+      Width = 150
+      Height = 46
+      Align = alLeft
+      Shape = bsSpacer
+      ExplicitTop = 2
+    end
     object Image2: TImage
-      Left = 5
-      Top = 3
+      AlignWithMargins = True
+      Left = 4
+      Top = 4
       Width = 47
-      Height = 47
+      Height = 46
+      Align = alLeft
       Picture.Data = {
         0A544A504547496D6167655D250000FFD8FFE000104A46494600010100000100
         010000FFDB00840009060712121010121010101012100F0F100F0F0F10100F0F
@@ -450,9 +476,10 @@ object frmPrincipal: TfrmPrincipal
       OnClick = Image2Click
       OnMouseLeave = Label1MouseLeave
       OnMouseMove = Label1MouseMove
+      ExplicitTop = 2
     end
     object Label1: TLabel
-      Left = 783
+      Left = 526
       Top = 16
       Width = 143
       Height = 18
@@ -582,10 +609,12 @@ object frmPrincipal: TfrmPrincipal
       ExplicitHeight = 1174
     end
     object Image5: TImage
-      Left = 261
-      Top = 3
+      AlignWithMargins = True
+      Left = 213
+      Top = 4
       Width = 90
-      Height = 47
+      Height = 46
+      Align = alLeft
       Picture.Data = {
         0A544A504547496D6167654D120000FFD8FFE000104A46494600010100000100
         010000FFDB00840009060712100F1510121015161517151815161516171A1518
@@ -738,9 +767,12 @@ object frmPrincipal: TfrmPrincipal
       OnClick = lblAcessoRemotoClick
       OnMouseLeave = Label1MouseLeave
       OnMouseMove = Label1MouseMove
+      ExplicitLeft = 261
+      ExplicitTop = 3
+      ExplicitHeight = 47
     end
     object lblAcessoRemoto: TLabel
-      Left = 354
+      Left = 309
       Top = 16
       Width = 110
       Height = 18
@@ -756,10 +788,12 @@ object frmPrincipal: TfrmPrincipal
       OnMouseLeave = Label1MouseLeave
     end
     object Image4: TImage
-      Left = 723
-      Top = 3
+      AlignWithMargins = True
+      Left = 465
+      Top = 4
       Width = 55
-      Height = 47
+      Height = 46
+      Align = alLeft
       Picture.Data = {
         0A544A504547496D6167654A1B0000FFD8FFE000104A46494600010100000100
         010000FFDB0084000906071212100F0F120F100F15100F0F1010150F100F1010
@@ -984,9 +1018,13 @@ object frmPrincipal: TfrmPrincipal
       OnClick = Sobre1Click
       OnMouseLeave = Label1MouseLeave
       OnMouseMove = Label1MouseMove
+      ExplicitLeft = 723
+      ExplicitTop = 3
+      ExplicitHeight = 47
     end
     object lblWhatsApp: TLinkLabel
-      Left = 55
+      AlignWithMargins = True
+      Left = 57
       Top = 16
       Width = 92
       Height = 22

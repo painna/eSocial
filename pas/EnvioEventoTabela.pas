@@ -120,17 +120,36 @@ begin
         eSocial.Eventos.Clear;
         dmESocial.LerConfiguracao;
 
-        aRetorno := dmESocial.Gerar_eSocial1000(cmbAnoMes.Text, TModoLancamento(gpbOperacao.ItemIndex + 1), lblProcesso, gagProcesso);
-        aRetorno := dmESocial.Gerar_eSocial1005(cmbAnoMes.Text, TModoLancamento(gpbOperacao.ItemIndex + 1), lblProcesso, gagProcesso);
-        aRetorno := dmESocial.Gerar_eSocial1010(cmbAnoMes.Text, TModoLancamento(gpbOperacao.ItemIndex + 1), lblProcesso, gagProcesso);
-        aRetorno := dmESocial.Gerar_eSocial1020(cmbAnoMes.Text, TModoLancamento(gpbOperacao.ItemIndex + 1), lblProcesso, gagProcesso);
-        aRetorno := dmESocial.Gerar_eSocial1030(cmbAnoMes.Text, TModoLancamento(gpbOperacao.ItemIndex + 1), lblProcesso, gagProcesso);
-        aRetorno := dmESocial.Gerar_eSocial1035(cmbAnoMes.Text, TModoLancamento(gpbOperacao.ItemIndex + 1), lblProcesso, gagProcesso);
-        aRetorno := dmESocial.Gerar_eSocial1040(cmbAnoMes.Text, TModoLancamento(gpbOperacao.ItemIndex + 1), lblProcesso, gagProcesso);
-        aRetorno := dmESocial.Gerar_eSocial1050(cmbAnoMes.Text, TModoLancamento(gpbOperacao.ItemIndex + 1), lblProcesso, gagProcesso);
-        aRetorno := dmESocial.Gerar_eSocial1060(cmbAnoMes.Text, TModoLancamento(gpbOperacao.ItemIndex + 1), lblProcesso, gagProcesso);
-        aRetorno := dmESocial.Gerar_eSocial1070(cmbAnoMes.Text, TModoLancamento(gpbOperacao.ItemIndex + 1), lblProcesso, gagProcesso);
-        aRetorno := dmESocial.Gerar_eSocial1080(cmbAnoMes.Text, TModoLancamento(gpbOperacao.ItemIndex + 1), lblProcesso, gagProcesso);
+        aRetorno := dmESocial.CertificadoInstalado;
+        if not aRetorno then
+          Mensagem('Certificado não instalado!', 'Aviso', MB_ICONINFORMATION);
+
+        aRetorno := dmESocial.CertificadoValido;
+        if not aRetorno then
+          Mensagem('Certificado não válido!', 'Aviso', MB_ICONINFORMATION);
+
+        if aRetorno and cbS1000.Checked then
+          aRetorno := dmESocial.Gerar_eSocial1000(cmbAnoMes.Text, TModoLancamento(gpbOperacao.ItemIndex + 1), lblProcesso, gagProcesso);
+        if aRetorno and cbS1005.Checked  then
+          aRetorno := dmESocial.Gerar_eSocial1005(cmbAnoMes.Text, TModoLancamento(gpbOperacao.ItemIndex + 1), lblProcesso, gagProcesso);
+        if aRetorno and cbS1010.Checked  then
+          aRetorno := dmESocial.Gerar_eSocial1010(cmbAnoMes.Text, TModoLancamento(gpbOperacao.ItemIndex + 1), lblProcesso, gagProcesso);
+        if aRetorno and cbS1020.Checked  then
+          aRetorno := dmESocial.Gerar_eSocial1020(cmbAnoMes.Text, TModoLancamento(gpbOperacao.ItemIndex + 1), lblProcesso, gagProcesso);
+        if aRetorno and cbS1030.Checked  then
+          aRetorno := dmESocial.Gerar_eSocial1030(cmbAnoMes.Text, TModoLancamento(gpbOperacao.ItemIndex + 1), lblProcesso, gagProcesso);
+        if aRetorno and cbS1035.Checked  then
+          aRetorno := dmESocial.Gerar_eSocial1035(cmbAnoMes.Text, TModoLancamento(gpbOperacao.ItemIndex + 1), lblProcesso, gagProcesso);
+        if aRetorno and cbS1040.Checked  then
+          aRetorno := dmESocial.Gerar_eSocial1040(cmbAnoMes.Text, TModoLancamento(gpbOperacao.ItemIndex + 1), lblProcesso, gagProcesso);
+        if aRetorno and cbS1050.Checked  then
+          aRetorno := dmESocial.Gerar_eSocial1050(cmbAnoMes.Text, TModoLancamento(gpbOperacao.ItemIndex + 1), lblProcesso, gagProcesso);
+        if aRetorno and cbS1060.Checked  then
+          aRetorno := dmESocial.Gerar_eSocial1060(cmbAnoMes.Text, TModoLancamento(gpbOperacao.ItemIndex + 1), lblProcesso, gagProcesso);
+        if aRetorno and cbS1070.Checked  then
+          aRetorno := dmESocial.Gerar_eSocial1070(cmbAnoMes.Text, TModoLancamento(gpbOperacao.ItemIndex + 1), lblProcesso, gagProcesso);
+        if aRetorno and cbS1080.Checked  then
+          aRetorno := dmESocial.Gerar_eSocial1080(cmbAnoMes.Text, TModoLancamento(gpbOperacao.ItemIndex + 1), lblProcesso, gagProcesso);
 
         if aRetorno then
           aRetorno := dmESocial.EventoEnviado_eSocial(egIniciais, cmbAnoMes.Text, lblProcesso, gagProcesso);

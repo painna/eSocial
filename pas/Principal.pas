@@ -113,6 +113,9 @@ type
     imEventoPeriodico: TMenuItem;
     imEventoNaoPeriodico: TMenuItem;
     imgList16: TcxImageList;
+    Bevel1: TBevel;
+    Bevel2: TBevel;
+    Bevel3: TBevel;
     procedure FormCreate(Sender: TObject);
     procedure FormActivate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
