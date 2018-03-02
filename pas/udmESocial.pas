@@ -44,9 +44,20 @@ type
 //      property Mes : Integer read aMes write aMes;
 //  end;
 
+  TProtocoloESocial = class(TObject)
+    private
+      aDataHota : TDateTime;
+      aNumero   : String;
+      procedure SetNumero(Value : String);
+    public
+      property DataHora : TDateTime read aDataHota write aDataHota;
+      property Numero   : String read aNumero write SetNumero;
+
+      constructor Create(Value : String); overload;
+  end;
+
   TdmESocial = class(TDataModule)
     ACBrESocial: TACBreSocial;
-    ACBrIntegrador: TACBrIntegrador;
     ACBrMail: TACBrMail;
     dspTabela: TDataSetProvider;
     cdsTabela: TClientDataSet;
@@ -57,11 +68,16 @@ type
   private
     { Private declarations }
     aForm : TfrmConfigurarCertificado;
+    aMensagemRetorno : TStringList;
     procedure AtualizaSSLLibsCombo;
     procedure GravarConfiguracao;
     procedure SetSQL(aSQL : TStringList);
+
+    function GetMensagemRetorno : TStringList;
   public
     { Public declarations }
+    property MensagemRetorno : TStringList read GetMensagemRetorno;
+
     procedure ListarCompetencias(aLista : TComboBox);
     procedure LerConfiguracao;
 
@@ -207,14 +223,14 @@ begin
   aForm := TfrmConfigurarCertificado.Create(Self);
   aForm.btnSalvarConfig.OnClick := btnSalvar;
 
-  ACBrIntegrador.PastaInput  := ExtractFilePath(ParamStr(0)) + 'Integra\In\';
-  ACBrIntegrador.PastaOutput := ExtractFilePath(ParamStr(0)) + 'Integra\Out\';
-  ACBrIntegrador.ArqLOG      := ExtractFilePath(ParamStr(0)) + 'Integra_log_' + FormatDateTime('yyyymmdd".txt"', Now);
-
-  if not DirectoryExists(ACBrIntegrador.PastaInput) then
-    ForceDirectories(ACBrIntegrador.PastaInput);
-  if not DirectoryExists(ACBrIntegrador.PastaOutput) then
-    ForceDirectories(ACBrIntegrador.PastaOutput);
+//  ACBrIntegrador.PastaInput  := ExtractFilePath(ParamStr(0)) + 'Integra\In\';
+//  ACBrIntegrador.PastaOutput := ExtractFilePath(ParamStr(0)) + 'Integra\Out\';
+//  ACBrIntegrador.ArqLOG      := ExtractFilePath(ParamStr(0)) + 'Integra_log_' + FormatDateTime('yyyymmdd".txt"', Now);
+//
+//  if not DirectoryExists(ACBrIntegrador.PastaInput) then
+//    ForceDirectories(ACBrIntegrador.PastaInput);
+//  if not DirectoryExists(ACBrIntegrador.PastaOutput) then
+//    ForceDirectories(ACBrIntegrador.PastaOutput);
 end;
 
 procedure TdmESocial.DataModuleDestroy(Sender: TObject);
@@ -227,15 +243,68 @@ function TdmESocial.EventoEnviado_eSocial(aGrupo: TeSocialGrupo;
   aCompetencia: String; aLabel: TLabel; aProcesso: TGauge): Boolean;
 var
   aRetorno : Boolean;
+  I : Integer;
 begin
   aRetorno := False;
   try
+    aLabel.Caption     := 'Enviando...';
+    aProcesso.Progress := aProcesso.MaxValue - 1;
+    Application.ProcessMessages;
+
     ACBrESocial.Eventos.TipoEmpregador := ACBrESocial.Configuracoes.Geral.TipoEmpregador;
     ACBrESocial.Eventos.GerarXMLs;
     ACBrESocial.Eventos.SaveToFiles;
 
     aRetorno := ACBrESocial.Enviar(aGrupo);
     Sleep(3000);
+
+    if aRetorno then
+      with ACBrESocial.WebServices.EnvioLote.RetEnvioLote do
+      begin
+        if Status.cdResposta in [201, 202] then
+        begin
+//          Add('ideEmpregador');
+//          Add(' - TpInsc: ' + eSTpInscricaoToStr(IdeEmpregador.TpInsc));
+//          Add(' - NrInsc: ' + IdeEmpregador.NrInsc);
+//          Add('ideTransmissor');
+//          Add(' - TpInsc: ' + eSTpInscricaoToStr(IdeTransmissor.TpInsc));
+//          Add(' - NrInsc: ' + IdeTransmissor.NrInsc);
+//          Add('dadosRecepcaoLote');
+//          Add(' - dhRecepcao..............: ' +
+//            DateTimeToStr(dadosRecLote.dhRecepcao));
+//          Add(' - versaoAplicativoRecepcao: ' +
+//            dadosRecLote.versaoAplicRecepcao);
+//          Add(' - protocoloEnvio..........: ' + dadosRecLote.Protocolo);
+
+          aLabel.Caption     := 'Envio realizado com sucesso...';
+          aProcesso.Progress := aProcesso.MaxValue;
+          Application.ProcessMessages;
+        end
+        else
+        begin
+          if not Assigned(aMensagemRetorno) then
+            aMensagemRetorno := TStringList.Create;
+
+          aMensagemRetorno.BeginUpdate;
+          aMensagemRetorno.Clear;
+
+          for I := 0 to Status.Ocorrencias.Count - 1 do
+          begin
+            with Status.Ocorrencias.Items[I] do
+            begin
+              aMensagemRetorno.Add('Ocorrencia '     + FormatFloat('###00', I + 1));
+              aMensagemRetorno.Add('  Código.....: ' + IntToStr(Codigo));
+              aMensagemRetorno.Add('  Descrição..: ' + Descricao);
+              aMensagemRetorno.Add('  Tipo.......: ' + IntToStr(Tipo));
+              aMensagemRetorno.Add('  Localização: ' + Localizacao + #13#13);
+            end;
+          end;
+
+          aMensagemRetorno.EndUpdate;
+
+          aRetorno := False;
+        end;
+      end;
   finally
     Result := aRetorno;
   end;
@@ -248,6 +317,7 @@ var
   aRetorno : Boolean;
   aSQL : TStringList;
   ok   : Boolean;
+  I    : Integer;
 begin
   aRetorno := False;
   aSQL := TStringList.Create;
@@ -269,6 +339,12 @@ begin
     if cdsTabela.IsEmpty then
       raise Exception.Create('Dados de configuração de eSocial ainda não foram informado!');
 
+    I := 1;
+
+    aProcesso.MaxValue := cdsTabela.RecordCount;
+    aProcesso.Progress := 0;
+    Application.ProcessMessages;
+
     cdsTabela.First;
     while not cdsTabela.Eof do
     begin
@@ -283,7 +359,7 @@ begin
         evtInfoEmpregador.IdeEvento.VerProc := Versao_Executavel(ParamStr(0));
 
         evtInfoEmpregador.IdeEmpregador.TpInsc := tiCNPJ;
-        evtInfoEmpregador.IdeEmpregador.NrInsc := Trim(aForm.edtIdEmpregador.Text);
+        evtInfoEmpregador.IdeEmpregador.NrInsc := Criptografa(cdsTabela.FieldByName('CNPJ').AsString, '2', 14);
 
         evtInfoEmpregador.ModoLancamento := aModoLancamento;
         evtInfoEmpregador.InfoEmpregador.IdePeriodo.IniValid := aCompetencia;
@@ -304,6 +380,7 @@ begin
           IndConstr        := iconNaoeConstrutora;
           IndDesFolha      := idfNaoAplicavel;
           IndOptRegEletron := iorOptoupeloregistro;
+          IndEntEd         := tpNao;
           IndEtt           := tpNao;
           nrRegEtt         := EmptyStr;
 
@@ -356,6 +433,11 @@ begin
         evtInfoEmpregador.InfoEmpregador.NovaValidade.FimValid := '2099-12';
       end;
 
+      aLabel.Caption     := Trim(cdsTabela.FieldByName('ENTE_FERERATIVO').AsString);
+      aProcesso.Progress := I;
+      Application.ProcessMessages;
+      Inc(I);
+
       cdsTabela.Next;
     end;
 
@@ -364,6 +446,13 @@ begin
     aSQL.Free;
     Result := aRetorno;
   end;
+end;
+
+function TdmESocial.GetMensagemRetorno: TStringList;
+begin
+  if not Assigned(aMensagemRetorno) then
+    aMensagemRetorno := TStringList.Create;
+  Result := aMensagemRetorno;
 end;
 
 procedure TdmESocial.GravarConfiguracao;
@@ -616,6 +705,20 @@ begin
     cdsTabela.FetchParams;
     cdsTabela.Open;
   end;
+end;
+
+{ TProtocoloESocial }
+
+constructor TProtocoloESocial.Create(Value : String);
+begin
+  inherited Create;
+  aDataHota := Now;
+  aNumero   := Trim(Value);
+end;
+
+procedure TProtocoloESocial.SetNumero(Value: String);
+begin
+  aNumero := Trim(Value);
 end;
 
 end.

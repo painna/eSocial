@@ -110,6 +110,7 @@ begin
   dmESocial.LerConfiguracao;
   LimparPainelProcesso(True);
 
+  Screen.Cursor   := crHourGlass;
   aModoLancamento := eSStrToModoLancamento(ok, IntToStr(gpbOperacao.ItemIndex));
 
   try
@@ -157,6 +158,9 @@ begin
 
         if aRetorno then
           aRetorno := dmESocial.EventoEnviado_eSocial(egIniciais, cmbAnoMes.Text, lblProcesso, gagProcesso);
+
+        if not aRetorno then
+          Mensagem(dmESocial.MensagemRetorno.Text, 'Alerta Retorno', MB_ICONWARNING);
       except
         On E : Exception do
         begin
@@ -167,6 +171,7 @@ begin
     end;
   finally
     LimparPainelProcesso(False);
+    Screen.Cursor := crDefault;
     Result := aRetorno;
   end;
 end;

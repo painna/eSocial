@@ -6,7 +6,6 @@ object dmESocial: TdmESocial
   Width = 541
   object ACBrESocial: TACBreSocial
     MAIL = ACBrMail
-    Integrador = ACBrIntegrador
     Configuracoes.Geral.SSLLib = libNone
     Configuracoes.Geral.SSLCryptLib = cryNone
     Configuracoes.Geral.SSLHttpLib = httpNone
@@ -16,14 +15,8 @@ object dmESocial: TdmESocial
     Configuracoes.WebServices.UF = 'SP'
     Configuracoes.WebServices.AguardarConsultaRet = 0
     Configuracoes.WebServices.QuebradeLinha = '|'
-    Left = 64
-    Top = 48
-  end
-  object ACBrIntegrador: TACBrIntegrador
-    PastaInput = 'C:\Integrador\Input\'
-    PastaOutput = 'C:\Integrador\Output\'
-    Left = 64
-    Top = 96
+    Left = 32
+    Top = 24
   end
   object ACBrMail: TACBrMail
     Host = '127.0.0.1'
@@ -33,8 +26,8 @@ object dmESocial: TdmESocial
     Attempts = 3
     DefaultCharset = UTF_8
     IDECharset = CP1252
-    Left = 64
-    Top = 144
+    Left = 32
+    Top = 72
   end
   object dspTabela: TDataSetProvider
     DataSet = qryTabela

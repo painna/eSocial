@@ -87,3 +87,20 @@ ON DELETE CASCADE
 ON UPDATE CASCADE;
 
 GRANT ALL ON CONFIG_ESOCIAL TO "PUBLIC";
+
+
+
+/*------ GERASYS.TI 02/03/2018 12:00:11 --------*/
+
+COMMENT ON COLUMN CONFIG_ESOCIAL.NRO_SIAFI IS
+'Preencher com o numero SIAFI (Sistema Integrado de Administracao Financeira), caso seja orgao publico usuario do sistema.
+
+Pesquisar em: http://consulta.tesouro.fazenda.gov.br/ug_novosite/index_ug.asp';
+
+
+
+
+/*------ GERASYS.TI 02/03/2018 12:04:09 --------*/
+
+ALTER SEQUENCE GEN_ESOCIAL_EVENTO_S1000 RESTART WITH 0;
+

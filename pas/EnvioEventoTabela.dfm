@@ -108,7 +108,6 @@ inherited frmEnvioEventoTabela: TfrmEnvioEventoTabela
       Width = 222
       Height = 17
       Caption = 'Limpar base p/ novo envio'
-      Enabled = False
       TabOrder = 1
     end
   end

@@ -25,7 +25,7 @@ object frmConfigurarCertificado: TfrmConfigurarCertificado
     Top = 3
     Width = 281
     Height = 470
-    ActivePage = tbsCertificado
+    ActivePage = tbsGeral
     Align = alClient
     MultiLine = True
     TabOrder = 0
@@ -160,6 +160,7 @@ object frmConfigurarCertificado: TfrmConfigurarCertificado
           Top = 93
           Width = 248
           Height = 21
+          Style = csDropDownList
           Anchors = [akLeft, akTop, akRight]
           TabOrder = 5
         end
@@ -194,9 +195,9 @@ object frmConfigurarCertificado: TfrmConfigurarCertificado
         object Label5: TLabel
           Left = 8
           Top = 58
-          Width = 100
+          Width = 123
           Height = 13
-          Caption = 'CNPJ do Transmissor'
+          Caption = 'CPF/CNPJ do Transmissor'
         end
         object Label7: TLabel
           Left = 8
@@ -226,6 +227,7 @@ object frmConfigurarCertificado: TfrmConfigurarCertificado
           Top = 117
           Width = 248
           Height = 21
+          Style = csDropDownList
           Anchors = [akLeft, akTop, akRight]
           TabOrder = 2
         end
