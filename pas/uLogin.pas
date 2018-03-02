@@ -26,11 +26,11 @@ type
   TfrmLogin = class(TfrmPadrao1)
     edUsuario: TcxTextEdit;
     edSenha: TcxTextEdit;
-    cxLabel1: TcxLabel;
-    cxLabel2: TcxLabel;
-    Image1: TImage;
+    imgKey: TImage;
     btnOk: TBitBtn;
     btnCancelar: TBitBtn;
+    lblUsuario: TcxLabel;
+    lblSenha: TcxLabel;
     procedure edUsuarioExit(Sender: TObject);
     procedure edSenhaExit(Sender: TObject);
     procedure FormShow(Sender: TObject);

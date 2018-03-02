@@ -23,7 +23,8 @@ uses
   udmESocial in '..\pas\udmESocial.pas' {dmESocial: TDataModule},
   SelecionarCertificado in '..\pas\SelecionarCertificado.pas' {frmSelecionarCertificado},
   DialogoPadrao in '..\pas\DialogoPadrao.pas' {frmDialogoPadrao},
-  EnvioEventoTabela in '..\pas\EnvioEventoTabela.pas' {frmEnvioEventoTabela};
+  EnvioEventoTabela in '..\pas\EnvioEventoTabela.pas' {frmEnvioEventoTabela},
+  ConfigurarESocial in '..\pas\ConfigurarESocial.pas' {frmConfigurarESocial};
 
 {$R *.res}
 

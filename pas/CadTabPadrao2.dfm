@@ -8,10 +8,8 @@ inherited frmCadTabPadrao2: TfrmCadTabPadrao2
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnShow = FormShow
-  ExplicitLeft = 1
-  ExplicitTop = 104
-  ExplicitWidth = 992
-  ExplicitHeight = 573
+  ExplicitWidth = 982
+  ExplicitHeight = 564
   PixelsPerInch = 96
   TextHeight = 13
   object pButtons: TPanel
@@ -651,9 +649,6 @@ inherited frmCadTabPadrao2: TfrmCadTabPadrao2
     object ts1: TcxTabSheet
       Caption = '&1 - I.R.F.F.'
       ImageIndex = 0
-      ExplicitTop = 0
-      ExplicitWidth = 655
-      ExplicitHeight = 0
       object GridTable1: TcxGrid
         AlignWithMargins = True
         Left = 3
@@ -669,7 +664,6 @@ inherited frmCadTabPadrao2: TfrmCadTabPadrao2
         ParentFont = False
         TabOrder = 0
         LookAndFeel.Kind = lfFlat
-        ExplicitWidth = 649
         object GridTable1DBTableView1: TcxGridDBTableView
           Navigator.Buttons.CustomButtons = <>
           Navigator.Buttons.PriorPage.Visible = True
@@ -738,9 +732,6 @@ inherited frmCadTabPadrao2: TfrmCadTabPadrao2
     object ts2: TcxTabSheet
       Caption = '&2 - Previd'#234'ncia (INSS)'
       ImageIndex = 1
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
     end
   end
   object Panel: TPanel

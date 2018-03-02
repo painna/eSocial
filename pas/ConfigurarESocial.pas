@@ -1,0 +1,122 @@
+unit ConfigurarESocial;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, AddEditPadrao2, cxGraphics, cxControls, cxLookAndFeels, cxLookAndFeelPainters,
+  cxContainer, cxEdit, dxSkinsCore, dxSkinBlack, dxSkinBlue, dxSkinBlueprint, dxSkinCaramel, dxSkinCoffee,
+  dxSkinDarkRoom, dxSkinDarkSide, dxSkinDevExpressDarkStyle, dxSkinDevExpressStyle, dxSkinFoggy, dxSkinGlassOceans,
+  dxSkinHighContrast, dxSkiniMaginary, dxSkinLilian, dxSkinLiquidSky, dxSkinLondonLiquidSky, dxSkinMcSkin,
+  dxSkinMetropolis, dxSkinMetropolisDark, dxSkinMoneyTwins, dxSkinOffice2007Black, dxSkinOffice2007Blue,
+  dxSkinOffice2007Green, dxSkinOffice2007Pink, dxSkinOffice2007Silver, dxSkinOffice2010Black, dxSkinOffice2010Blue,
+  dxSkinOffice2010Silver, dxSkinOffice2013DarkGray, dxSkinOffice2013LightGray, dxSkinOffice2013White,
+  dxSkinOffice2016Colorful, dxSkinOffice2016Dark, dxSkinPumpkin, dxSkinSeven, dxSkinSevenClassic, dxSkinSharp,
+  dxSkinSharpPlus, dxSkinSilver, dxSkinSpringTime, dxSkinStardust, dxSkinSummer2008, dxSkinTheAsphaltWorld,
+  dxSkinsDefaultPainters, dxSkinValentine, dxSkinVisualStudio2013Blue, dxSkinVisualStudio2013Dark,
+  dxSkinVisualStudio2013Light, dxSkinVS2010, dxSkinWhiteprint, dxSkinXmas2008Blue, Vcl.Menus, Data.FMTBcd, Data.DB,
+  Datasnap.DBClient, Datasnap.Provider, Data.SqlExpr, Vcl.StdCtrls, cxButtons, cxLabel, Vcl.ExtCtrls,
+  dxSkinscxPCPainter, dxBarBuiltInMenu, cxPC, cxTextEdit, cxMaskEdit, cxDropDownEdit, cxLookupEdit, cxDBLookupEdit,
+  cxDBLookupComboBox, cxDBEdit, cxCurrencyEdit, cxCheckBox;
+
+type
+  TfrmConfigurarESocial = class(TfrmAddEditPadrao2)
+    pgDados: TcxPageControl;
+    tbsUNG: TcxTabSheet;
+    tbsContador: TcxTabSheet;
+    lblID_UNID_GESTORA: TcxLabel;
+    dbeID_UNID_GESTORA: TcxDBLookupComboBox;
+    lblNAT_JURIDICA: TcxLabel;
+    dbeNAT_JURIDICA: TcxDBLookupComboBox;
+    dbeNRO_SIAFI: TcxDBTextEdit;
+    lblNRO_SIAFI: TcxLabel;
+    lblSUBTETO_VENCTO_VALOR: TcxLabel;
+    dbeSUBTETO_VENCTO_TIPO: TcxDBLookupComboBox;
+    dbeSUBTETO_VENCTO_VALOR: TcxDBCurrencyEdit;
+    lblSUBTETO_VENCTO_TIPO: TcxLabel;
+    dbePOSSUI_RPPS: TcxDBCheckBox;
+    cxLabel6: TcxLabel;
+    cxDBTextEdit2: TcxDBTextEdit;
+    cds1ID_CONFIG_ORGAO: TIntegerField;
+    cds1ID_UNID_GESTORA: TIntegerField;
+    cds1CONTADOR_NOME: TStringField;
+    cds1CONTADOR_CPF: TStringField;
+    cds1CONTADOR_FONEFIXO: TStringField;
+    cds1CONTADOR_FONECELULAR: TStringField;
+    cds1CONTADOR_EMAIL: TStringField;
+    cds1NAT_JURIDICA: TStringField;
+    cds1NRO_SIAFI: TStringField;
+    cds1SUBTETO_VENCTO_TIPO: TStringField;
+    cds1SUBTETO_VENCTO_VALOR: TFMTBCDField;
+    cds1POSSUI_RPPS: TStringField;
+    sds1ID_CONFIG_ORGAO: TIntegerField;
+    sds1ID_UNID_GESTORA: TIntegerField;
+    sds1CONTADOR_NOME: TStringField;
+    sds1CONTADOR_CPF: TStringField;
+    sds1CONTADOR_FONEFIXO: TStringField;
+    sds1CONTADOR_FONECELULAR: TStringField;
+    sds1CONTADOR_EMAIL: TStringField;
+    sds1NAT_JURIDICA: TStringField;
+    sds1NRO_SIAFI: TStringField;
+    sds1SUBTETO_VENCTO_TIPO: TStringField;
+    sds1SUBTETO_VENCTO_VALOR: TFMTBCDField;
+    sds1POSSUI_RPPS: TStringField;
+    qryUNG: TSQLDataSet;
+    dspUNG: TDataSetProvider;
+    cdsUNG: TClientDataSet;
+    dsUNG: TDataSource;
+    qryNatureza: TSQLDataSet;
+    dspNatureza: TDataSetProvider;
+    cdsNatureza: TClientDataSet;
+    dsNatureza: TDataSource;
+    qryTipoTeto: TSQLDataSet;
+    dspTipoTeto: TDataSetProvider;
+    cdsTipoTeto: TClientDataSet;
+    dsTipoTeto: TDataSource;
+    procedure FormCreate(Sender: TObject);
+    procedure cds1NewRecord(DataSet: TDataSet);
+    procedure FormShow(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  frmConfigurarESocial: TfrmConfigurarESocial;
+
+implementation
+
+{$R *.dfm}
+
+uses udmESocial, udmPrincipal, gsLib, UtilsDb;
+
+procedure TfrmConfigurarESocial.cds1NewRecord(DataSet: TDataSet);
+begin
+  inherited;
+  cds1ID_CONFIG_ORGAO.AsInteger := 1;
+end;
+
+procedure TfrmConfigurarESocial.FormCreate(Sender: TObject);
+begin
+  inherited;
+  pb_sNomeTab     := 'CONFIG_ESOCIAL';
+  pb_sNomeCampoPK := 'ID_CONFIG_ORGAO';
+  pb_sFormCall    := 'frmConfigurarESocial';
+  pb_sTitJanela   := 'Configurar eSocial';
+
+  pgDados.ActivePage := tbsUNG;
+
+  cdsUNG.Open;
+  cdsNatureza.Open;
+  cdsTipoTeto.Open;
+end;
+
+procedure TfrmConfigurarESocial.FormShow(Sender: TObject);
+begin
+  inherited;
+  cds1.ParamByName('ID').AsInteger := 1;
+  cds1.Open;
+end;
+
+end.

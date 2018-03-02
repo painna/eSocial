@@ -164,6 +164,7 @@ uses
   udmPrincipal, VarGlobais, gsLib, UtilsDb, uEditComandosSQL, uLogin, uSobre,
 
   udmESocial,
+  ConfigurarESocial,
   EnvioEventoTabela;
 
 {$R *.dfm}
@@ -189,7 +190,13 @@ begin
                'Aviso !!!',MB_OK+MB_ICONEXCLAMATION);
       Exit;
    end;
-//   dmESocial.ConfigurarCertificado(Self);
+
+   try
+     frmConfigurarESocial := TfrmConfigurarESocial.Create(Self);
+     frmConfigurarESocial.ShowModal;
+   finally
+     FreeAndNil(frmConfigurarESocial);
+   end;
 end;
 
 procedure TfrmPrincipal.imEditComandSQLClick(Sender: TObject);

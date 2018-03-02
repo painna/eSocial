@@ -13,8 +13,8 @@ object dmPrincipal: TdmPrincipal
       'User_Name=GERASYS.TI'
       'Password=gsti2010'
       
-        'Database=D:\Aplicativos\Delphi2010\Remuneratus\Dados\REMUN_DEVEL' +
-        'OP.FDB'
+        'Database=C:\Users\Teste\Documents\Dados\GeraSysTI\REMUN_PMSJA_US' +
+        'O.FDB'
       'ServerCharSet=WIN1252')
     BeforeConnect = SConPrincipalBeforeConnect
     Left = 24
@@ -1566,5 +1566,11 @@ object dmPrincipal: TdmPrincipal
       ProviderFlags = [pfInUpdate]
       Size = 40
     end
+  end
+  object dxSkinController: TdxSkinController
+    NativeStyle = False
+    SkinName = 'Office2007Green'
+    Left = 232
+    Top = 384
   end
 end

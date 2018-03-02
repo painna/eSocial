@@ -7,11 +7,11 @@ inherited frmLogin: TfrmLogin
   ExplicitHeight = 200
   PixelsPerInch = 96
   TextHeight = 13
-  object Image1: TImage
-    Left = 15
-    Top = 16
-    Width = 100
-    Height = 138
+  object imgKey: TImage
+    Left = 6
+    Top = 24
+    Width = 115
+    Height = 121
     Picture.Data = {
       07544269746D617036000300424D360003000000000036000000280000000001
       000000010000010018000000000000000300C40E0000C40E0000000000000000
@@ -6164,46 +6164,38 @@ inherited frmLogin: TfrmLogin
     Transparent = True
   end
   object edUsuario: TcxTextEdit
-    Left = 167
-    Top = 16
+    Left = 175
+    Top = 47
     ParentFont = False
     Properties.CharCase = ecUpperCase
     Properties.MaxLength = 20
+    Style.Font.Charset = ANSI_CHARSET
+    Style.Font.Color = clWhite
+    Style.Font.Height = -12
+    Style.Font.Name = 'Tahoma'
+    Style.Font.Style = [fsBold]
     Style.StyleController = dmPrincipal.cxEditStyleNormal
-    TabOrder = 0
+    Style.IsFontAssigned = True
+    TabOrder = 1
     OnExit = edUsuarioExit
-    Width = 154
+    Width = 146
   end
   object edSenha: TcxTextEdit
-    Left = 167
+    Left = 175
     Top = 74
     ParentFont = False
     Properties.EchoMode = eemPassword
     Properties.MaxLength = 8
+    Style.Font.Charset = ANSI_CHARSET
+    Style.Font.Color = clWhite
+    Style.Font.Height = -12
+    Style.Font.Name = 'Tahoma'
+    Style.Font.Style = [fsBold]
     Style.StyleController = dmPrincipal.cxEditStyleNormal
-    TabOrder = 1
+    Style.IsFontAssigned = True
+    TabOrder = 3
     OnExit = edSenhaExit
-    Width = 154
-  end
-  object cxLabel1: TcxLabel
-    Left = 119
-    Top = 16
-    AutoSize = False
-    Caption = 'Usu'#225'rio:'
-    Properties.Alignment.Horz = taRightJustify
-    Height = 17
-    Width = 48
-    AnchorX = 167
-  end
-  object cxLabel2: TcxLabel
-    Left = 119
-    Top = 76
-    AutoSize = False
-    Caption = 'Senha:'
-    Properties.Alignment.Horz = taRightJustify
-    Height = 17
-    Width = 48
-    AnchorX = 167
+    Width = 146
   end
   object btnOk: TBitBtn
     Left = 144
@@ -6211,10 +6203,10 @@ inherited frmLogin: TfrmLogin
     Width = 88
     Height = 30
     Caption = 'OK'
-    Font.Charset = DEFAULT_CHARSET
+    Font.Charset = ANSI_CHARSET
     Font.Color = clWindowText
     Font.Height = -12
-    Font.Name = 'Arial'
+    Font.Name = 'Tahoma'
     Font.Style = [fsBold]
     Glyph.Data = {
       DE010000424DDE01000000000000760000002800000024000000120000000100
@@ -6244,15 +6236,47 @@ inherited frmLogin: TfrmLogin
     Width = 88
     Height = 30
     Caption = 'Cancelar'
-    Font.Charset = DEFAULT_CHARSET
+    Font.Charset = ANSI_CHARSET
     Font.Color = clWindowText
     Font.Height = -12
-    Font.Name = 'Arial'
+    Font.Name = 'Tahoma'
     Font.Style = [fsBold]
     Kind = bkCancel
     NumGlyphs = 2
     ParentFont = False
     TabOrder = 5
     OnClick = btnCancelarClick
+  end
+  object lblUsuario: TcxLabel
+    Left = 119
+    Top = 49
+    Caption = '&Usu'#225'rio:'
+    FocusControl = edUsuario
+    ParentFont = False
+    Style.Font.Charset = DEFAULT_CHARSET
+    Style.Font.Color = clWindowText
+    Style.Font.Height = -11
+    Style.Font.Name = 'Tahoma'
+    Style.Font.Style = [fsBold]
+    Style.IsFontAssigned = True
+    Properties.Alignment.Horz = taRightJustify
+    Transparent = True
+    AnchorX = 169
+  end
+  object lblSenha: TcxLabel
+    Left = 127
+    Top = 76
+    Caption = '&Senha:'
+    FocusControl = edSenha
+    ParentFont = False
+    Style.Font.Charset = DEFAULT_CHARSET
+    Style.Font.Color = clWindowText
+    Style.Font.Height = -11
+    Style.Font.Name = 'Tahoma'
+    Style.Font.Style = [fsBold]
+    Style.IsFontAssigned = True
+    Properties.Alignment.Horz = taRightJustify
+    Transparent = True
+    AnchorX = 169
   end
 end

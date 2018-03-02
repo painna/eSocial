@@ -6,7 +6,17 @@ uses
   SysUtils, Classes, WideStrings, DBXFirebird, DB, SqlExpr, cxClasses, cxStyles,
   cxGridTableView, cxContainer, cxEdit, cxHint, FMTBcd, DBClient, Provider,
   Windows, Messages, Variants, Graphics, Controls, Forms, Dialogs, cxGraphics,
-  cxLookAndFeels, cxLookAndFeelPainters, StdCtrls, dxScreenTip, dxCustomHint;
+  cxLookAndFeels, cxLookAndFeelPainters, StdCtrls, dxScreenTip, dxCustomHint, dxSkinsCore, dxSkinBlack, dxSkinBlue,
+  dxSkinBlueprint, dxSkinCaramel, dxSkinCoffee, dxSkinDarkRoom, dxSkinDarkSide, dxSkinDevExpressDarkStyle,
+  dxSkinDevExpressStyle, dxSkinFoggy, dxSkinGlassOceans, dxSkinHighContrast, dxSkiniMaginary, dxSkinLilian,
+  dxSkinLiquidSky, dxSkinLondonLiquidSky, dxSkinMcSkin, dxSkinMetropolis, dxSkinMetropolisDark, dxSkinMoneyTwins,
+  dxSkinOffice2007Black, dxSkinOffice2007Blue, dxSkinOffice2007Green, dxSkinOffice2007Pink, dxSkinOffice2007Silver,
+  dxSkinOffice2010Black, dxSkinOffice2010Blue, dxSkinOffice2010Silver, dxSkinOffice2013DarkGray,
+  dxSkinOffice2013LightGray, dxSkinOffice2013White, dxSkinOffice2016Colorful, dxSkinOffice2016Dark, dxSkinPumpkin,
+  dxSkinSeven, dxSkinSevenClassic, dxSkinSharp, dxSkinSharpPlus, dxSkinSilver, dxSkinSpringTime, dxSkinStardust,
+  dxSkinSummer2008, dxSkinTheAsphaltWorld, dxSkinsDefaultPainters, dxSkinValentine, dxSkinVisualStudio2013Blue,
+  dxSkinVisualStudio2013Dark, dxSkinVisualStudio2013Light, dxSkinVS2010, dxSkinWhiteprint, dxSkinXmas2008Blue,
+  dxSkinsForm;
 
 type
   TdmPrincipal = class(TDataModule)
@@ -190,6 +200,7 @@ type
     cxStyle117: TcxStyle;
     cxStyle118: TcxStyle;
     cxStyle119: TcxStyle;
+    dxSkinController: TdxSkinController;
     procedure cdsLogUsuarioAfterInsert(DataSet: TDataSet);
     procedure SConPrincipalAfterDisconnect(Sender: TObject);
     procedure SConPrincipalAfterConnect(Sender: TObject);
