@@ -85,7 +85,7 @@ type
     cxStyle63: TcxStyle;
     cxLabelStyleNormal: TcxEditStyleController;
     cxLabelStyleNormal2: TcxEditStyleController;
-    cxHintStyleController1: TcxHintStyleController;
+    cxHintStyleController: TcxHintStyleController;
     cxLabelStyleNormal3: TcxEditStyleController;
     cxStyle64: TcxStyle;
     cxStyle65: TcxStyle;

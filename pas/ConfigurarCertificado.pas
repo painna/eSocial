@@ -285,6 +285,7 @@ var
   AddRow : Boolean;
   aSCert : TfrmSelecionarCertificado;
 begin
+//  edtNumSerie.Text := eSocial.SSL.SelecionarCertificado;
   aSCert := TfrmSelecionarCertificado.Create(Self);
   try
     eSocial.SSL.LerCertificadosStore;

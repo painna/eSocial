@@ -102,11 +102,15 @@ end;
 
 function TfrmEnvioEventoTabela.GeradoEnviado: Boolean;
 var
+  ok ,
   aRetorno : Boolean;
+  aModoLancamento : TModoLancamento;
 begin
   aRetorno := True;
   dmESocial.LerConfiguracao;
   LimparPainelProcesso(True);
+
+  aModoLancamento := eSStrToModoLancamento(ok, IntToStr(gpbOperacao.ItemIndex));
 
   try
     if not dmESocial.CertificadoInstalado then
@@ -129,27 +133,27 @@ begin
           Mensagem('Certificado não válido!', 'Aviso', MB_ICONINFORMATION);
 
         if aRetorno and cbS1000.Checked then
-          aRetorno := dmESocial.Gerar_eSocial1000(cmbAnoMes.Text, TModoLancamento(gpbOperacao.ItemIndex + 1), lblProcesso, gagProcesso);
+          aRetorno := dmESocial.Gerar_eSocial1000(cmbAnoMes.Text, Checb_ZeraBase.Checked, aModoLancamento, lblProcesso, gagProcesso);
         if aRetorno and cbS1005.Checked  then
-          aRetorno := dmESocial.Gerar_eSocial1005(cmbAnoMes.Text, TModoLancamento(gpbOperacao.ItemIndex + 1), lblProcesso, gagProcesso);
+          aRetorno := dmESocial.Gerar_eSocial1005(cmbAnoMes.Text, Checb_ZeraBase.Checked, aModoLancamento, lblProcesso, gagProcesso);
         if aRetorno and cbS1010.Checked  then
-          aRetorno := dmESocial.Gerar_eSocial1010(cmbAnoMes.Text, TModoLancamento(gpbOperacao.ItemIndex + 1), lblProcesso, gagProcesso);
+          aRetorno := dmESocial.Gerar_eSocial1010(cmbAnoMes.Text, Checb_ZeraBase.Checked, aModoLancamento, lblProcesso, gagProcesso);
         if aRetorno and cbS1020.Checked  then
-          aRetorno := dmESocial.Gerar_eSocial1020(cmbAnoMes.Text, TModoLancamento(gpbOperacao.ItemIndex + 1), lblProcesso, gagProcesso);
+          aRetorno := dmESocial.Gerar_eSocial1020(cmbAnoMes.Text, Checb_ZeraBase.Checked, aModoLancamento, lblProcesso, gagProcesso);
         if aRetorno and cbS1030.Checked  then
-          aRetorno := dmESocial.Gerar_eSocial1030(cmbAnoMes.Text, TModoLancamento(gpbOperacao.ItemIndex + 1), lblProcesso, gagProcesso);
+          aRetorno := dmESocial.Gerar_eSocial1030(cmbAnoMes.Text, Checb_ZeraBase.Checked, aModoLancamento, lblProcesso, gagProcesso);
         if aRetorno and cbS1035.Checked  then
-          aRetorno := dmESocial.Gerar_eSocial1035(cmbAnoMes.Text, TModoLancamento(gpbOperacao.ItemIndex + 1), lblProcesso, gagProcesso);
+          aRetorno := dmESocial.Gerar_eSocial1035(cmbAnoMes.Text, Checb_ZeraBase.Checked, aModoLancamento, lblProcesso, gagProcesso);
         if aRetorno and cbS1040.Checked  then
-          aRetorno := dmESocial.Gerar_eSocial1040(cmbAnoMes.Text, TModoLancamento(gpbOperacao.ItemIndex + 1), lblProcesso, gagProcesso);
+          aRetorno := dmESocial.Gerar_eSocial1040(cmbAnoMes.Text, Checb_ZeraBase.Checked, aModoLancamento, lblProcesso, gagProcesso);
         if aRetorno and cbS1050.Checked  then
-          aRetorno := dmESocial.Gerar_eSocial1050(cmbAnoMes.Text, TModoLancamento(gpbOperacao.ItemIndex + 1), lblProcesso, gagProcesso);
+          aRetorno := dmESocial.Gerar_eSocial1050(cmbAnoMes.Text, Checb_ZeraBase.Checked, aModoLancamento, lblProcesso, gagProcesso);
         if aRetorno and cbS1060.Checked  then
-          aRetorno := dmESocial.Gerar_eSocial1060(cmbAnoMes.Text, TModoLancamento(gpbOperacao.ItemIndex + 1), lblProcesso, gagProcesso);
+          aRetorno := dmESocial.Gerar_eSocial1060(cmbAnoMes.Text, Checb_ZeraBase.Checked, aModoLancamento, lblProcesso, gagProcesso);
         if aRetorno and cbS1070.Checked  then
-          aRetorno := dmESocial.Gerar_eSocial1070(cmbAnoMes.Text, TModoLancamento(gpbOperacao.ItemIndex + 1), lblProcesso, gagProcesso);
+          aRetorno := dmESocial.Gerar_eSocial1070(cmbAnoMes.Text, Checb_ZeraBase.Checked, aModoLancamento, lblProcesso, gagProcesso);
         if aRetorno and cbS1080.Checked  then
-          aRetorno := dmESocial.Gerar_eSocial1080(cmbAnoMes.Text, TModoLancamento(gpbOperacao.ItemIndex + 1), lblProcesso, gagProcesso);
+          aRetorno := dmESocial.Gerar_eSocial1080(cmbAnoMes.Text, Checb_ZeraBase.Checked, aModoLancamento, lblProcesso, gagProcesso);
 
         if aRetorno then
           aRetorno := dmESocial.EventoEnviado_eSocial(egIniciais, cmbAnoMes.Text, lblProcesso, gagProcesso);

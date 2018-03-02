@@ -578,9 +578,6 @@ object frmConfigurarCertificado: TfrmConfigurarCertificado
             'Produ'#231#227'o'
             'Homologa'#231#227'o')
           TabOrder = 1
-          ExplicitLeft = 8
-          ExplicitTop = 16
-          ExplicitWidth = 249
         end
         object cbxSalvarSOAP: TCheckBox
           Left = 8
@@ -696,9 +693,6 @@ object frmConfigurarCertificado: TfrmConfigurarCertificado
         Align = alTop
         Caption = 'Retorno de Envio do eSocial '
         TabOrder = 2
-        ExplicitLeft = 14
-        ExplicitTop = 352
-        ExplicitWidth = 265
         object Label24: TLabel
           Left = 93
           Top = 31

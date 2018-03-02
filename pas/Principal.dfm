@@ -134,7 +134,6 @@ object frmPrincipal: TfrmPrincipal
     ParentBackground = False
     ParentFont = False
     TabOrder = 6
-    ExplicitTop = -6
     object Bevel3: TBevel
       AlignWithMargins = True
       Left = 309
@@ -1102,6 +1101,10 @@ object frmPrincipal: TfrmPrincipal
       object imConfigurarCertificado: TMenuItem
         Caption = 'Configurar Certificado'
         OnClick = imConfigurarCertificadoClick
+      end
+      object imConfigurarESocial: TMenuItem
+        Caption = 'Configurar eSocial'
+        OnClick = imConfigurarESocialClick
       end
       object imEditComandSQL: TMenuItem
         Caption = 'Editor de Comandos SQL'

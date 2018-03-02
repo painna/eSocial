@@ -116,6 +116,7 @@ type
     Bevel1: TBevel;
     Bevel2: TBevel;
     Bevel3: TBevel;
+    imConfigurarESocial: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormActivate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
@@ -131,6 +132,7 @@ type
     procedure lblAcessoRemotoClick(Sender: TObject);
     procedure imConfigurarCertificadoClick(Sender: TObject);
     procedure imEventoTabelaClick(Sender: TObject);
+    procedure imConfigurarESocialClick(Sender: TObject);
 
   private
     pv_lPerguntaFechar,
@@ -176,6 +178,18 @@ begin
       Exit;
    end;
    dmESocial.ConfigurarCertificado(Self);
+end;
+
+procedure TfrmPrincipal.imConfigurarESocialClick(Sender: TObject);
+begin
+   if (MDIChildCount>0) then
+   begin
+      Mensagem('Você precisa Fechar todas as Janelas deste Programa, '+#13+
+               'antes de Executar essa Operação ...',
+               'Aviso !!!',MB_OK+MB_ICONEXCLAMATION);
+      Exit;
+   end;
+//   dmESocial.ConfigurarCertificado(Self);
 end;
 
 procedure TfrmPrincipal.imEditComandSQLClick(Sender: TObject);

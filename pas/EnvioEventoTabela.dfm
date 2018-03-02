@@ -5,9 +5,6 @@ inherited frmEnvioEventoTabela: TfrmEnvioEventoTabela
   TextHeight = 13
   inherited pnlControle: TPanel
     TabOrder = 2
-    ExplicitLeft = -60
-    ExplicitTop = 199
-    ExplicitWidth = 619
     inherited btnCancelar: TBitBtn
       ExplicitLeft = 584
     end
@@ -43,7 +40,7 @@ inherited frmEnvioEventoTabela: TfrmEnvioEventoTabela
       object lblProcesso: TLabel
         Left = 0
         Top = 0
-        Width = 146
+        Width = 484
         Height = 13
         Align = alTop
         Caption = 'Andamento do processo...'
@@ -53,6 +50,7 @@ inherited frmEnvioEventoTabela: TfrmEnvioEventoTabela
         Font.Name = 'Tahoma'
         Font.Style = [fsBold]
         ParentFont = False
+        ExplicitWidth = 146
       end
     end
   end
@@ -99,17 +97,17 @@ inherited frmEnvioEventoTabela: TfrmEnvioEventoTabela
     object cmbAnoMes: TComboBox
       Left = 12
       Top = 36
-      Width = 145
+      Width = 101
       Height = 21
       Style = csDropDownList
       TabOrder = 0
     end
     object Checb_ZeraBase: TCheckBox
-      Left = 163
+      Left = 119
       Top = 38
-      Width = 178
+      Width = 222
       Height = 17
-      Caption = 'Zera Base Homologa'#231#227'o'
+      Caption = 'Limpar base p/ novo envio'
       Enabled = False
       TabOrder = 1
     end

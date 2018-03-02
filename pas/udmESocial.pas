@@ -67,19 +67,32 @@ type
 
     function CertificadoInstalado : Boolean;
     function CertificadoValido : Boolean;
+    function AmbienteWebServiceHomologacao : Boolean;
+    function AmbienteWebServiceProducao : Boolean;
 
     // procedures eventos de tabela
-    function Gerar_eSocial1000(aCompetencia : String; aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge) : Boolean;
-    function Gerar_eSocial1005(aCompetencia : String; aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge) : Boolean; virtual; abstract;
-    function Gerar_eSocial1010(aCompetencia : String; aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge) : Boolean; virtual; abstract;
-    function Gerar_eSocial1020(aCompetencia : String; aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge) : Boolean; virtual; abstract;
-    function Gerar_eSocial1030(aCompetencia : String; aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge) : Boolean; virtual; abstract;
-    function Gerar_eSocial1035(aCompetencia : String; aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge) : Boolean; virtual; abstract;
-    function Gerar_eSocial1040(aCompetencia : String; aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge) : Boolean; virtual; abstract;
-    function Gerar_eSocial1050(aCompetencia : String; aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge) : Boolean; virtual; abstract;
-    function Gerar_eSocial1060(aCompetencia : String; aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge) : Boolean; virtual; abstract;
-    function Gerar_eSocial1070(aCompetencia : String; aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge) : Boolean; virtual; abstract;
-    function Gerar_eSocial1080(aCompetencia : String; aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge) : Boolean; virtual; abstract;
+    function Gerar_eSocial1000(aCompetencia : String; aZerarBase : Boolean;
+      aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge) : Boolean;
+    function Gerar_eSocial1005(aCompetencia : String; aZerarBase : Boolean;
+      aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge) : Boolean; virtual; abstract;
+    function Gerar_eSocial1010(aCompetencia : String; aZerarBase : Boolean;
+      aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge) : Boolean; virtual; abstract;
+    function Gerar_eSocial1020(aCompetencia : String; aZerarBase : Boolean;
+      aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge) : Boolean; virtual; abstract;
+    function Gerar_eSocial1030(aCompetencia : String; aZerarBase : Boolean;
+      aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge) : Boolean; virtual; abstract;
+    function Gerar_eSocial1035(aCompetencia : String; aZerarBase : Boolean;
+      aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge) : Boolean; virtual; abstract;
+    function Gerar_eSocial1040(aCompetencia : String; aZerarBase : Boolean;
+      aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge) : Boolean; virtual; abstract;
+    function Gerar_eSocial1050(aCompetencia : String; aZerarBase : Boolean;
+      aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge) : Boolean; virtual; abstract;
+    function Gerar_eSocial1060(aCompetencia : String; aZerarBase : Boolean;
+      aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge) : Boolean; virtual; abstract;
+    function Gerar_eSocial1070(aCompetencia : String; aZerarBase : Boolean;
+      aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge) : Boolean; virtual; abstract;
+    function Gerar_eSocial1080(aCompetencia : String; aZerarBase : Boolean;
+      aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge) : Boolean; virtual; abstract;
 
     function ConfigurarCertificado(const AOwner : TComponent) : Boolean;
     function EventoEnviado_eSocial(aGrupo : TeSocialGrupo; aCompetencia : String; aLabel : TLabel; aProcesso : TGauge) : Boolean;
@@ -89,6 +102,12 @@ var
   dmESocial: TdmESocial;
 
   procedure ShowInforme(aTitulo, aMensagem : String);
+
+  function IfThen(aExpressao : Boolean; aTrue, aFalse : tpSimNao) : tpSimNao; overload;
+
+const
+  FLAG_SIM = 'S';
+  FLAG_NAO = 'N';
 
 implementation
 
@@ -102,6 +121,14 @@ uses
 procedure ShowInforme(aTitulo, aMensagem : String);
 begin
   Application.MessageBox(PChar(aMensagem), PChar(aTitulo), MB_ICONINFORMATION);
+end;
+
+function IfThen(aExpressao : Boolean; aTrue, aFalse : tpSimNao) : tpSimNao;
+begin
+  if aExpressao then
+    Result := aTrue
+  else
+    Result := aFalse;
 end;
 
 procedure TdmESocial.AtualizaSSLLibsCombo;
@@ -143,6 +170,22 @@ function TdmESocial.CertificadoValido: Boolean;
 begin
   if Assigned(ACBrESocial.Configuracoes.Certificados) then
     Result := ACBrESocial.Configuracoes.Certificados.VerificarValidade
+  else
+    Result := False;
+end;
+
+function TdmESocial.AmbienteWebServiceHomologacao : Boolean;
+begin
+  if Assigned(ACBrESocial.Configuracoes.WebServices) then
+    Result := (ACBrESocial.Configuracoes.WebServices.Ambiente = taHomologacao)
+  else
+    Result := False;
+end;
+
+function TdmESocial.AmbienteWebServiceProducao : Boolean;
+begin
+  if Assigned(ACBrESocial.Configuracoes.WebServices) then
+    Result := (ACBrESocial.Configuracoes.WebServices.Ambiente = taProducao)
   else
     Result := False;
 end;
@@ -190,7 +233,6 @@ begin
     ACBrESocial.Eventos.TipoEmpregador := ACBrESocial.Configuracoes.Geral.TipoEmpregador;
     ACBrESocial.Eventos.GerarXMLs;
     ACBrESocial.Eventos.SaveToFiles;
-    ACBrESocial.AssinarEventos;
 
     aRetorno := ACBrESocial.Enviar(aGrupo);
     Sleep(3000);
@@ -199,22 +241,33 @@ begin
   end;
 end;
 
-function TdmESocial.Gerar_eSocial1000(aCompetencia: String; aModoLancamento : TModoLancamento;
+function TdmESocial.Gerar_eSocial1000(aCompetencia: String;  aZerarBase : Boolean;
+  aModoLancamento : TModoLancamento;
   aLabel: TLabel; aProcesso: TGauge): Boolean;
 var
   aRetorno : Boolean;
   aSQL : TStringList;
+  ok   : Boolean;
 begin
   aRetorno := False;
   aSQL := TStringList.Create;
+  ok   := True;
   try
     aSQL.BeginUpdate;
     aSQL.Clear;
-    aSQL.Add('Select *');
+    aSQL.Add('Select');
+    aSQL.Add('    c.*');
+    aSQL.Add('  , e.*');
+    aSQL.Add('  , u.RAZAO_SOCIAL as ENTE_FERERATIVO');
     aSQL.Add('from CONFIG_ORGAO c');
+    aSQL.Add('  inner join CONFIG_ESOCIAL e on (e.ID_CONFIG_ORGAO = c.ID)');
+    aSQL.Add('  inner join UNID_GESTORA   u on (u.ID = e.ID_UNID_GESTORA)');
     aSQL.Add('where c.id = 1');
     aSQL.EndUpdate;
     SetSQL(aSQL);
+
+    if cdsTabela.IsEmpty then
+      raise Exception.Create('Dados de configuração de eSocial ainda não foram informado!');
 
     cdsTabela.First;
     while not cdsTabela.Eof do
@@ -223,11 +276,11 @@ begin
       begin
         // So tem na Versão 2.x4.1
         // taProducao, taProducaoRestrita
-        evtInfoEmpregador.Sequencial      := 0;
+        evtInfoEmpregador.Sequencial      := StrToInt(IncrementGenerator('GEN_ESOCIAL_EVENTO_S1000', 1));
         evtInfoEmpregador.IdeEvento.TpAmb := taProducaoRestrita;
 
         evtInfoEmpregador.IdeEvento.ProcEmi := peAplicEmpregador;
-        evtInfoEmpregador.IdeEvento.VerProc := '1.0';
+        evtInfoEmpregador.IdeEvento.VerProc := Versao_Executavel(ParamStr(0));
 
         evtInfoEmpregador.IdeEmpregador.TpInsc := tiCNPJ;
         evtInfoEmpregador.IdeEmpregador.NrInsc := Trim(aForm.edtIdEmpregador.Text);
@@ -239,31 +292,30 @@ begin
         with evtInfoEmpregador.InfoEmpregador.InfoCadastro do
         begin
           NmRazao   := Criptografa(cdsTabela.FieldByName('RAZAO_SOCIAL').AsString, '2', 60);
-          ClassTrib := ct01;
-//          if Checb_ZeraBase.Checked then
-//          Begin
-//            NmRazao := 'RemoverEmpregadorDaBaseDeDadosDaProducaoRestrita';
-//            ClassTrib := ct00;
-//          End
-//          else
-//          Begin
-//            NmRazao := 'Empresa Teste';
-//            ClassTrib := ct01;
-//          End;
-//
-//          NatJurid    := '0001';
-//          IndCoop     := TpIndCoop(1);
-//          IndConstr   := TpIndConstr(2);
-//          IndDesFolha := TpIndDesFolha(1);
-//          IndOptRegEletron := TpIndOptRegEletron(1);
-//          IndEtt      := tpSimNao(1);
-//          nrRegEtt    := '';
-//
-//          InfoOp.nrSiafi := '12345';
-//
-//          InfoOp.infoEnte.nmEnte    := 'Ente federativo teste';
-//          InfoOp.infoEnte.uf        := tpuf(ufSP);
-//          InfoOp.infoEnte.vrSubteto := 100.00;
+          ClassTrib := ct01; // CNPJ
+          if aZerarBase then
+          Begin
+            NmRazao   := 'RemoverEmpregadorDaBaseDeDadosDaProducaoRestrita';
+            ClassTrib := ct00;
+          End;
+
+          NatJurid         := Trim(ReplaceStr(cdsTabela.FieldByName('NAT_JURIDICA').AsString, '-', ''));
+          IndCoop          := icCooperativadeTrabalho;
+          IndConstr        := iconNaoeConstrutora;
+          IndDesFolha      := idfNaoAplicavel;
+          IndOptRegEletron := iorOptoupeloregistro;
+          IndEtt           := tpNao;
+          nrRegEtt         := EmptyStr;
+
+          InfoOp.nrSiafi            := Trim(cdsTabela.FieldByName('NRO_SIAFI').AsString);
+          InfoOp.infoEnte.nmEnte    := Trim(cdsTabela.FieldByName('ENTE_FERERATIVO').AsString); // Nome do Entidade Federativa ao qual o órgão está vinculado
+          InfoOp.infoEnte.uf        := eSStrTouf(ok, Trim(cdsTabela.FieldByName('ENDER_UF').AsString));
+          InfoOp.infoEnte.codMunic  := cdsTabela.FieldByName('COD_MUNICIPIO_RAIS').AsInteger;   // Conforme Tabela do IBGE
+          InfoOp.infoEnte.indRPPS   := IfThen(AnsiUpperCase(Trim(cdsTabela.FieldByName('POSSUI_RPPS').AsString)) = FLAG_SIM, tpSim, tpNao);
+          InfoOp.infoEnte.subteto   := eSStrToIdeSubteto(ok, Trim(cdsTabela.FieldByName('SUBTETO_VENCTO_TIPO').AsString));
+          InfoOp.infoEnte.vrSubteto := cdsTabela.FieldByName('SUBTETO_VENCTO_TIPO').AsCurrency; // Valor do subteto do Entedade Federativa
+
+//          // Dados para empresas particulares
 //
 //          dadosIsencao.IdeMinLei    := 'Sigla Min';
 //          dadosIsencao.NrCertif     := '1111';
@@ -274,11 +326,11 @@ begin
 //          dadosIsencao.DtDou        := date;
 //          dadosIsencao.PagDou       := '111';
 
-          Contato.NmCtt    := 'Contato 1';
-          Contato.CpfCtt   := '00000222220';
-          Contato.FoneFixo := '34335856';
-          Contato.FoneCel  := '991524587';
-          Contato.email    := 'testecontato@testecontato.com';
+          Contato.NmCtt    := Trim(cdsTabela.FieldByName('CONTADOR_NOME').AsString);
+          Contato.CpfCtt   := OnlyNumber(Trim(cdsTabela.FieldByName('CONTADOR_CPF').AsString));
+          Contato.FoneFixo := OnlyNumber(Trim(cdsTabela.FieldByName('CONTADOR_FONEFIXO').AsString));
+          Contato.FoneCel  := OnlyNumber(Trim(cdsTabela.FieldByName('CONTADOR_FONECELULAR').AsString));
+          Contato.email    := AnsiLowerCase(Trim(cdsTabela.FieldByName('CONTADOR_EMAIL').AsString));
 
           InfoOrgInternacional.IndAcordoIsenMulta := iaiSemacordo;  // (iaiSemacordo, iaiComacordo);
         end;
@@ -390,10 +442,14 @@ begin
   try
     with aForm do
     begin
-      cbSSLLib.ItemIndex     := Ini.ReadInteger('Certificado', 'SSLLib',     Ord(libCustom));
-      cbCryptLib.ItemIndex   := Ini.ReadInteger('Certificado', 'CryptLib',   Ord(cryWinCrypt));
-      cbHttpLib.ItemIndex    := Ini.ReadInteger('Certificado', 'HttpLib',    Ord(httpWinHttp));
-      cbXmlSignLib.ItemIndex := Ini.ReadInteger('Certificado', 'XmlSignLib', Ord(xsLibXml2));
+//      cbSSLLib.ItemIndex     := Ini.ReadInteger('Certificado', 'SSLLib',     Ord(libCustom));
+//      cbCryptLib.ItemIndex   := Ini.ReadInteger('Certificado', 'CryptLib',   Ord(cryWinCrypt));
+//      cbHttpLib.ItemIndex    := Ini.ReadInteger('Certificado', 'HttpLib',    Ord(httpWinHttp));
+//      cbXmlSignLib.ItemIndex := Ini.ReadInteger('Certificado', 'XmlSignLib', Ord(xsLibXml2));
+      cbSSLLib.ItemIndex     := Ini.ReadInteger('Certificado', 'SSLLib',     Ord(libOpenSSL));
+      cbCryptLib.ItemIndex   := Ini.ReadInteger('Certificado', 'CryptLib',   Ord(cryOpenSSL));
+      cbHttpLib.ItemIndex    := Ini.ReadInteger('Certificado', 'HttpLib',    Ord(httpOpenSSL));
+      cbXmlSignLib.ItemIndex := Ini.ReadInteger('Certificado', 'XmlSignLib', Ord(xsXmlSec));
       edtCaminho.Text        := Ini.ReadString ('Certificado', 'Caminho',  '');
       edtSenha.Text          := Ini.ReadString ('Certificado', 'Senha',    '');
       edtNumSerie.Text       := Ini.ReadString ('Certificado', 'NumSerie', '');

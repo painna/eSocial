@@ -1198,7 +1198,7 @@ object dmPrincipal: TdmPrincipal
     Top = 184
     PixelsPerInch = 96
   end
-  object cxHintStyleController1: TcxHintStyleController
+  object cxHintStyleController: TcxHintStyleController
     HintStyleClassName = 'TcxHintStyle'
     HintStyle.CaptionFont.Charset = DEFAULT_CHARSET
     HintStyle.CaptionFont.Color = clWindowText
