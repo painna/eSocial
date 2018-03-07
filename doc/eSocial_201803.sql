@@ -161,3 +161,74 @@ Select '9' as Codigo, 'Todos os poderes' as Descricao from rdb$database
 ;
 
 GRANT ALL ON VW_TIPO_SUBTETO TO "PUBLIC";
+
+
+
+/*------ GERASYS.TI 07/03/2018 17:27:29 --------*/
+
+CREATE DOMAIN ESOCIAL_OPERACAO AS
+CHAR(1)
+DEFAULT 'I'
+NOT NULL
+CHECK (value in ('I', 'A', 'E', 'P'));COMMENT ON DOMAIN ESOCIAL_OPERACAO IS 'Opercao do registro:
+I - nclusao
+A - Alteracao
+E - Exclusao
+P - Processado/Enviado';
+
+
+
+
+/*------ GERASYS.TI 07/03/2018 17:27:50 --------*/
+
+COMMENT ON DOMAIN ESOCIAL_OPERACAO IS 'Operacao do registro no eSocial:
+I - Inclusao
+A - Alteracao
+E - Exclusao
+P - Processado/Enviado';
+
+
+
+
+/*------ GERASYS.TI 07/03/2018 17:28:22 --------*/
+
+ALTER TABLE CONFIG_ESOCIAL
+    ADD TIPO_OPERACAO ESOCIAL_OPERACAO;
+
+COMMENT ON COLUMN CONFIG_ESOCIAL.TIPO_OPERACAO IS
+'Operacao do registro no eSocial:
+I - Inclusao
+A - Alteracao
+E - Exclusao
+P - Processado/Enviado';
+
+
+
+
+/*------ GERASYS.TI 07/03/2018 17:28:49 --------*/
+
+ALTER TABLE CONFIG_ESOCIAL DROP TIPO_OPERACAO;
+
+
+
+
+/*------ GERASYS.TI 07/03/2018 17:29:05 --------*/
+
+ALTER TABLE CONFIG_ESOCIAL
+    ADD TIPO_OPERACAO ESOCIAL_OPERACAO;
+
+COMMENT ON COLUMN CONFIG_ESOCIAL.TIPO_OPERACAO IS
+'Operacao do registro no eSocial:
+I - Inclusao
+A - Alteracao
+E - Exclusao
+P - Processado/Enviado';
+
+
+
+
+/*------ GERASYS.TI 07/03/2018 17:29:11 --------*/
+
+UPDATE CONFIG_ESOCIAL
+SET TIPO_OPERACAO = 'I';
+

@@ -151,4 +151,9 @@ object dmESocial: TdmESocial
     Left = 272
     Top = 96
   end
+  object ACBrValidador: TACBrValidador
+    IgnorarChar = './-'
+    Left = 104
+    Top = 160
+  end
 end

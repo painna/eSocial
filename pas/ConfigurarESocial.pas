@@ -35,8 +35,8 @@ type
     dbeSUBTETO_VENCTO_VALOR: TcxDBCurrencyEdit;
     lblSUBTETO_VENCTO_TIPO: TcxLabel;
     dbePOSSUI_RPPS: TcxDBCheckBox;
-    cxLabel6: TcxLabel;
-    cxDBTextEdit2: TcxDBTextEdit;
+    lblCONTADOR_NOME: TcxLabel;
+    dbeCONTADOR_NOME: TcxDBTextEdit;
     cds1ID_CONFIG_ORGAO: TIntegerField;
     cds1ID_UNID_GESTORA: TIntegerField;
     cds1CONTADOR_NOME: TStringField;
@@ -73,9 +73,20 @@ type
     dspTipoTeto: TDataSetProvider;
     cdsTipoTeto: TClientDataSet;
     dsTipoTeto: TDataSource;
+    lblCONTADOR_CPF: TcxLabel;
+    dbeCONTADOR_CPF: TcxDBMaskEdit;
+    dbeCONTADOR_FONEFIXO: TcxDBMaskEdit;
+    lblCONTADOR_FONEFIXO: TcxLabel;
+    lblCONTADOR_FONECELULAR: TcxLabel;
+    dbeCONTADOR_FONECELULAR: TcxDBMaskEdit;
+    dbeCONTADOR_EMAIL: TcxDBTextEdit;
+    lblCONTADOR_EMAIL: TcxLabel;
+    sds1TIPO_OPERACAO: TStringField;
+    cds1TIPO_OPERACAO: TStringField;
     procedure FormCreate(Sender: TObject);
     procedure cds1NewRecord(DataSet: TDataSet);
     procedure FormShow(Sender: TObject);
+    procedure cds1BeforePost(DataSet: TDataSet);
   private
     { Private declarations }
   public
@@ -90,6 +101,21 @@ implementation
 {$R *.dfm}
 
 uses udmESocial, udmPrincipal, gsLib, UtilsDb;
+
+procedure TfrmConfigurarESocial.cds1BeforePost(DataSet: TDataSet);
+begin
+  inherited;
+  if not ValidarCPF(dbeCONTADOR_CPF.Text) then
+  begin
+    Mensagem('CPF Inválido!', 'Alerta', MB_ICONWARNING);
+    Abort;
+  end
+  else
+    if cds1.State = dsInsert then
+      cds1TIPO_OPERACAO.AsString := FLAG_OPERACAO_INSERIR
+    else
+      cds1TIPO_OPERACAO.AsString := FLAG_OPERACAO_ALTERAR;
+end;
 
 procedure TfrmConfigurarESocial.cds1NewRecord(DataSet: TDataSet);
 begin

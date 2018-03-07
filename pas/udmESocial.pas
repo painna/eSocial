@@ -31,7 +31,7 @@ uses
   Dialogs,
 
   System.SysUtils, System.Classes, Controls, Vcl.StdCtrls, Vcl.Samples.Gauges,
-  Data.FMTBcd, Data.SqlExpr, Data.DB, Datasnap.DBClient, Datasnap.Provider;
+  Data.FMTBcd, Data.SqlExpr, Data.DB, Datasnap.DBClient, Datasnap.Provider, ACBrValidador;
 
 type
   TTipoOperacao = (toInclusao, toAlteracao, toExclusao);
@@ -47,13 +47,22 @@ type
   TProtocoloESocial = class(TObject)
     private
       aDataHota : TDateTime;
+      aNumeroInscricao,
+      aVersao   ,
       aNumero   : String;
+      aArquivos : TStringList;
+      procedure SetNumeroInscricao(Value : String);
+      procedure SetVersao(Value : String);
       procedure SetNumero(Value : String);
     public
       property DataHora : TDateTime read aDataHota write aDataHota;
+      property NumeroInscricao : String read aNumeroInscricao write SetNumeroInscricao;
+      property Versao   : String read aVersao write SetVersao;
       property Numero   : String read aNumero write SetNumero;
+      property Arquivos : TStringList read aArquivos write aArquivos;
 
       constructor Create(Value : String); overload;
+      destructor Destroy; override;
   end;
 
   TdmESocial = class(TDataModule)
@@ -62,6 +71,7 @@ type
     dspTabela: TDataSetProvider;
     cdsTabela: TClientDataSet;
     qryTabela: TSQLQuery;
+    ACBrValidador: TACBrValidador;
     procedure DataModuleCreate(Sender: TObject);
     procedure DataModuleDestroy(Sender: TObject);
     procedure btnSalvar(Sender: TObject);
@@ -90,7 +100,7 @@ type
     function Gerar_eSocial1000(aCompetencia : String; aZerarBase : Boolean;
       aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge) : Boolean;
     function Gerar_eSocial1005(aCompetencia : String; aZerarBase : Boolean;
-      aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge) : Boolean; virtual; abstract;
+      aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge) : Boolean;
     function Gerar_eSocial1010(aCompetencia : String; aZerarBase : Boolean;
       aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge) : Boolean; virtual; abstract;
     function Gerar_eSocial1020(aCompetencia : String; aZerarBase : Boolean;
@@ -111,7 +121,8 @@ type
       aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge) : Boolean; virtual; abstract;
 
     function ConfigurarCertificado(const AOwner : TComponent) : Boolean;
-    function EventoEnviado_eSocial(aGrupo : TeSocialGrupo; aCompetencia : String; aLabel : TLabel; aProcesso : TGauge) : Boolean;
+    function EventoEnviado_eSocial(aGrupo : TeSocialGrupo; aCompetencia : String;
+      aLabel : TLabel; aProcesso : TGauge; var aProtocolo : TProtocoloESocial) : Boolean;
   end;
 
 var
@@ -120,10 +131,15 @@ var
   procedure ShowInforme(aTitulo, aMensagem : String);
 
   function IfThen(aExpressao : Boolean; aTrue, aFalse : tpSimNao) : tpSimNao; overload;
+  function ValidarCPF(aCPF : String) : Boolean;
 
 const
   FLAG_SIM = 'S';
   FLAG_NAO = 'N';
+  FLAG_OPERACAO_INSERIR = 'I';
+  FLAG_OPERACAO_ALTERAR = 'A';
+  FLAG_OPERACAO_EXCLUIR = 'E';
+  FLAG_OPERACAO_ENVIADO = 'P';
 
 implementation
 
@@ -159,6 +175,19 @@ begin
 
       cbSSLType.Enabled := (ACBrESocial.Configuracoes.Geral.SSLHttpLib in [httpWinHttp, httpOpenSSL]);
     end;
+end;
+
+function ValidarCPF(aCPF : String) : Boolean;
+var
+  sCpf : String;
+begin
+  sCpf := OnlyNumber(Trim(aCPF));
+  with dmESocial, ACBrValidador do
+  begin
+    TipoDocto := docCPF;
+    Documento := sCpf;
+    Result    := ValidCPF(sCpf, False);
+  end;
 end;
 
 procedure TdmESocial.btnSalvar(Sender: TObject);
@@ -240,10 +269,18 @@ begin
 end;
 
 function TdmESocial.EventoEnviado_eSocial(aGrupo: TeSocialGrupo;
-  aCompetencia: String; aLabel: TLabel; aProcesso: TGauge): Boolean;
+  aCompetencia: String; aLabel: TLabel; aProcesso: TGauge;
+  var aProtocolo : TProtocoloESocial): Boolean;
 var
-  aRetorno : Boolean;
+  aDataHora1 ,
+  aDataHora2 ,
+  aDataHora3 ,
+  aDataHora4 ,
+  aDataHora5 : TDateTime;
+  aRetorno   : Boolean;
   I : Integer;
+  sPath    ,
+  sArquivo : String;
 begin
   aRetorno := False;
   try
@@ -255,56 +292,102 @@ begin
     ACBrESocial.Eventos.GerarXMLs;
     ACBrESocial.Eventos.SaveToFiles;
 
-    aRetorno := ACBrESocial.Enviar(aGrupo);
-    Sleep(3000);
+    I :=
+      ACBrESocial.Eventos.Iniciais.Count   +
+      ACBrESocial.Eventos.Tabelas.Count    +
+      ACBrESocial.Eventos.Periodicos.Count +
+      ACBrESocial.Eventos.NaoPeriodicos.Count;
 
-    if aRetorno then
-      with ACBrESocial.WebServices.EnvioLote.RetEnvioLote do
-      begin
-        if Status.cdResposta in [201, 202] then
+    if (I = 0) then
+      Mensagem('Sem dados para envio!', 'Aviso', MB_ICONINFORMATION)
+    else
+    begin
+
+      aDataHora1 := Now;
+      aDataHora2 := aDataHora1 + StrToTime('00:00:01');
+      aDataHora3 := aDataHora1 + StrToTime('00:00:02');
+      aDataHora4 := aDataHora1 + StrToTime('00:00:03');
+      aDataHora5 := aDataHora1 + StrToTime('00:00:04');
+      aRetorno   := ACBrESocial.Enviar(aGrupo);
+
+      Sleep(3000);
+
+      if aRetorno then
+        with ACBrESocial.Eventos, ACBrESocial.WebServices.EnvioLote.RetEnvioLote do
         begin
-//          Add('ideEmpregador');
-//          Add(' - TpInsc: ' + eSTpInscricaoToStr(IdeEmpregador.TpInsc));
-//          Add(' - NrInsc: ' + IdeEmpregador.NrInsc);
-//          Add('ideTransmissor');
-//          Add(' - TpInsc: ' + eSTpInscricaoToStr(IdeTransmissor.TpInsc));
-//          Add(' - NrInsc: ' + IdeTransmissor.NrInsc);
-//          Add('dadosRecepcaoLote');
-//          Add(' - dhRecepcao..............: ' +
-//            DateTimeToStr(dadosRecLote.dhRecepcao));
-//          Add(' - versaoAplicativoRecepcao: ' +
-//            dadosRecLote.versaoAplicRecepcao);
-//          Add(' - protocoloEnvio..........: ' + dadosRecLote.Protocolo);
-
-          aLabel.Caption     := 'Envio realizado com sucesso...';
-          aProcesso.Progress := aProcesso.MaxValue;
-          Application.ProcessMessages;
-        end
-        else
-        begin
-          if not Assigned(aMensagemRetorno) then
-            aMensagemRetorno := TStringList.Create;
-
-          aMensagemRetorno.BeginUpdate;
-          aMensagemRetorno.Clear;
-
-          for I := 0 to Status.Ocorrencias.Count - 1 do
+          if Status.cdResposta in [201, 202] then
           begin
-            with Status.Ocorrencias.Items[I] do
+            aProtocolo.Versao   := dadosRecLote.versaoAplicRecepcao;
+            aProtocolo.DataHora := dadosRecLote.dhRecepcao;
+            aProtocolo.Numero   := dadosRecLote.Protocolo;
+            aProtocolo.NumeroInscricao := IdeTransmissor.NrInsc;
+
+            sPath    := PathWithDelim(ACBrESocial.Configuracoes.Arquivos.GetPatheSocial(aProtocolo.DataHora, ACBrESocial.Configuracoes.Geral.IdEmpregador));
+            sArquivo := sPath + '\' + FormatDateTime('yyyymmddhhmmss', aDataHora1);
+
+            // Pegar Arquivo de Envio
+            if FileExists(sArquivo + '-env-lot.xml') then
+              aProtocolo.Arquivos.Add(sArquivo + '-env-lot.xml');
+
+            // Pegar Arquivo de Retorno
+            if FileExists(sArquivo + '-rec.xml') then
+              aProtocolo.Arquivos.Add(sArquivo + '-rec.xml')
+            else
             begin
-              aMensagemRetorno.Add('Ocorrencia '     + FormatFloat('###00', I + 1));
-              aMensagemRetorno.Add('  Código.....: ' + IntToStr(Codigo));
-              aMensagemRetorno.Add('  Descrição..: ' + Descricao);
-              aMensagemRetorno.Add('  Tipo.......: ' + IntToStr(Tipo));
-              aMensagemRetorno.Add('  Localização: ' + Localizacao + #13#13);
+              sArquivo := sPath + '\' + FormatDateTime('yyyymmddhhmmss', aDataHora2);
+              if FileExists(sArquivo + '-rec.xml') then
+                aProtocolo.Arquivos.Add(sArquivo + '-rec.xml')
+              else
+              begin
+                sArquivo := sPath + '\' + FormatDateTime('yyyymmddhhmmss', aDataHora3);
+                if FileExists(sArquivo + '-rec.xml') then
+                  aProtocolo.Arquivos.Add(sArquivo + '-rec.xml')
+                else
+                begin
+                  sArquivo := sPath + '\' + FormatDateTime('yyyymmddhhmmss', aDataHora4);
+                  if FileExists(sArquivo + '-rec.xml') then
+                    aProtocolo.Arquivos.Add(sArquivo + '-rec.xml')
+                  else
+                  begin
+                    sArquivo := sPath + '\' + FormatDateTime('yyyymmddhhmmss', aDataHora5);
+                    if FileExists(sArquivo + '-rec.xml') then
+                      aProtocolo.Arquivos.Add(sArquivo + '-rec.xml');
+                  end;
+                end;
+              end;
             end;
+
+            aLabel.Caption     := 'Envio realizado com sucesso...';
+            aProcesso.Progress := aProcesso.MaxValue;
+            Application.ProcessMessages;
+          end
+          else
+          begin
+            if not Assigned(aMensagemRetorno) then
+              aMensagemRetorno := TStringList.Create;
+
+            aMensagemRetorno.BeginUpdate;
+            aMensagemRetorno.Clear;
+
+            for I := 0 to Status.Ocorrencias.Count - 1 do
+            begin
+              with Status.Ocorrencias.Items[I] do
+              begin
+                aMensagemRetorno.Add('Ocorrencia '     + FormatFloat('###00', I + 1));
+                aMensagemRetorno.Add('  Código.....: ' + FormatFloat('##00000', Codigo));
+                aMensagemRetorno.Add('  Descrição..: ' + Descricao);
+                aMensagemRetorno.Add('  Tipo.......: ' + IntToStr(Tipo));
+                aMensagemRetorno.Add('  Localização: ' + Localizacao + #13#13);
+              end;
+            end;
+
+            aMensagemRetorno.EndUpdate;
+
+            aRetorno := False;
           end;
-
-          aMensagemRetorno.EndUpdate;
-
-          aRetorno := False;
         end;
-      end;
+
+    end;
   finally
     Result := aRetorno;
   end;
@@ -338,6 +421,15 @@ begin
 
     if cdsTabela.IsEmpty then
       raise Exception.Create('Dados de configuração de eSocial ainda não foram informado!');
+
+    aSQL.BeginUpdate;
+    case aModoLancamento of
+      mlInclusao  : aSQL.Add('  and e.tipo_operacao = ' + QuotedStr(FLAG_OPERACAO_INSERIR));
+      mlAlteracao : aSQL.Add('  and e.tipo_operacao = ' + QuotedStr(FLAG_OPERACAO_ALTERAR));
+      mlExclusao  : aSQL.Add('  and e.tipo_operacao = ' + QuotedStr(FLAG_OPERACAO_EXCLUIR));
+    end;
+    aSQL.EndUpdate;
+    SetSQL(aSQL);
 
     I := 1;
 
@@ -440,6 +532,78 @@ begin
 
       cdsTabela.Next;
     end;
+
+    aRetorno := True;
+  finally
+    aSQL.Free;
+    Result := aRetorno;
+  end;
+end;
+
+function TdmESocial.Gerar_eSocial1005(aCompetencia: String; aZerarBase: Boolean; aModoLancamento: TModoLancamento;
+  aLabel: TLabel; aProcesso: TGauge): Boolean;
+var
+  aRetorno : Boolean;
+  aSQL : TStringList;
+  ok   : Boolean;
+  I    : Integer;
+begin
+  aRetorno := False;
+  aSQL := TStringList.Create;
+  ok   := True;
+  try
+//    for i := 0 to 2 do
+//    begin
+//      with ACBreSocial1.Eventos.Iniciais.S1005.Add do
+//      begin
+//        evtTabEstab.Sequencial := 0;
+//
+//        evtTabEstab.IdeEvento.TpAmb := taProducaoRestrita;
+//        evtTabEstab.IdeEvento.ProcEmi := TpProcEmi(0);
+//        evtTabEstab.IdeEvento.VerProc := '1.0';
+//
+//        evtTabEstab.IdeEmpregador.TpInsc := tiCPF;
+//        evtTabEstab.IdeEmpregador.NrInsc := '0123456789';
+//
+//        evtTabEstab.ModoLancamento := TModoLancamento(i);
+//        evtTabEstab.infoEstab.IdeEstab.TpInsc := tiCNPJ;
+//        evtTabEstab.infoEstab.IdeEstab.NrInsc := '012345678901234';
+//        evtTabEstab.infoEstab.IdeEstab.IniValid := '2015-05';
+//        evtTabEstab.infoEstab.IdeEstab.FimValid := '2099-12';
+//
+//        evtTabEstab.infoEstab.DadosEstab.cnaePrep := '2015';
+//
+//        evtTabEstab.infoEstab.DadosEstab.aliqGilrat.AliqRat := arat1;
+//        evtTabEstab.infoEstab.DadosEstab.aliqGilrat.Fap := 1.5;
+//        evtTabEstab.infoEstab.DadosEstab.aliqGilrat.AliqRatAjust := 2.5;
+//
+//        evtTabEstab.infoEstab.DadosEstab.aliqGilrat.ProcAdmJudRat.tpProc := tpTpProc(1);
+//        evtTabEstab.infoEstab.DadosEstab.aliqGilrat.ProcAdmJudRat.nrProc := '20150512';
+//        evtTabEstab.infoEstab.DadosEstab.aliqGilrat.ProcAdmJudRat.codSusp := '1';
+//
+//        evtTabEstab.infoEstab.DadosEstab.aliqGilrat.ProcAdmJudFap.tpProc := tpTpProc(1);
+//        evtTabEstab.infoEstab.DadosEstab.aliqGilrat.ProcAdmJudFap.nrProc := '20150512';
+//        evtTabEstab.infoEstab.DadosEstab.aliqGilrat.ProcAdmJudFap.codSusp := '2';
+//
+//        evtTabEstab.infoEstab.DadosEstab.infoCaepf.tpCaepf := tcContrIndividual;
+//
+//        evtTabEstab.infoEstab.DadosEstab.infoObra.indSubstPatrObra := tpIndSubstPatronalObra(1);
+//
+//        evtTabEstab.infoEstab.DadosEstab.infoTrab.regPt := tpRegPt(3);
+//
+//        evtTabEstab.infoEstab.DadosEstab.infoTrab.infoApr.contApr := tpContApr(2);
+//        evtTabEstab.infoEstab.DadosEstab.infoTrab.infoApr.nrProcJud := '20150612';
+//        evtTabEstab.infoEstab.DadosEstab.infoTrab.infoApr.contEntEd := tpSim;
+//        with evtTabEstab.infoEstab.DadosEstab.infoTrab.infoApr.infoEntEduc.Add do
+//          NrInsc := '0123456789';
+//
+//        evtTabEstab.infoEstab.DadosEstab.infoTrab.infoPCD.contPCD := tpContPCD(9);
+//        evtTabEstab.infoEstab.DadosEstab.infoTrab.infoPCD.nrProcJud := '20160131';
+//
+//        evtTabEstab.infoEstab.NovaValidade.IniValid := '2014-05';
+//        evtTabEstab.infoEstab.NovaValidade.FimValid := '2099-12';
+//      end;
+//    end;
 
     aRetorno := True;
   finally
@@ -713,10 +877,30 @@ constructor TProtocoloESocial.Create(Value : String);
 begin
   inherited Create;
   aDataHota := Now;
+  aNumeroInscricao := EmptyStr;
+  aVersao   := EmptyStr;
   aNumero   := Trim(Value);
+  aArquivos := TStringList.Create;
+  aArquivos.Clear;
+end;
+
+procedure TProtocoloESocial.SetNumeroInscricao(Value: String);
+begin
+  aNumeroInscricao := Trim(Value);
+end;
+
+destructor TProtocoloESocial.Destroy;
+begin
+  aArquivos.Free;
+  inherited Destroy;
 end;
 
 procedure TProtocoloESocial.SetNumero(Value: String);
+begin
+  aNumero := Trim(Value);
+end;
+
+procedure TProtocoloESocial.SetVersao(Value: String);
 begin
   aNumero := Trim(Value);
 end;

@@ -134,9 +134,8 @@ inherited frmEnvioEventoTabela: TfrmEnvioEventoTabela
       Top = 41
       Width = 329
       Height = 17
-      Caption = 'S-1005 Tabela de Estabelecimentos e Obras de Constru'#231#227'o Civil'
+      Caption = 'S-1005 Tabela de Estab., Obras ou Unidades de '#211'rg'#227'os P'#250'blicos'
       Ctl3D = False
-      Enabled = False
       ParentCtl3D = False
       TabOrder = 1
     end

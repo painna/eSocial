@@ -42,35 +42,30 @@ inherited frmConfigurarESocial: TfrmConfigurarESocial
       ParentBackground = False
       ParentFont = False
       TabOrder = 1
-      Properties.ActivePage = tbsUNG
+      Properties.ActivePage = tbsContador
       Properties.CustomButtons.Buttons = <>
       Properties.Options = [pcoAlwaysShowGoDialogButton, pcoGradient, pcoGradientClientArea, pcoRedrawOnResize, pcoSort]
       Properties.Style = 9
-      ExplicitLeft = 192
-      ExplicitTop = 72
-      ExplicitWidth = 613
-      ExplicitHeight = 270
       ClientRectBottom = 364
       ClientRectRight = 668
       ClientRectTop = 23
       object tbsUNG: TcxTabSheet
         Caption = '&1 - Ente Federativo'
         ImageIndex = 0
-        ExplicitLeft = -3
         object lblID_UNID_GESTORA: TcxLabel
-          Left = 11
-          Top = 42
+          Left = 17
+          Top = 41
           Caption = 'Unidade Gestora Prncipal:'
           FocusControl = dbeID_UNID_GESTORA
           ParentFont = False
           Style.StyleController = dmPrincipal.cxLabelStyleNormal
           Properties.Alignment.Horz = taRightJustify
           Transparent = True
-          AnchorX = 140
+          AnchorX = 146
         end
         object dbeID_UNID_GESTORA: TcxDBLookupComboBox
-          Left = 146
-          Top = 41
+          Left = 152
+          Top = 40
           DataBinding.DataField = 'ID_UNID_GESTORA'
           DataBinding.DataSource = ds1
           ParentFont = False
@@ -96,19 +91,19 @@ inherited frmConfigurarESocial: TfrmConfigurarESocial
           Width = 431
         end
         object lblNAT_JURIDICA: TcxLabel
-          Left = 49
-          Top = 67
+          Left = 55
+          Top = 65
           Caption = 'Natureza Jur'#237'dica:'
           FocusControl = dbeNAT_JURIDICA
           ParentFont = False
           Style.StyleController = dmPrincipal.cxLabelStyleNormal
           Properties.Alignment.Horz = taRightJustify
           Transparent = True
-          AnchorX = 140
+          AnchorX = 146
         end
         object dbeNAT_JURIDICA: TcxDBLookupComboBox
-          Left = 146
-          Top = 66
+          Left = 152
+          Top = 64
           DataBinding.DataField = 'NAT_JURIDICA'
           DataBinding.DataSource = ds1
           ParentFont = False
@@ -135,7 +130,7 @@ inherited frmConfigurarESocial: TfrmConfigurarESocial
           Width = 431
         end
         object dbeNRO_SIAFI: TcxDBTextEdit
-          Left = 146
+          Left = 152
           Top = 16
           DataBinding.DataField = 'NRO_SIAFI'
           DataBinding.DataSource = ds1
@@ -150,7 +145,7 @@ inherited frmConfigurarESocial: TfrmConfigurarESocial
           Width = 121
         end
         object lblNRO_SIAFI: TcxLabel
-          Left = 68
+          Left = 74
           Top = 17
           Caption = 'N'#250'mero SIAFI:'
           FocusControl = dbeNRO_SIAFI
@@ -158,22 +153,22 @@ inherited frmConfigurarESocial: TfrmConfigurarESocial
           Style.StyleController = dmPrincipal.cxLabelStyleNormal
           Properties.Alignment.Horz = taRightJustify
           Transparent = True
-          AnchorX = 140
+          AnchorX = 146
         end
         object lblSUBTETO_VENCTO_VALOR: TcxLabel
-          Left = 29
-          Top = 116
+          Left = 35
+          Top = 114
           Caption = 'Valor do Subteto (R$):'
           FocusControl = dbeSUBTETO_VENCTO_VALOR
           ParentFont = False
           Style.StyleController = dmPrincipal.cxLabelStyleNormal
           Properties.Alignment.Horz = taRightJustify
           Transparent = True
-          AnchorX = 140
+          AnchorX = 146
         end
         object dbeSUBTETO_VENCTO_TIPO: TcxDBLookupComboBox
-          Left = 146
-          Top = 90
+          Left = 152
+          Top = 88
           DataBinding.DataField = 'SUBTETO_VENCTO_TIPO'
           DataBinding.DataSource = ds1
           ParentFont = False
@@ -194,8 +189,8 @@ inherited frmConfigurarESocial: TfrmConfigurarESocial
           Width = 431
         end
         object dbeSUBTETO_VENCTO_VALOR: TcxDBCurrencyEdit
-          Left = 146
-          Top = 115
+          Left = 153
+          Top = 113
           DataBinding.DataField = 'SUBTETO_VENCTO_VALOR'
           DataBinding.DataSource = ds1
           ParentFont = False
@@ -210,19 +205,19 @@ inherited frmConfigurarESocial: TfrmConfigurarESocial
           Width = 121
         end
         object lblSUBTETO_VENCTO_TIPO: TcxLabel
-          Left = 58
-          Top = 91
+          Left = 64
+          Top = 89
           Caption = 'Tipo do Subteto:'
           FocusControl = dbeSUBTETO_VENCTO_TIPO
           ParentFont = False
           Style.StyleController = dmPrincipal.cxLabelStyleNormal
           Properties.Alignment.Horz = taRightJustify
           Transparent = True
-          AnchorX = 140
+          AnchorX = 146
         end
         object dbePOSSUI_RPPS: TcxDBCheckBox
-          Left = 146
-          Top = 143
+          Left = 153
+          Top = 137
           Caption = 'Possui Regime Proprio de Previdencia Social (RPPS)'
           DataBinding.DataField = 'POSSUI_RPPS'
           DataBinding.DataSource = ds1
@@ -242,23 +237,24 @@ inherited frmConfigurarESocial: TfrmConfigurarESocial
       object tbsContador: TcxTabSheet
         Caption = '&2 - Contador'
         ImageIndex = 1
-        ExplicitWidth = 970
-        ExplicitHeight = 276
-        object cxLabel6: TcxLabel
-          Left = 59
+        object lblCONTADOR_NOME: TcxLabel
+          Left = 66
           Top = 17
           Caption = 'Nome Completo:'
+          FocusControl = dbeCONTADOR_NOME
           ParentFont = False
           Style.StyleController = dmPrincipal.cxLabelStyleNormal
           Properties.Alignment.Horz = taRightJustify
           Transparent = True
-          AnchorX = 140
+          AnchorX = 147
         end
-        object cxDBTextEdit2: TcxDBTextEdit
-          Left = 146
+        object dbeCONTADOR_NOME: TcxDBTextEdit
+          Left = 152
           Top = 16
+          DataBinding.DataField = 'CONTADOR_NOME'
           DataBinding.DataSource = ds1
           ParentFont = False
+          Properties.CharCase = ecUpperCase
           Style.Font.Charset = DEFAULT_CHARSET
           Style.Font.Color = clDefault
           Style.Font.Height = -11
@@ -267,6 +263,114 @@ inherited frmConfigurarESocial: TfrmConfigurarESocial
           Style.IsFontAssigned = True
           TabOrder = 1
           Width = 439
+        end
+        object lblCONTADOR_CPF: TcxLabel
+          Left = 121
+          Top = 41
+          Caption = 'CPF:'
+          FocusControl = dbeCONTADOR_CPF
+          ParentFont = False
+          Style.StyleController = dmPrincipal.cxLabelStyleNormal
+          Properties.Alignment.Horz = taRightJustify
+          Transparent = True
+          AnchorX = 147
+        end
+        object dbeCONTADOR_CPF: TcxDBMaskEdit
+          Left = 152
+          Top = 40
+          DataBinding.DataField = 'CONTADOR_CPF'
+          DataBinding.DataSource = ds1
+          ParentFont = False
+          Properties.EditMask = '000.000.000-00;0; '
+          Style.Font.Charset = DEFAULT_CHARSET
+          Style.Font.Color = clDefault
+          Style.Font.Height = -11
+          Style.Font.Name = 'Arial'
+          Style.Font.Style = [fsBold]
+          Style.IsFontAssigned = True
+          TabOrder = 3
+          Width = 121
+        end
+        object dbeCONTADOR_FONEFIXO: TcxDBMaskEdit
+          Left = 152
+          Top = 64
+          DataBinding.DataField = 'CONTADOR_FONEFIXO'
+          DataBinding.DataSource = ds1
+          ParentFont = False
+          Properties.EditMask = '(00)0000-0000;0; '
+          Style.Font.Charset = DEFAULT_CHARSET
+          Style.Font.Color = clDefault
+          Style.Font.Height = -11
+          Style.Font.Name = 'Arial'
+          Style.Font.Style = [fsBold]
+          Style.IsFontAssigned = True
+          TabOrder = 4
+          Width = 121
+        end
+        object lblCONTADOR_FONEFIXO: TcxLabel
+          Left = 76
+          Top = 65
+          Caption = 'Telefone Fixo:'
+          FocusControl = dbeCONTADOR_FONEFIXO
+          ParentFont = False
+          Style.StyleController = dmPrincipal.cxLabelStyleNormal
+          Properties.Alignment.Horz = taRightJustify
+          Transparent = True
+          AnchorX = 147
+        end
+        object lblCONTADOR_FONECELULAR: TcxLabel
+          Left = 63
+          Top = 89
+          Caption = 'Telefone Celular:'
+          FocusControl = dbeCONTADOR_FONECELULAR
+          ParentFont = False
+          Style.StyleController = dmPrincipal.cxLabelStyleNormal
+          Properties.Alignment.Horz = taRightJustify
+          Transparent = True
+          AnchorX = 147
+        end
+        object dbeCONTADOR_FONECELULAR: TcxDBMaskEdit
+          Left = 152
+          Top = 88
+          DataBinding.DataField = 'CONTADOR_FONECELULAR'
+          DataBinding.DataSource = ds1
+          ParentFont = False
+          Properties.EditMask = '(00)0000-0000;0; '
+          Style.Font.Charset = DEFAULT_CHARSET
+          Style.Font.Color = clDefault
+          Style.Font.Height = -11
+          Style.Font.Name = 'Arial'
+          Style.Font.Style = [fsBold]
+          Style.IsFontAssigned = True
+          TabOrder = 7
+          Width = 121
+        end
+        object dbeCONTADOR_EMAIL: TcxDBTextEdit
+          Left = 152
+          Top = 112
+          DataBinding.DataField = 'CONTADOR_EMAIL'
+          DataBinding.DataSource = ds1
+          ParentFont = False
+          Properties.CharCase = ecLowerCase
+          Style.Font.Charset = DEFAULT_CHARSET
+          Style.Font.Color = clDefault
+          Style.Font.Height = -11
+          Style.Font.Name = 'Arial'
+          Style.Font.Style = [fsBold]
+          Style.IsFontAssigned = True
+          TabOrder = 8
+          Width = 439
+        end
+        object lblCONTADOR_EMAIL: TcxLabel
+          Left = 112
+          Top = 113
+          Caption = 'E-mail:'
+          FocusControl = dbeCONTADOR_EMAIL
+          ParentFont = False
+          Style.StyleController = dmPrincipal.cxLabelStyleNormal
+          Properties.Alignment.Horz = taRightJustify
+          Transparent = True
+          AnchorX = 147
         end
       end
     end
@@ -291,7 +395,7 @@ inherited frmConfigurarESocial: TfrmConfigurarESocial
         Value = 0
       end>
     Left = 16
-    Top = 320
+    Top = 319
     object sds1ID_CONFIG_ORGAO: TIntegerField
       FieldName = 'ID_CONFIG_ORGAO'
       ProviderFlags = [pfInUpdate, pfInWhere, pfInKey]
@@ -353,6 +457,12 @@ inherited frmConfigurarESocial: TfrmConfigurarESocial
     object sds1POSSUI_RPPS: TStringField
       FieldName = 'POSSUI_RPPS'
       ProviderFlags = [pfInUpdate]
+      Required = True
+      FixedChar = True
+      Size = 1
+    end
+    object sds1TIPO_OPERACAO: TStringField
+      FieldName = 'TIPO_OPERACAO'
       Required = True
       FixedChar = True
       Size = 1
@@ -427,6 +537,12 @@ inherited frmConfigurarESocial: TfrmConfigurarESocial
         Attributes = [faRequired, faFixed]
         DataType = ftString
         Size = 1
+      end
+      item
+        Name = 'TIPO_OPERACAO'
+        Attributes = [faRequired, faFixed]
+        DataType = ftString
+        Size = 1
       end>
     Params = <
       item
@@ -435,9 +551,10 @@ inherited frmConfigurarESocial: TfrmConfigurarESocial
         ParamType = ptInput
         Value = 0
       end>
+    BeforePost = cds1BeforePost
     OnNewRecord = cds1NewRecord
-    Left = 80
-    Top = 320
+    Left = 81
+    Top = 319
     object cds1ID_CONFIG_ORGAO: TIntegerField
       FieldName = 'ID_CONFIG_ORGAO'
       ProviderFlags = [pfInUpdate, pfInWhere, pfInKey]
@@ -499,6 +616,12 @@ inherited frmConfigurarESocial: TfrmConfigurarESocial
     object cds1POSSUI_RPPS: TStringField
       FieldName = 'POSSUI_RPPS'
       ProviderFlags = [pfInUpdate]
+      Required = True
+      FixedChar = True
+      Size = 1
+    end
+    object cds1TIPO_OPERACAO: TStringField
+      FieldName = 'TIPO_OPERACAO'
       Required = True
       FixedChar = True
       Size = 1

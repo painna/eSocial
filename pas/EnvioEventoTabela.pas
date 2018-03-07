@@ -105,6 +105,7 @@ var
   ok ,
   aRetorno : Boolean;
   aModoLancamento : TModoLancamento;
+  aProtocolo : TProtocoloESocial;
 begin
   aRetorno := True;
   dmESocial.LerConfiguracao;
@@ -157,10 +158,14 @@ begin
           aRetorno := dmESocial.Gerar_eSocial1080(cmbAnoMes.Text, Checb_ZeraBase.Checked, aModoLancamento, lblProcesso, gagProcesso);
 
         if aRetorno then
-          aRetorno := dmESocial.EventoEnviado_eSocial(egIniciais, cmbAnoMes.Text, lblProcesso, gagProcesso);
+        begin
+          aProtocolo := TProtocoloESocial.Create(EmptyStr);
+          aRetorno   := dmESocial.EventoEnviado_eSocial(egIniciais, cmbAnoMes.Text, lblProcesso, gagProcesso, aProtocolo);
+        end;
 
         if not aRetorno then
-          Mensagem(dmESocial.MensagemRetorno.Text, 'Alerta Retorno', MB_ICONWARNING);
+          if (dmESocial.MensagemRetorno.Count > 0) then
+            Mensagem(dmESocial.MensagemRetorno.Text, 'Alerta Retorno', MB_ICONWARNING);
       except
         On E : Exception do
         begin
