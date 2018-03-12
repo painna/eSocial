@@ -84,6 +84,7 @@ type
     procedure SetSQL(aSQL : TStringList);
 
     function GetMensagemRetorno : TStringList;
+    function ProximaCompetencia(aCompetencia : String) : String;
   public
     { Public declarations }
     property MensagemRetorno : TStringList read GetMensagemRetorno;
@@ -102,7 +103,7 @@ type
     function Gerar_eSocial1005(aCompetencia : String; aZerarBase : Boolean;
       aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge) : Boolean;
     function Gerar_eSocial1010(aCompetencia : String; aZerarBase : Boolean;
-      aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge) : Boolean; virtual; abstract;
+      aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge) : Boolean;
     function Gerar_eSocial1020(aCompetencia : String; aZerarBase : Boolean;
       aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge) : Boolean; virtual; abstract;
     function Gerar_eSocial1030(aCompetencia : String; aZerarBase : Boolean;
@@ -612,6 +613,130 @@ begin
   end;
 end;
 
+function TdmESocial.Gerar_eSocial1010(aCompetencia: String; aZerarBase: Boolean; aModoLancamento: TModoLancamento;
+  aLabel: TLabel; aProcesso: TGauge): Boolean;
+var
+  aRetorno : Boolean;
+  aSQL : TStringList;
+  ok   : Boolean;
+  I    : Integer;
+begin
+  aRetorno := False;
+  aSQL := TStringList.Create;
+  ok   := True;
+  try
+    aSQL.BeginUpdate;
+    aSQL.Clear;
+    aSQL.Add('Select');
+    aSQL.Add('    e.*');
+    aSQL.Add('  , (Select CNPJ from CONFIG_ORGAO c where c.id = 1) as CNPJ ');
+    aSQL.Add('from EVENTO e');
+    aSQL.Add('where (coalesce(e.nat_rubrica, '''') <> '''')');
+
+    case aModoLancamento of
+      mlInclusao  : aSQL.Add('  and e.tipo_operacao = ' + QuotedStr(FLAG_OPERACAO_INSERIR));
+      mlAlteracao : aSQL.Add('  and e.tipo_operacao = ' + QuotedStr(FLAG_OPERACAO_ALTERAR));
+      mlExclusao  : aSQL.Add('  and e.tipo_operacao = ' + QuotedStr(FLAG_OPERACAO_EXCLUIR));
+    end;
+
+    aSQL.EndUpdate;
+    SetSQL(aSQL);
+
+    I := 1;
+
+    aProcesso.MaxValue := cdsTabela.RecordCount;
+    aProcesso.Progress := 0;
+    Application.ProcessMessages;
+
+    cdsTabela.First;
+    while not cdsTabela.Eof do
+    begin
+      with ACBrESocial.Eventos.Tabelas.S1010.Add do
+      begin
+        evtTabRubrica.Sequencial := StrToInt(IncrementGenerator('GEN_ESOCIAL_EVENTO_S1010', 1));
+
+        evtTabRubrica.IdeEvento.TpAmb   := taProducaoRestrita;
+        evtTabRubrica.IdeEvento.ProcEmi := peAplicEmpregador;
+        evtTabRubrica.IdeEvento.VerProc := Versao_Executavel(ParamStr(0));
+
+        evtTabRubrica.IdeEmpregador.TpInsc := tiCNPJ;
+        evtTabRubrica.IdeEmpregador.NrInsc := Criptografa(cdsTabela.FieldByName('CNPJ').AsString, '2', 14);
+
+        evtTabRubrica.ModoLancamento := aModoLancamento;
+
+        evtTabRubrica.infoRubrica.IdeRubrica.CodRubr    := Trim(cdsTabela.FieldByName('codigo').AsString);
+        evtTabRubrica.infoRubrica.IdeRubrica.ideTabRubr := Trim(cdsTabela.FieldByName('id').AsString);
+        evtTabRubrica.infoRubrica.IdeRubrica.IniValid   := aCompetencia;
+        evtTabRubrica.infoRubrica.IdeRubrica.FimValid   := ProximaCompetencia(aCompetencia);
+
+        evtTabRubrica.infoRubrica.DadosRubrica.dscRubr  := AnsiUpperCase(Trim(cdsTabela.FieldByName('descricao').AsString));
+        evtTabRubrica.infoRubrica.DadosRubrica.natRubr  := StrToIntDef(Trim(cdsTabela.FieldByName('nat_rubrica').AsString), 0);
+
+        if (Trim(cdsTabela.FieldByName('tipo').AsString) = 'V') then
+          evtTabRubrica.infoRubrica.DadosRubrica.tpRubr := tpVencimento
+        else
+        if (Trim(cdsTabela.FieldByName('tipo').AsString) = 'D') then
+          evtTabRubrica.infoRubrica.DadosRubrica.tpRubr := tpDesconto;
+
+        evtTabRubrica.infoRubrica.DadosRubrica.codIncCP   := tpCodIncCP(1);
+        evtTabRubrica.infoRubrica.DadosRubrica.codIncIRRF := tpCodIncIRRF(1);
+        evtTabRubrica.infoRubrica.DadosRubrica.codIncFGTS := tpCodIncFGTS(1);
+        evtTabRubrica.infoRubrica.DadosRubrica.codIncSIND := tpCodIncSIND(1);
+        evtTabRubrica.infoRubrica.DadosRubrica.observacao := AnsiUpperCase(Trim(cdsTabela.FieldByName('descr_categ_tcm').AsString));
+
+        evtTabRubrica.infoRubrica.DadosRubrica.IdeProcessoCP.Clear;
+
+//        with evtTabRubrica.infoRubrica.DadosRubrica.IdeProcessoCP.Add do
+//        begin
+//          nrProc := '1020';
+//          ExtDecisao := tpExtDecisao(1);
+//          codSusp := '1';
+//        end;
+//
+//        evtTabRubrica.infoRubrica.DadosRubrica.IdeProcessoIRRF.Clear;
+//
+//        with evtTabRubrica.infoRubrica.DadosRubrica.IdeProcessoIRRF.Add do
+//        begin
+//          nrProc := '1020';
+//          codSusp := '2';
+//        end;
+//
+//        evtTabRubrica.infoRubrica.DadosRubrica.IdeProcessoFGTS.Clear;
+//
+//        with evtTabRubrica.infoRubrica.DadosRubrica.IdeProcessoFGTS.Add do
+//        begin
+//          nrProc := '50740';
+//        end;
+//
+//        evtTabRubrica.infoRubrica.DadosRubrica.IdeProcessoSIND.Clear;
+//
+//        with evtTabRubrica.infoRubrica.DadosRubrica.IdeProcessoSIND.Add do
+//        begin
+//          nrProc := '50';
+//        end;
+
+        if (evtTabRubrica.ModoLancamento = mlAlteracao) then
+        begin
+          evtTabRubrica.infoRubrica.NovaValidade.IniValid := aCompetencia;
+          evtTabRubrica.infoRubrica.NovaValidade.FimValid := '2099-12';
+        end;
+      end;
+
+      aLabel.Caption     := Trim(cdsTabela.FieldByName('DESCRICAO').AsString);
+      aProcesso.Progress := I;
+      Application.ProcessMessages;
+      Inc(I);
+
+      cdsTabela.Next;
+    end;
+
+    aRetorno := True;
+  finally
+    aSQL.Free;
+    Result := aRetorno;
+  end;
+end;
+
 function TdmESocial.GetMensagemRetorno: TStringList;
 begin
   if not Assigned(aMensagemRetorno) then
@@ -853,6 +978,23 @@ begin
     aLista.Items.EndUpdate;
     aLista.ItemIndex := x;
   end;
+end;
+
+function TdmESocial.ProximaCompetencia(aCompetencia : String): String;
+var
+  aAno ,
+  aMes : Integer;
+  aRetorno : String;
+begin
+  aAno := StrToInt(Copy(aCompetencia, 1, 4));
+  aMes := StrToInt(Copy(aCompetencia, 6, 2)) + 1;
+
+  if (aMes > 12) then
+    aRetorno := IntToStr(aAno + 1) + '-01'
+  else
+    aRetorno := IntToStr(aAno) + FormatFloat('"-"00', aMes);
+
+  Result := aRetorno;
 end;
 
 procedure TdmESocial.SetSQL(aSQL: TStringList);

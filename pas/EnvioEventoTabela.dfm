@@ -146,7 +146,6 @@ inherited frmEnvioEventoTabela: TfrmEnvioEventoTabela
       Height = 17
       Caption = 'S-1010 Tabela de Rubricas'
       Ctl3D = False
-      Enabled = False
       ParentCtl3D = False
       TabOrder = 2
     end
