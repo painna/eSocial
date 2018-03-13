@@ -107,7 +107,7 @@ type
     function Gerar_eSocial1020(aCompetencia : String; aZerarBase : Boolean;
       aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge) : Boolean; virtual; abstract;
     function Gerar_eSocial1030(aCompetencia : String; aZerarBase : Boolean;
-      aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge) : Boolean; virtual; abstract;
+      aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge) : Boolean;
     function Gerar_eSocial1035(aCompetencia : String; aZerarBase : Boolean;
       aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge) : Boolean; virtual; abstract;
     function Gerar_eSocial1040(aCompetencia : String; aZerarBase : Boolean;
@@ -721,6 +721,130 @@ begin
           evtTabRubrica.infoRubrica.NovaValidade.FimValid := '2099-12';
         end;
       end;
+
+      aLabel.Caption     := Trim(cdsTabela.FieldByName('DESCRICAO').AsString);
+      aProcesso.Progress := I;
+      Application.ProcessMessages;
+      Inc(I);
+
+      cdsTabela.Next;
+    end;
+
+    aRetorno := True;
+  finally
+    aSQL.Free;
+    Result := aRetorno;
+  end;
+end;
+
+function TdmESocial.Gerar_eSocial1030(aCompetencia: String; aZerarBase: Boolean; aModoLancamento: TModoLancamento;
+  aLabel: TLabel; aProcesso: TGauge): Boolean;
+var
+  aRetorno : Boolean;
+  aSQL : TStringList;
+  ok   : Boolean;
+  I    : Integer;
+begin
+  aRetorno := False;
+  aSQL := TStringList.Create;
+  ok   := True;
+  try
+    aSQL.BeginUpdate;
+    aSQL.Clear;
+    aSQL.Add('Select');
+    aSQL.Add('    f.*');
+    aSQL.Add('  , c.codigo as cbo ');
+    aSQL.Add('  , (Select CNPJ from CONFIG_ORGAO c where c.id = 1) as CNPJ ');
+    aSQL.Add('from CARGO_FUNCAO f');
+    aSQL.Add('  left join CBO c on (c.id = f.id_cbo)');
+    aSQL.Add('where (c.id > 0)');
+
+    case aModoLancamento of
+      mlInclusao  : aSQL.Add('  and f.tipo_operacao = ' + QuotedStr(FLAG_OPERACAO_INSERIR));
+      mlAlteracao : aSQL.Add('  and f.tipo_operacao = ' + QuotedStr(FLAG_OPERACAO_ALTERAR));
+      mlExclusao  : aSQL.Add('  and f.tipo_operacao = ' + QuotedStr(FLAG_OPERACAO_EXCLUIR));
+    end;
+
+    aSQL.EndUpdate;
+    SetSQL(aSQL);
+
+    I := 1;
+
+    aProcesso.MaxValue := cdsTabela.RecordCount;
+    aProcesso.Progress := 0;
+    Application.ProcessMessages;
+
+    cdsTabela.First;
+    while not cdsTabela.Eof do
+    begin
+      with ACBrESocial.Eventos.Tabelas.S1030.Add do
+      begin
+        evtTabCargo.Sequencial := 0;
+
+        evtTabCargo.IdeEvento.TpAmb   := taProducaoRestrita;
+        evtTabCargo.IdeEvento.ProcEmi := peAplicEmpregador;
+        evtTabCargo.IdeEvento.VerProc := Versao_Executavel(ParamStr(0));
+
+        evtTabCargo.IdeEmpregador.TpInsc := tiCNPJ;
+        evtTabCargo.IdeEmpregador.NrInsc := Criptografa(cdsTabela.FieldByName('CNPJ').AsString, '2', 14);
+
+        evtTabCargo.ModoLancamento := aModoLancamento;
+
+        evtTabCargo.infoCargo.IdeCargo.CodCargo := cdsTabela.FieldByName('id').AsString;
+        evtTabCargo.infoCargo.IdeCargo.IniValid := aCompetencia;
+        evtTabCargo.infoCargo.IdeCargo.FimValid := '2099-12';
+
+        evtTabCargo.infoCargo.DadosCargo.nmCargo := AnsiUpperCase(Trim(cdsTabela.FieldByName('descricao').AsString));
+        evtTabCargo.infoCargo.DadosCargo.codCBO  := cdsTabela.FieldByName('cbo').AsString;
+
+        evtTabCargo.infoCargo.DadosCargo.cargoPublico.acumCargo   := tpAcumCargo(0);
+        evtTabCargo.infoCargo.DadosCargo.cargoPublico.contagemEsp := tpContagemEsp(0);
+        evtTabCargo.infoCargo.DadosCargo.cargoPublico.dedicExcl   := tpSimNao(0);
+
+        evtTabCargo.infoCargo.DadosCargo.cargoPublico.leiCargo.nrLei    := '11111';
+        evtTabCargo.infoCargo.DadosCargo.cargoPublico.leiCargo.dtLei    := Now;
+        evtTabCargo.infoCargo.DadosCargo.cargoPublico.leiCargo.sitCargo := tpSitCargo(0);
+
+        evtTabCargo.infoCargo.NovaValidade.IniValid := aCompetencia;
+        evtTabCargo.infoCargo.NovaValidade.FimValid := '2099-12';
+      end;
+
+  //  for i := 0 to 2 do
+  //  begin
+  //    with ACBreSocial1.Eventos.Tabelas.S1030.Add do
+  //    begin
+  //      evtTabCargo.Sequencial := 0;
+  //
+  //      evtTabCargo.IdeEvento.TpAmb := taProducaoRestrita;
+  //      evtTabCargo.IdeEvento.ProcEmi := TpProcEmi(0);
+  //      evtTabCargo.IdeEvento.VerProc := '1.0';
+  //
+  //      evtTabCargo.IdeEmpregador.TpInsc := tiCPF;
+  //      evtTabCargo.IdeEmpregador.NrInsc := '0123456789';
+  //
+  //      evtTabCargo.ModoLancamento := TModoLancamento(i);
+  //
+  //      evtTabCargo.infoCargo.IdeCargo.CodCargo := '37';
+  //      evtTabCargo.infoCargo.IdeCargo.IniValid := '2015-05';
+  //      evtTabCargo.infoCargo.IdeCargo.FimValid := '2099-12';
+  //
+  //      evtTabCargo.infoCargo.DadosCargo.nmCargo := 'Programador';
+  //      evtTabCargo.infoCargo.DadosCargo.codCBO := '500000';
+  //
+  //      evtTabCargo.infoCargo.DadosCargo.cargoPublico.acumCargo := tpAcumCargo(0);
+  //      evtTabCargo.infoCargo.DadosCargo.cargoPublico.contagemEsp :=
+  //        tpContagemEsp(0);
+  //      evtTabCargo.infoCargo.DadosCargo.cargoPublico.dedicExcl := tpSimNao(0);
+  //
+  //      evtTabCargo.infoCargo.DadosCargo.cargoPublico.leiCargo.nrLei := '11111';
+  //      evtTabCargo.infoCargo.DadosCargo.cargoPublico.leiCargo.dtLei := Now;
+  //      evtTabCargo.infoCargo.DadosCargo.cargoPublico.leiCargo.sitCargo :=
+  //        tpSitCargo(0);
+  //
+  //      evtTabCargo.infoCargo.NovaValidade.IniValid := '2015-05';
+  //      evtTabCargo.infoCargo.NovaValidade.FimValid := '2099-12';
+  //    end;
+  //  end;
 
       aLabel.Caption     := Trim(cdsTabela.FieldByName('DESCRICAO').AsString);
       aProcesso.Progress := I;
