@@ -156,7 +156,6 @@ inherited frmEnvioEventoTabela: TfrmEnvioEventoTabela
       Height = 17
       Caption = 'S-1020 Tabela de Lota'#231#245'es/Departamentos'
       Ctl3D = False
-      Enabled = False
       ParentCtl3D = False
       TabOrder = 3
     end
@@ -167,7 +166,6 @@ inherited frmEnvioEventoTabela: TfrmEnvioEventoTabela
       Height = 17
       Caption = 'S-1030 Tabela de Cargos'
       Ctl3D = False
-      Enabled = False
       ParentCtl3D = False
       TabOrder = 4
     end

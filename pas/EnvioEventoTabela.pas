@@ -163,6 +163,11 @@ begin
           aRetorno   := dmESocial.EventoEnviado_eSocial(egIniciais, cmbAnoMes.Text, lblProcesso, gagProcesso, aProtocolo);
         end;
 
+        if aRetorno then
+        begin
+          Mensagem('Protocolo : ' + aProtocolo.Numero + #13#13 + aProtocolo.Arquivos.Text, 'T E S T E !', MB_ICONINFORMATION);
+        end
+        else
         if not aRetorno then
           if (dmESocial.MensagemRetorno.Count > 0) then
             Mensagem(dmESocial.MensagemRetorno.Text, 'Alerta Retorno', MB_ICONWARNING);

@@ -754,9 +754,12 @@ begin
     aSQL.Add('Select');
     aSQL.Add('    f.*');
     aSQL.Add('  , c.codigo as cbo ');
+    aSQL.Add('  , e.cod_rais as escolaridade ');
+    aSQL.Add('  , Case when coalesce(f.dt_extinsao, current_date) > cast(' + QuotedStr(aCompetencia + '-01') + ' as date) then 0 else 1 end extinto');
     aSQL.Add('  , (Select CNPJ from CONFIG_ORGAO c where c.id = 1) as CNPJ ');
     aSQL.Add('from CARGO_FUNCAO f');
     aSQL.Add('  left join CBO c on (c.id = f.id_cbo)');
+    aSQL.Add('  left join ESCOLARIDADE e on (e.id = f.id_escolaridade)');
     aSQL.Add('where (c.id > 0)');
 
     case aModoLancamento of
@@ -797,54 +800,29 @@ begin
         evtTabCargo.infoCargo.DadosCargo.nmCargo := AnsiUpperCase(Trim(cdsTabela.FieldByName('descricao').AsString));
         evtTabCargo.infoCargo.DadosCargo.codCBO  := cdsTabela.FieldByName('cbo').AsString;
 
-        evtTabCargo.infoCargo.DadosCargo.cargoPublico.acumCargo   := tpAcumCargo(0);
-        evtTabCargo.infoCargo.DadosCargo.cargoPublico.contagemEsp := tpContagemEsp(0);
-        evtTabCargo.infoCargo.DadosCargo.cargoPublico.dedicExcl   := tpSimNao(0);
+//        evtTabCargo.infoCargo.DadosCargo.cargoPublico.acumCargo   := tpAcumCargo(0);
+//        evtTabCargo.infoCargo.DadosCargo.cargoPublico.contagemEsp := tpContagemEsp(0);
+//        evtTabCargo.infoCargo.DadosCargo.cargoPublico.dedicExcl   := tpSimNao(0);
 
-        evtTabCargo.infoCargo.DadosCargo.cargoPublico.leiCargo.nrLei    := '11111';
-        evtTabCargo.infoCargo.DadosCargo.cargoPublico.leiCargo.dtLei    := Now;
-        evtTabCargo.infoCargo.DadosCargo.cargoPublico.leiCargo.sitCargo := tpSitCargo(0);
+        if (not cdsTabela.FieldByName('data_ato_criacao').IsNull) then
+        begin
+          evtTabCargo.infoCargo.DadosCargo.cargoPublico.leiCargo.nrLei := FormatFloat('#######00000', StrToCurrDef(Trim(cdsTabela.FieldByName('num_ato_criacao').AsString), 0));
+          evtTabCargo.infoCargo.DadosCargo.cargoPublico.leiCargo.dtLei := cdsTabela.FieldByName('data_ato_criacao').AsDateTime;
+        end
+        else
+        begin
+          evtTabCargo.infoCargo.DadosCargo.cargoPublico.leiCargo.nrLei := '11111';
+          evtTabCargo.infoCargo.DadosCargo.cargoPublico.leiCargo.dtLei := Now;
+        end;
+
+        if (cdsTabela.FieldByName('extinto').AsInteger = 1) then
+          evtTabCargo.infoCargo.DadosCargo.cargoPublico.leiCargo.sitCargo := scExtincao
+        else
+          evtTabCargo.infoCargo.DadosCargo.cargoPublico.leiCargo.sitCargo := scCriacao;
 
         evtTabCargo.infoCargo.NovaValidade.IniValid := aCompetencia;
         evtTabCargo.infoCargo.NovaValidade.FimValid := '2099-12';
       end;
-
-  //  for i := 0 to 2 do
-  //  begin
-  //    with ACBreSocial1.Eventos.Tabelas.S1030.Add do
-  //    begin
-  //      evtTabCargo.Sequencial := 0;
-  //
-  //      evtTabCargo.IdeEvento.TpAmb := taProducaoRestrita;
-  //      evtTabCargo.IdeEvento.ProcEmi := TpProcEmi(0);
-  //      evtTabCargo.IdeEvento.VerProc := '1.0';
-  //
-  //      evtTabCargo.IdeEmpregador.TpInsc := tiCPF;
-  //      evtTabCargo.IdeEmpregador.NrInsc := '0123456789';
-  //
-  //      evtTabCargo.ModoLancamento := TModoLancamento(i);
-  //
-  //      evtTabCargo.infoCargo.IdeCargo.CodCargo := '37';
-  //      evtTabCargo.infoCargo.IdeCargo.IniValid := '2015-05';
-  //      evtTabCargo.infoCargo.IdeCargo.FimValid := '2099-12';
-  //
-  //      evtTabCargo.infoCargo.DadosCargo.nmCargo := 'Programador';
-  //      evtTabCargo.infoCargo.DadosCargo.codCBO := '500000';
-  //
-  //      evtTabCargo.infoCargo.DadosCargo.cargoPublico.acumCargo := tpAcumCargo(0);
-  //      evtTabCargo.infoCargo.DadosCargo.cargoPublico.contagemEsp :=
-  //        tpContagemEsp(0);
-  //      evtTabCargo.infoCargo.DadosCargo.cargoPublico.dedicExcl := tpSimNao(0);
-  //
-  //      evtTabCargo.infoCargo.DadosCargo.cargoPublico.leiCargo.nrLei := '11111';
-  //      evtTabCargo.infoCargo.DadosCargo.cargoPublico.leiCargo.dtLei := Now;
-  //      evtTabCargo.infoCargo.DadosCargo.cargoPublico.leiCargo.sitCargo :=
-  //        tpSitCargo(0);
-  //
-  //      evtTabCargo.infoCargo.NovaValidade.IniValid := '2015-05';
-  //      evtTabCargo.infoCargo.NovaValidade.FimValid := '2099-12';
-  //    end;
-  //  end;
 
       aLabel.Caption     := Trim(cdsTabela.FieldByName('DESCRICAO').AsString);
       aProcesso.Progress := I;
