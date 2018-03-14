@@ -545,3 +545,20 @@ P - Processado/Enviado';
 UPDATE CARGO_FUNCAO
 SET TIPO_OPERACAO = 'I';
 
+
+Update ESOCIAL_NATUREZA_RUBRICA Set DESCONTO = 'S' where DESCONTO = 'D';
+
+COMMIT WORK;
+
+
+
+/*------ GERASYS.TI 14/03/2018 10:30:16 --------*/
+
+/*!!! Error occured !!!
+Invalid token.
+Dynamic SQL Error.
+SQL error code = -104.
+Token unknown - line 5, column 45.
+as.
+
+*/
