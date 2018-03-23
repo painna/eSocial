@@ -553,6 +553,24 @@ begin
   aSQL := TStringList.Create;
   ok   := True;
   try
+(*
+Select
+  ug.*
+from UNID_GESTORA ug
+  inner join (
+    Select distinct
+        u.cnpj
+      , (
+          Select first 1
+            x.id
+          from UNID_GESTORA x
+          where x.cnpj = u.cnpj
+            and coalesce(nullif(trim(x.razao_social), ''), '') <> ''
+        ) as id
+    from UNID_GESTORA u
+  ) tp on (tp.id = ug.id)
+*)
+
 //    for i := 0 to 2 do
 //    begin
 //      with ACBreSocial1.Eventos.Iniciais.S1005.Add do
