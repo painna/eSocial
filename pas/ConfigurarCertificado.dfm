@@ -32,6 +32,10 @@ object frmConfigurarCertificado: TfrmConfigurarCertificado
     object tbsGeral: TTabSheet
       Caption = 'Geral'
       ImageIndex = 1
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object GroupBox1: TGroupBox
         AlignWithMargins = True
         Left = 3
@@ -235,6 +239,10 @@ object frmConfigurarCertificado: TfrmConfigurarCertificado
     end
     object tbsCertificado: TTabSheet
       Caption = 'Certificado'
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       DesignSize = (
         273
         442)
@@ -520,6 +528,10 @@ object frmConfigurarCertificado: TfrmConfigurarCertificado
     object tbsWebService: TTabSheet
       Caption = 'WebService'
       ImageIndex = 2
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object GroupBox4: TGroupBox
         AlignWithMargins = True
         Left = 3
@@ -756,6 +768,10 @@ object frmConfigurarCertificado: TfrmConfigurarCertificado
     object tbsArquivos: TTabSheet
       Caption = 'Arquivos'
       ImageIndex = 4
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       DesignSize = (
         273
         442)

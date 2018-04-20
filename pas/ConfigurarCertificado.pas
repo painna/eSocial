@@ -224,7 +224,7 @@ begin
   cbVersaoDF.Items.Clear;
   for K := Low(TVersaoeSocial) to High(TVersaoeSocial) do
     cbVersaoDF.Items.Add(GetEnumName(TypeInfo(TVersaoeSocial), Integer(K)));
-  cbVersaoDF.ItemIndex := Ord(ve240);
+  cbVersaoDF.ItemIndex := Ord(ve02_04_02);
 
   cbTEmpregador.Items.Clear;
   for L := Low(TEmpregador) to High(TEmpregador) do
