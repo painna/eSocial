@@ -1,4 +1,4 @@
-
+﻿
 
 
 /*------ GERASYS.TI 01/03/2018 15:52:07 --------*/
@@ -552,13 +552,3 @@ COMMIT WORK;
 
 
 
-/*------ GERASYS.TI 14/03/2018 10:30:16 --------*/
-
-/*!!! Error occured !!!
-Invalid token.
-Dynamic SQL Error.
-SQL error code = -104.
-Token unknown - line 5, column 45.
-as.
-
-*/

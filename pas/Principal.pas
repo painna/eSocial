@@ -117,6 +117,8 @@ type
     Bevel2: TBevel;
     Bevel3: TBevel;
     imConfigurarESocial: TMenuItem;
+    imArquivoUnidadeGestora: TMenuItem;
+    imArquivoEvento: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormActivate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);

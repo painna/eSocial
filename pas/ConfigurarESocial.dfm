@@ -42,7 +42,7 @@ inherited frmConfigurarESocial: TfrmConfigurarESocial
       ParentBackground = False
       ParentFont = False
       TabOrder = 1
-      Properties.ActivePage = tbsContador
+      Properties.ActivePage = tbsUNG
       Properties.CustomButtons.Buttons = <>
       Properties.Options = [pcoAlwaysShowGoDialogButton, pcoGradient, pcoGradientClientArea, pcoRedrawOnResize, pcoSort]
       Properties.Style = 9
@@ -217,7 +217,7 @@ inherited frmConfigurarESocial: TfrmConfigurarESocial
         end
         object dbePOSSUI_RPPS: TcxDBCheckBox
           Left = 153
-          Top = 137
+          Top = 141
           Caption = 'Possui Regime Proprio de Previdencia Social (RPPS)'
           DataBinding.DataField = 'POSSUI_RPPS'
           DataBinding.DataSource = ds1
@@ -232,6 +232,25 @@ inherited frmConfigurarESocial: TfrmConfigurarESocial
           Style.IsFontAssigned = True
           TabOrder = 10
           Transparent = True
+        end
+        object dbeDATA_IMPLANTACAO: TcxDBDateEdit
+          Left = 153
+          Top = 166
+          DataBinding.DataField = 'DATA_IMPLANTACAO'
+          DataBinding.DataSource = ds1
+          TabOrder = 11
+          Width = 121
+        end
+        object cxLabel1: TcxLabel
+          Left = 6
+          Top = 169
+          Caption = 'Data de Implata'#231#227'o e-Social:'
+          FocusControl = dbeSUBTETO_VENCTO_VALOR
+          ParentFont = False
+          Style.StyleController = dmPrincipal.cxLabelStyleNormal
+          Properties.Alignment.Horz = taRightJustify
+          Transparent = True
+          AnchorX = 146
         end
       end
       object tbsContador: TcxTabSheet
@@ -463,9 +482,14 @@ inherited frmConfigurarESocial: TfrmConfigurarESocial
     end
     object sds1TIPO_OPERACAO: TStringField
       FieldName = 'TIPO_OPERACAO'
+      ProviderFlags = [pfInUpdate]
       Required = True
       FixedChar = True
       Size = 1
+    end
+    object sds1DATA_IMPLANTACAO: TDateField
+      FieldName = 'DATA_IMPLANTACAO'
+      ProviderFlags = [pfInUpdate]
     end
   end
   inherited dsp1: TDataSetProvider
@@ -543,6 +567,10 @@ inherited frmConfigurarESocial: TfrmConfigurarESocial
         Attributes = [faRequired, faFixed]
         DataType = ftString
         Size = 1
+      end
+      item
+        Name = 'DATA_IMPLANTACAO'
+        DataType = ftDate
       end>
     Params = <
       item
@@ -625,6 +653,10 @@ inherited frmConfigurarESocial: TfrmConfigurarESocial
       Required = True
       FixedChar = True
       Size = 1
+    end
+    object cds1DATA_IMPLANTACAO: TDateField
+      FieldName = 'DATA_IMPLANTACAO'
+      ProviderFlags = [pfInUpdate]
     end
   end
   inherited ds1: TDataSource

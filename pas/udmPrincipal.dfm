@@ -17,8 +17,8 @@ object dmPrincipal: TdmPrincipal
         'O.FDB'
       'ServerCharSet=WIN1252')
     BeforeConnect = SConPrincipalBeforeConnect
-    Left = 24
-    Top = 8
+    Left = 56
+    Top = 40
   end
   object cxEditStyleReadyOnly: TcxEditStyleController
     Style.BorderColor = clGray

@@ -13,6 +13,7 @@ Procedure Logradouros(oEd1,oEd2: TCustomEdit);
 Procedure Bairros(oEd1,oEd2: TCustomEdit);
 Procedure LocaisDePagto(oEd1,oEd2: TCustomEdit);
 Function Pesquisa(sTabela, sCampoPesq, sTextPesq, sCampoRet, sMensagem: String): String;
+Function PesquisaData(sTabela, sCampoPesq, sTextPesq, sCampoRet, sMensagem: String): TDateTime;
 Procedure AtualizaUltSequencial(sTabela: String; iUltSequencial: Integer);
 Procedure MostraDados(sTabela,sCampoId,sCampoDisp1,sCampoDisp2,sTextoPesq: String; oEdit1,oEdit2: TCustomEdit; sMsg: String);
 Procedure CancelaTransacao(oTab: TClientDataSet; sNomeTab: String);
@@ -163,6 +164,34 @@ Begin
          Result := '';
      End;
      If Result = '' Then
+        If sMensagem <> '' Then
+           Mensagem(sMensagem,'E r r o !!!',MB_ICONERROR+MB_OK);
+   Finally
+     oQry1.Close;
+     oQry1.Free;
+   End;
+End;
+
+Function PesquisaData(sTabela, sCampoPesq, sTextPesq, sCampoRet, sMensagem: String): TDateTime;
+Var
+   oQry1: TSQLQuery;
+Begin
+
+   oQry1 := TSQLQuery.Create(Nil);
+   oQry1.SQLConnection := dmPrincipal.SConPrincipal;
+   oQry1.SQL.Clear;
+   oQry1.SQL.Add('SELECT '+UpperCase(sCampoRet)+' FROM '+UpperCase(sTabela)+
+                          ' WHERE '+UpperCase(sCampoPesq)+' = :Param1');
+
+   oQry1.Params[0].AsString := Trim(sTextPesq);
+   Try
+     oQry1.Open;
+     Try
+         Result := oQry1.FieldByName(UpperCase(sCampoRet)).AsDateTime;
+     except
+         Result := null;
+     End;
+     If Result = null Then
         If sMensagem <> '' Then
            Mensagem(sMensagem,'E r r o !!!',MB_ICONERROR+MB_OK);
    Finally
@@ -518,14 +547,18 @@ function IncrementGenerator(Generator_: String; N_: Integer): String;
 Var
   oQry1: TSQLQuery;
 begin
-  //GetFieldValue('CRIA_GERADOR('''+Generator_+''')', 'OK', EmptyStr);
-  //FinishTransaction(True);
-  //StartTransaction;
-
+//  try
+//    GetFieldValue('CRIA_GERADOR(' + QuotedStr(Generator_) + ')', 'OK', EmptyStr);
+//    FinishTransaction(True);
+//    StartTransaction;
+//  except
+//  end;
+//
   Result := '0';
-  oQry1 := TSQLQuery.Create(Nil);
+  oQry1  := TSQLQuery.Create(Nil);
+
   oQry1.SQLConnection := dmPrincipal.SConPrincipal;
-  oQry1.SQL.Add('select gen_id('+Generator_+',1) as NewId from RDB$DATABASE');
+  oQry1.SQL.Add('select gen_id(' + Generator_ + ', 1) as NewId from RDB$DATABASE');
   try
     try
        oQry1.Open;

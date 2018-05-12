@@ -17,7 +17,7 @@ uses
   dxSkinVisualStudio2013Light, dxSkinVS2010, dxSkinWhiteprint, dxSkinXmas2008Blue, Vcl.Menus, Data.FMTBcd, Data.DB,
   Datasnap.DBClient, Datasnap.Provider, Data.SqlExpr, Vcl.StdCtrls, cxButtons, cxLabel, Vcl.ExtCtrls,
   dxSkinscxPCPainter, dxBarBuiltInMenu, cxPC, cxTextEdit, cxMaskEdit, cxDropDownEdit, cxLookupEdit, cxDBLookupEdit,
-  cxDBLookupComboBox, cxDBEdit, cxCurrencyEdit, cxCheckBox;
+  cxDBLookupComboBox, cxDBEdit, cxCurrencyEdit, cxCheckBox, cxCalendar;
 
 type
   TfrmConfigurarESocial = class(TfrmAddEditPadrao2)
@@ -83,6 +83,10 @@ type
     lblCONTADOR_EMAIL: TcxLabel;
     sds1TIPO_OPERACAO: TStringField;
     cds1TIPO_OPERACAO: TStringField;
+    sds1DATA_IMPLANTACAO: TDateField;
+    cds1DATA_IMPLANTACAO: TDateField;
+    dbeDATA_IMPLANTACAO: TcxDBDateEdit;
+    cxLabel1: TcxLabel;
     procedure FormCreate(Sender: TObject);
     procedure cds1NewRecord(DataSet: TDataSet);
     procedure FormShow(Sender: TObject);

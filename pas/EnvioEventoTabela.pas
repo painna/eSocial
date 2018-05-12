@@ -112,7 +112,7 @@ begin
   LimparPainelProcesso(True);
 
   Screen.Cursor   := crHourGlass;
-  aModoLancamento := eSStrToModoLancamento(ok, IntToStr(gpbOperacao.ItemIndex));
+  aModoLancamento := TModoLancamento(gpbOperacao.ItemIndex); //eSStrToModoLancamento(ok, IntToStr(gpbOperacao.ItemIndex));
 
   try
     if not dmESocial.CertificadoInstalado then

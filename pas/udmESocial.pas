@@ -413,6 +413,7 @@ begin
     aSQL.Add('    c.*');
     aSQL.Add('  , e.*');
     aSQL.Add('  , u.RAZAO_SOCIAL as ENTE_FERERATIVO');
+    aSQL.Add('  , u.cnpj as ENTE_CNPJ');
     aSQL.Add('from CONFIG_ORGAO c');
     aSQL.Add('  inner join CONFIG_ESOCIAL e on (e.ID_CONFIG_ORGAO = c.ID)');
     aSQL.Add('  inner join UNID_GESTORA   u on (u.ID = e.ID_UNID_GESTORA)');
@@ -446,7 +447,11 @@ begin
         // So tem na Versão 2.x4.1
         // taProducao, taProducaoRestrita
         evtInfoEmpregador.Sequencial      := StrToInt(IncrementGenerator('GEN_ESOCIAL_EVENTO_S1000', 1));
-        evtInfoEmpregador.IdeEvento.TpAmb := taProducaoRestrita;
+
+        if AmbienteWebServiceProducao then
+          evtInfoEmpregador.IdeEvento.TpAmb := TpTpAmb(0) //taProducao
+        else
+          evtInfoEmpregador.IdeEvento.TpAmb := taProducaoRestrita;
 
         evtInfoEmpregador.IdeEvento.ProcEmi := peAplicEmpregador;
         evtInfoEmpregador.IdeEvento.VerProc := Versao_Executavel(ParamStr(0));
@@ -477,7 +482,9 @@ begin
           IndEtt           := tpNao;
           nrRegEtt         := EmptyStr;
 
-          InfoOp.nrSiafi            := Trim(cdsTabela.FieldByName('NRO_SIAFI').AsString);
+          InfoOp.nrSiafi := Trim(cdsTabela.FieldByName('NRO_SIAFI').AsString);
+
+          InfoOp.infoEnte.indRPPS   := IfThen(Criptografa(cdsTabela.FieldByName('CNPJ').AsString, '2', 14) = cdsTabela.FieldByName('ENTE_CNPJ').AsString, tpSim, tpNao);
           InfoOp.infoEnte.nmEnte    := Trim(cdsTabela.FieldByName('ENTE_FERERATIVO').AsString); // Nome do Entidade Federativa ao qual o órgão está vinculado
           InfoOp.infoEnte.uf        := eSStrTouf(ok, Trim(cdsTabela.FieldByName('ENDER_UF').AsString));
           InfoOp.infoEnte.codMunic  := cdsTabela.FieldByName('COD_MUNICIPIO_RAIS').AsInteger;   // Conforme Tabela do IBGE
@@ -548,81 +555,143 @@ var
   aSQL : TStringList;
   ok   : Boolean;
   I    : Integer;
+  aDataImplantacao : TDateTime;
 begin
   aRetorno := False;
   aSQL := TStringList.Create;
   ok   := True;
   try
-(*
-Select
-  ug.*
-from UNID_GESTORA ug
-  inner join (
-    Select distinct
-        u.cnpj
-      , (
-          Select first 1
-            x.id
-          from UNID_GESTORA x
-          where x.cnpj = u.cnpj
-            and coalesce(nullif(trim(x.razao_social), ''), '') <> ''
-        ) as id
-    from UNID_GESTORA u
-  ) tp on (tp.id = ug.id)
-*)
+    aDataImplantacao := PesquisaData('CONFIG_ESOCIAL','ID_CONFIG_ORGAO', '1', 'DATA_IMPLANTACAO', '');
 
-//    for i := 0 to 2 do
-//    begin
-//      with ACBreSocial1.Eventos.Iniciais.S1005.Add do
-//      begin
-//        evtTabEstab.Sequencial := 0;
+    aSQL.BeginUpdate;
+    aSQL.Clear;
+    aSQL.Add('Select');
+    aSQL.Add('  ug.*');
+    aSQL.Add('from UNID_GESTORA ug');
+//    aSQL.Add('  inner join (');
+//    aSQL.Add('    Select distinct');
+//    aSQL.Add('        u.cnpj');
+//    aSQL.Add('      , (');
+//    aSQL.Add('          Select first 1');
+//    aSQL.Add('            x.id');
+//    aSQL.Add('          from UNID_GESTORA x');
+//    aSQL.Add('          where x.cnpj = u.cnpj');
+//    aSQL.Add('            and coalesce(nullif(trim(x.razao_social), ''''), '''') <> '''' ');
+//    aSQL.Add('        ) as id');
+//    aSQL.Add('    from UNID_GESTORA u');
+//    aSQL.Add('  ) tp on (tp.id = ug.id)');
+    aSQL.Add('where ug.id_tipo_unid_gestora <> 99');
+    aSQL.EndUpdate;
+    SetSQL(aSQL);
+
+    if cdsTabela.IsEmpty then
+      raise Exception.Create('Dados das Unidades Gestoras para o eSocial ainda não foram disponíveis!');
+
+    aSQL.BeginUpdate;
+    case aModoLancamento of
+      mlInclusao  : aSQL.Add('  and ug.tipo_operacao = ' + QuotedStr(FLAG_OPERACAO_INSERIR));
+      mlAlteracao : aSQL.Add('  and ug.tipo_operacao = ' + QuotedStr(FLAG_OPERACAO_ALTERAR));
+      mlExclusao  : aSQL.Add('  and ug.tipo_operacao = ' + QuotedStr(FLAG_OPERACAO_EXCLUIR));
+    end;
+    aSQL.EndUpdate;
+    SetSQL(aSQL);
+
+    I := 1;
+
+    aProcesso.MaxValue := cdsTabela.RecordCount;
+    aProcesso.Progress := 0;
+    Application.ProcessMessages;
+
+    cdsTabela.First;
+    while not cdsTabela.Eof do
+    begin
+      with ACBrESocial.Eventos.Iniciais.S1005.Add do
+      begin
+        with evtTabEstab do
+        begin
+          Sequencial     := StrToInt(IncrementGenerator('GEN_ESOCIAL_EVENTO_S1005', 1));
+          ModoLancamento := aModoLancamento;
+
+          if AmbienteWebServiceProducao then
+            IdeEvento.TpAmb := TpTpAmb(0) //taProducao
+          else
+            IdeEvento.TpAmb := taProducaoRestrita;
+
+          IdeEvento.ProcEmi := peAplicEmpregador;
+          IdeEvento.VerProc := Versao_Executavel(ParamStr(0));
+
+          IdeEmpregador.TpInsc := tiCNPJ;
+          IdeEmpregador.NrInsc := cdsTabela.FieldByName('CNPJ').AsString;
+
+          with infoEstab do
+          begin
+            with IdeEstab do
+            begin
+              TpInsc   := tiCNPJ;
+              NrInsc   := cdsTabela.FieldByName('CNPJ').AsString;
+              IniValid := aCompetencia;;
+              FimValid := '2099-12';
+            end;
+
+            with DadosEstab do
+            begin
+              cnaePrep := cdsTabela.FieldByName('CNAE_PREP').AsString;
+
+              with aliqGilrat do
+              begin
+                AliqRat      := eSStrToAliqRat(ok, cdsTabela.FieldByName('aliquota_rat').AsString); // arat1;
+                Fap          := 1.5;
+                AliqRatAjust := 2.5; // Igual à "AliqRat x Fap"
+
+                // Sem necessidade de "Processo administrativo/judicial relativo à alíquota RAT"
+//                with ProcAdmJudRat do
+//                begin
+//                  tpProc := tpTpProc(1);
+//                  nrProc := '20150512';
+//                  codSusp := '1';
+//                  tpProc := tpTpProc(1);
+//                  nrProc := '20150512';
+//                  codSusp := '2';
+//                end;
+              end;
+
+              infoCaepf.tpCaepf         := tcContrIndividual;
+              infoObra.indSubstPatrObra := ispPatronalNaoSubstituida;
+
+              with infoTrab do
+              begin
+//              regPt := tpRegPt(3);
 //
-//        evtTabEstab.IdeEvento.TpAmb := taProducaoRestrita;
-//        evtTabEstab.IdeEvento.ProcEmi := TpProcEmi(0);
-//        evtTabEstab.IdeEvento.VerProc := '1.0';
+//              with infoApr do
+//              begin
+//                contApr := tpContApr(2);
+//                nrProcJud := '20150612';
+//                contEntEd := tpSim;
 //
-//        evtTabEstab.IdeEmpregador.TpInsc := tiCPF;
-//        evtTabEstab.IdeEmpregador.NrInsc := '0123456789';
+//                infoEntEduc.Clear;
 //
-//        evtTabEstab.ModoLancamento := TModoLancamento(i);
-//        evtTabEstab.infoEstab.IdeEstab.TpInsc := tiCNPJ;
-//        evtTabEstab.infoEstab.IdeEstab.NrInsc := '012345678901234';
-//        evtTabEstab.infoEstab.IdeEstab.IniValid := '2015-05';
-//        evtTabEstab.infoEstab.IdeEstab.FimValid := '2099-12';
+//                with infoEntEduc.Add do
+//                  NrInsc := '0123456789';
+//              end;
 //
-//        evtTabEstab.infoEstab.DadosEstab.cnaePrep := '2015';
+//              infoPCD.contPCD := tpContPCD(9);
+//              infoPCD.nrProcJud := '20160131';
+              end;
+            end;
 //
-//        evtTabEstab.infoEstab.DadosEstab.aliqGilrat.AliqRat := arat1;
-//        evtTabEstab.infoEstab.DadosEstab.aliqGilrat.Fap := 1.5;
-//        evtTabEstab.infoEstab.DadosEstab.aliqGilrat.AliqRatAjust := 2.5;
-//
-//        evtTabEstab.infoEstab.DadosEstab.aliqGilrat.ProcAdmJudRat.tpProc := tpTpProc(1);
-//        evtTabEstab.infoEstab.DadosEstab.aliqGilrat.ProcAdmJudRat.nrProc := '20150512';
-//        evtTabEstab.infoEstab.DadosEstab.aliqGilrat.ProcAdmJudRat.codSusp := '1';
-//
-//        evtTabEstab.infoEstab.DadosEstab.aliqGilrat.ProcAdmJudFap.tpProc := tpTpProc(1);
-//        evtTabEstab.infoEstab.DadosEstab.aliqGilrat.ProcAdmJudFap.nrProc := '20150512';
-//        evtTabEstab.infoEstab.DadosEstab.aliqGilrat.ProcAdmJudFap.codSusp := '2';
-//
-//        evtTabEstab.infoEstab.DadosEstab.infoCaepf.tpCaepf := tcContrIndividual;
-//
-//        evtTabEstab.infoEstab.DadosEstab.infoObra.indSubstPatrObra := tpIndSubstPatronalObra(1);
-//
-//        evtTabEstab.infoEstab.DadosEstab.infoTrab.regPt := tpRegPt(3);
-//
-//        evtTabEstab.infoEstab.DadosEstab.infoTrab.infoApr.contApr := tpContApr(2);
-//        evtTabEstab.infoEstab.DadosEstab.infoTrab.infoApr.nrProcJud := '20150612';
-//        evtTabEstab.infoEstab.DadosEstab.infoTrab.infoApr.contEntEd := tpSim;
-//        with evtTabEstab.infoEstab.DadosEstab.infoTrab.infoApr.infoEntEduc.Add do
-//          NrInsc := '0123456789';
-//
-//        evtTabEstab.infoEstab.DadosEstab.infoTrab.infoPCD.contPCD := tpContPCD(9);
-//        evtTabEstab.infoEstab.DadosEstab.infoTrab.infoPCD.nrProcJud := '20160131';
-//
-//        evtTabEstab.infoEstab.NovaValidade.IniValid := '2014-05';
-//        evtTabEstab.infoEstab.NovaValidade.FimValid := '2099-12';
-//      end;
-//    end;
+            NovaValidade.IniValid := FormatDateTime('yyyy"-"mm', aDataImplantacao);
+            NovaValidade.FimValid := '2099-12';
+          end;
+        end;
+      end;
+
+      aLabel.Caption     := Trim(cdsTabela.FieldByName('RAZAO_SOCIAL').AsString);
+      aProcesso.Progress := I;
+      Application.ProcessMessages;
+      Inc(I);
+
+      cdsTabela.Next;
+    end;
 
     aRetorno := True;
   finally
@@ -673,7 +742,11 @@ begin
       begin
         evtTabRubrica.Sequencial := StrToInt(IncrementGenerator('GEN_ESOCIAL_EVENTO_S1010', 1));
 
-        evtTabRubrica.IdeEvento.TpAmb   := taProducaoRestrita;
+        if AmbienteWebServiceProducao then
+          evtTabRubrica.IdeEvento.TpAmb := TpTpAmb(0) //taProducao
+        else
+          evtTabRubrica.IdeEvento.TpAmb := taProducaoRestrita;
+
         evtTabRubrica.IdeEvento.ProcEmi := peAplicEmpregador;
         evtTabRubrica.IdeEvento.VerProc := Versao_Executavel(ParamStr(0));
 
@@ -802,7 +875,11 @@ begin
       begin
         evtTabCargo.Sequencial := 0;
 
-        evtTabCargo.IdeEvento.TpAmb   := taProducaoRestrita;
+        if AmbienteWebServiceProducao then
+          evtTabCargo.IdeEvento.TpAmb := TpTpAmb(0) //taProducao
+        else
+          evtTabCargo.IdeEvento.TpAmb := taProducaoRestrita;
+
         evtTabCargo.IdeEvento.ProcEmi := peAplicEmpregador;
         evtTabCargo.IdeEvento.VerProc := Versao_Executavel(ParamStr(0));
 
