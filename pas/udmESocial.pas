@@ -418,6 +418,76 @@ begin
     aSQL.Add('  inner join CONFIG_ESOCIAL e on (e.ID_CONFIG_ORGAO = c.ID)');
     aSQL.Add('  inner join UNID_GESTORA   u on (u.ID = e.ID_UNID_GESTORA)');
     aSQL.Add('where c.id = 1');
+//    aSQL.Add('Select');
+//    aSQL.Add('    u.*');
+//    aSQL.Add('  , u.cnpj as ENTE_CNPJ');
+//    aSQL.Add('  , u.RAZAO_SOCIAL as ENTE_FERERATIVO');
+//    aSQL.Add('');
+//    aSQL.Add('  , (Select RAZAO_SOCIAL            from CONFIG_ORGAO c where c.id = 1) as RAZAO_SOCIAL_ENCRIP');
+//    aSQL.Add('  , (Select SIGLA                   from CONFIG_ORGAO c where c.id = 1) as SIGLA');
+//    aSQL.Add('  , (Select CNPJ                    from CONFIG_ORGAO c where c.id = 1) as CNPJ_ENCRIP');
+//    aSQL.Add('  , (Select TIPO_ORGAO              from CONFIG_ORGAO c where c.id = 1) as TIPO_ORGAO');
+//    aSQL.Add('  , (Select ENDER_LOGRAD            from CONFIG_ORGAO c where c.id = 1) as ENDER_LOGRAD');
+//    aSQL.Add('  , (Select ENDER_NUM               from CONFIG_ORGAO c where c.id = 1) as ENDER_NUM');
+//    aSQL.Add('  , (Select ENDER_BAIRRO            from CONFIG_ORGAO c where c.id = 1) as ENDER_BAIRRO');
+//    aSQL.Add('  , (Select ENDER_CIDADE            from CONFIG_ORGAO c where c.id = 1) as ENDER_CIDADE');
+//    aSQL.Add('  , (Select ENDER_CEP               from CONFIG_ORGAO c where c.id = 1) as ENDER_CEP');
+//    aSQL.Add('  , (Select ENDER_UF                from CONFIG_ORGAO c where c.id = 1) as ENDER_UF');
+//    aSQL.Add('  , (Select TELEFONE                from CONFIG_ORGAO c where c.id = 1) as TELEFONE');
+//    aSQL.Add('  , (Select NOME_DIR_DRH            from CONFIG_ORGAO c where c.id = 1) as NOME_DIR_DRH');
+//    aSQL.Add('  , (Select COD_CNAE                from CONFIG_ORGAO c where c.id = 1) as COD_CNAE');
+//    aSQL.Add('  , (Select COD_FPAS                from CONFIG_ORGAO c where c.id = 1) as COD_FPAS');
+//    aSQL.Add('  , (Select COD_NATUREZA_JURIDICA   from CONFIG_ORGAO c where c.id = 1) as COD_NATUREZA_JURIDICA');
+//    aSQL.Add('  , (Select COD_MUNICIPIO_RAIS      from CONFIG_ORGAO c where c.id = 1) as COD_MUNICIPIO_RAIS');
+//    aSQL.Add('  , (Select COD_MUNICIPIO_TCM       from CONFIG_ORGAO c where c.id = 1) as COD_MUNICIPIO_TCM');
+//    aSQL.Add('  , (Select BRASAO                  from CONFIG_ORGAO c where c.id = 1) as BRASAO');
+//    aSQL.Add('  , (Select VER_EXE                 from CONFIG_ORGAO c where c.id = 1) as VER_EXE');
+//    aSQL.Add('  , (Select DT_VER_EXE              from CONFIG_ORGAO c where c.id = 1) as DT_VER_EXE');
+//    aSQL.Add('  , (Select NOME_PASTA_ATUALIZA_EXE from CONFIG_ORGAO c where c.id = 1) as NOME_PASTA_ATUALIZA_EXE');
+//    aSQL.Add('  , (Select TIPO_CONTRA_CHEQUE      from CONFIG_ORGAO c where c.id = 1) as TIPO_CONTRA_CHEQUE');
+//    aSQL.Add('  , (Select ID_SERVID_GESTOR        from CONFIG_ORGAO c where c.id = 1) as ID_SERVID_GESTOR');
+//    aSQL.Add('  , (Select NOME_SERVID_GESTOR      from CONFIG_ORGAO c where c.id = 1) as NOME_SERVID_GESTOR');
+//    aSQL.Add('  , (Select DESCR_TIPO_ORGAO        from CONFIG_ORGAO c where c.id = 1) as DESCR_TIPO_ORGAO');
+//    aSQL.Add('  , (Select ANO_MES_TRAVA           from CONFIG_ORGAO c where c.id = 1) as ANO_MES_TRAVA');
+//    aSQL.Add('  , (Select COD_CLI_RH_TRANSP       from CONFIG_ORGAO c where c.id = 1) as COD_CLI_RH_TRANSP');
+//    aSQL.Add('  , (Select COD_ORGAO_TCM           from CONFIG_ORGAO c where c.id = 1) as COD_ORGAO_TCM');
+//    aSQL.Add('  , (Select COD_HASH_DRH_TRANSP     from CONFIG_ORGAO c where c.id = 1) as COD_HASH_DRH_TRANSP');
+//    aSQL.Add('  , (Select E_MAIL                  from CONFIG_ORGAO c where c.id = 1) as E_MAIL');
+//    aSQL.Add('  , (Select PRAZO_LICENCA           from CONFIG_ORGAO c where c.id = 1) as PRAZO_LICENCA');
+//    aSQL.Add('');
+//    aSQL.Add('  , (Select ID_CONFIG_ORGAO      from CONFIG_ESOCIAL e where e.id_config_orgao = 1) as ID_CONFIG_ORGAO');
+//    aSQL.Add('  , (Select ID_UNID_GESTORA      from CONFIG_ESOCIAL e where e.id_config_orgao = 1) as ID_UNID_GESTORA');
+//    aSQL.Add('  , (Select CONTADOR_NOME        from CONFIG_ESOCIAL e where e.id_config_orgao = 1) as CONTADOR_NOME');
+//    aSQL.Add('  , (Select CONTADOR_CPF         from CONFIG_ESOCIAL e where e.id_config_orgao = 1) as CONTADOR_CPF');
+//    aSQL.Add('  , (Select CONTADOR_FONEFIXO    from CONFIG_ESOCIAL e where e.id_config_orgao = 1) as CONTADOR_FONEFIXO');
+//    aSQL.Add('  , (Select CONTADOR_FONECELULAR from CONFIG_ESOCIAL e where e.id_config_orgao = 1) as CONTADOR_FONECELULAR');
+//    aSQL.Add('  , (Select CONTADOR_EMAIL       from CONFIG_ESOCIAL e where e.id_config_orgao = 1) as CONTADOR_EMAIL');
+//
+//    aSQL.Add('  , coalesce(u.NAT_JURIDICA, ');
+//    aSQL.Add('  , (Select NAT_JURIDICA         from CONFIG_ESOCIAL e where e.id_config_orgao = 1)) as NATUREZA_JURIDICA');
+//
+//    aSQL.Add('  , coalesce(u.NRO_SIAFI, ');
+//    aSQL.Add('  , (Select NRO_SIAFI            from CONFIG_ESOCIAL e where e.id_config_orgao = 1)) as SIAFI');
+//
+//    aSQL.Add('  , (Select SUBTETO_VENCTO_TIPO  from CONFIG_ESOCIAL e where e.id_config_orgao = 1) as SUBTETO_VENCTO_TIPO');
+//    aSQL.Add('  , (Select SUBTETO_VENCTO_VALOR from CONFIG_ESOCIAL e where e.id_config_orgao = 1) as SUBTETO_VENCTO_VALOR');
+//    aSQL.Add('  , (Select POSSUI_RPPS          from CONFIG_ESOCIAL e where e.id_config_orgao = 1) as POSSUI_RPPS');
+//    aSQL.Add('  , (Select TIPO_OPERACAO        from CONFIG_ESOCIAL e where e.id_config_orgao = 1) as TIPO_OPERACAO');
+//    aSQL.Add('  , (Select DATA_IMPLANTACAO     from CONFIG_ESOCIAL e where e.id_config_orgao = 1) as DATA_IMPLANTACAO');
+//    aSQL.Add('from UNID_GESTORA u');
+//    aSQL.Add('  inner join (');
+//    aSQL.Add('    Select distinct');
+//    aSQL.Add('        u.cnpj');
+//    aSQL.Add('      , (');
+//    aSQL.Add('          Select first 1');
+//    aSQL.Add('            x.id');
+//    aSQL.Add('          from UNID_GESTORA x');
+//    aSQL.Add('          where x.cnpj = u.cnpj');
+//    aSQL.Add('            and coalesce(nullif(trim(x.razao_social), ''''), '''') <> '''' ');
+//    aSQL.Add('        ) as id');
+//    aSQL.Add('    from UNID_GESTORA u');
+//    aSQL.Add('  ) tp on (tp.id = u.id)');
+//    aSQL.Add('where u.id > 0');
     aSQL.EndUpdate;
     SetSQL(aSQL);
 
@@ -444,9 +514,7 @@ begin
     begin
       with ACBrESocial.Eventos.Iniciais.S1000.Add do
       begin
-        // So tem na Versão 2.x4.1
-        // taProducao, taProducaoRestrita
-        evtInfoEmpregador.Sequencial      := StrToInt(IncrementGenerator('GEN_ESOCIAL_EVENTO_S1000', 1));
+        evtInfoEmpregador.Sequencial := StrToInt(IncrementGenerator('GEN_ESOCIAL_EVENTO_S1000', 1));
 
         if AmbienteWebServiceProducao then
           evtInfoEmpregador.IdeEvento.TpAmb := TpTpAmb(0) //taProducao
@@ -458,6 +526,10 @@ begin
 
         evtInfoEmpregador.IdeEmpregador.TpInsc := tiCNPJ;
         evtInfoEmpregador.IdeEmpregador.NrInsc := Criptografa(cdsTabela.FieldByName('CNPJ').AsString, '2', 14);
+        //evtInfoEmpregador.IdeEmpregador.NrInsc := cdsTabela.FieldByName('CNPJ').AsString;
+
+        with ACBrESocial.Configuracoes.Geral do
+          IdEmpregador := evtInfoEmpregador.IdeEmpregador.NrInsc;
 
         evtInfoEmpregador.ModoLancamento := aModoLancamento;
         evtInfoEmpregador.InfoEmpregador.IdePeriodo.IniValid := aCompetencia;
@@ -466,6 +538,7 @@ begin
         with evtInfoEmpregador.InfoEmpregador.InfoCadastro do
         begin
           NmRazao   := Criptografa(cdsTabela.FieldByName('RAZAO_SOCIAL').AsString, '2', 60);
+          //NmRazao   := cdsTabela.FieldByName('RAZAO_SOCIAL').AsString;
           ClassTrib := ct01; // CNPJ
           if aZerarBase then
           Begin
@@ -474,6 +547,7 @@ begin
           End;
 
           NatJurid         := Trim(ReplaceStr(cdsTabela.FieldByName('NAT_JURIDICA').AsString, '-', ''));
+          //NatJurid         := Trim(ReplaceStr(cdsTabela.FieldByName('NATUREZA_JURIDICA').AsString, '-', ''));
           IndCoop          := icCooperativadeTrabalho;
           IndConstr        := iconNaoeConstrutora;
           IndDesFolha      := idfNaoAplicavel;
@@ -483,8 +557,10 @@ begin
           nrRegEtt         := EmptyStr;
 
           InfoOp.nrSiafi := Trim(cdsTabela.FieldByName('NRO_SIAFI').AsString);
+          //InfoOp.nrSiafi := Trim(cdsTabela.FieldByName('SIAFI').AsString);
 
           InfoOp.infoEnte.indRPPS   := IfThen(Criptografa(cdsTabela.FieldByName('CNPJ').AsString, '2', 14) = cdsTabela.FieldByName('ENTE_CNPJ').AsString, tpSim, tpNao);
+          //InfoOp.infoEnte.indRPPS   := IfThen(Criptografa(cdsTabela.FieldByName('CNPJ_ENCRIP').AsString, '2', 14) = cdsTabela.FieldByName('ENTE_CNPJ').AsString, tpSim, tpNao);
           InfoOp.infoEnte.nmEnte    := Trim(cdsTabela.FieldByName('ENTE_FERERATIVO').AsString); // Nome do Entidade Federativa ao qual o órgão está vinculado
           InfoOp.infoEnte.uf        := eSStrTouf(ok, Trim(cdsTabela.FieldByName('ENDER_UF').AsString));
           InfoOp.infoEnte.codMunic  := cdsTabela.FieldByName('COD_MUNICIPIO_RAIS').AsInteger;   // Conforme Tabela do IBGE
@@ -566,7 +642,9 @@ begin
     aSQL.BeginUpdate;
     aSQL.Clear;
     aSQL.Add('Select');
-    aSQL.Add('  ug.*');
+    aSQL.Add('    ug.*');
+    aSQL.Add('  , ' + QuotedStr(eSAliqRatToStr(arat2)) + ' as aliquota_rat ');
+    aSQL.Add('  , coalesce(fp.valor, 0.0) as aliquota_fap ');
     aSQL.Add('from UNID_GESTORA ug');
 //    aSQL.Add('  inner join (');
 //    aSQL.Add('    Select distinct');
@@ -580,7 +658,8 @@ begin
 //    aSQL.Add('        ) as id');
 //    aSQL.Add('    from UNID_GESTORA u');
 //    aSQL.Add('  ) tp on (tp.id = ug.id)');
-    aSQL.Add('where ug.id_tipo_unid_gestora <> 99');
+    aSQL.Add('  left join TAB_ALIQ_FAP fp on (fp.id_unid_gestora = ug.id)');
+    aSQL.Add('where ug.id > 0');
     aSQL.EndUpdate;
     SetSQL(aSQL);
 
@@ -621,7 +700,10 @@ begin
           IdeEvento.VerProc := Versao_Executavel(ParamStr(0));
 
           IdeEmpregador.TpInsc := tiCNPJ;
-          IdeEmpregador.NrInsc := cdsTabela.FieldByName('CNPJ').AsString;
+          IdeEmpregador.NrInsc := cdsTabela.FieldByName('CNPJ_PRINCIPAL').AsString;
+
+          with ACBrESocial.Configuracoes.Geral do
+            IdEmpregador := IdeEmpregador.NrInsc;
 
           with infoEstab do
           begin
@@ -640,8 +722,8 @@ begin
               with aliqGilrat do
               begin
                 AliqRat      := eSStrToAliqRat(ok, cdsTabela.FieldByName('aliquota_rat').AsString); // arat1;
-                Fap          := 1.5;
-                AliqRatAjust := 2.5; // Igual à "AliqRat x Fap"
+                Fap          := cdsTabela.FieldByName('aliquota_fap').AsCurrency;
+                AliqRatAjust := cdsTabela.FieldByName('aliquota_rat').AsCurrency * cdsTabela.FieldByName('aliquota_fap').AsCurrency; // Igual à "AliqRat x Fap"
 
                 // Sem necessidade de "Processo administrativo/judicial relativo à alíquota RAT"
 //                with ProcAdmJudRat do
@@ -655,27 +737,25 @@ begin
 //                end;
               end;
 
-              infoCaepf.tpCaepf         := tcContrIndividual;
-              infoObra.indSubstPatrObra := ispPatronalNaoSubstituida;
-
               with infoTrab do
               begin
-//              regPt := tpRegPt(3);
+                regPt := eSStrTotpRegPt(ok, cdsTabela.FieldByName('regime_ponto').AsString);
+
+                // Informação de Contratação de Aprendiz
+                with infoApr do
+                begin
+                  contApr   := caDispensado;
+//                  nrProcJud := '20150612';
 //
-//              with infoApr do
-//              begin
-//                contApr := tpContApr(2);
-//                nrProcJud := '20150612';
-//                contEntEd := tpSim;
-//
-//                infoEntEduc.Clear;
-//
-//                with infoEntEduc.Add do
-//                  NrInsc := '0123456789';
-//              end;
-//
-//              infoPCD.contPCD := tpContPCD(9);
-//              infoPCD.nrProcJud := '20160131';
+//                  contEntEd := tpSim;
+//                  infoEntEduc.Clear;
+//                  with infoEntEduc.Add do
+//                    NrInsc := '0123456789';
+                end;
+
+                // Contratação de trabalhadores com Deficiência
+                if (cdsTabela.FieldByName('aliquota_rat').AsInteger = 1) then
+                  infoPCD.contPCD := eSStrToTpContPCD(ok, cdsTabela.FieldByName('contrata_pcd').AsString);
               end;
             end;
 //
@@ -707,6 +787,8 @@ var
   aSQL : TStringList;
   ok   : Boolean;
   I    : Integer;
+  aInicio,
+  aFim   : String;
 begin
   aRetorno := False;
   aSQL := TStringList.Create;
@@ -717,7 +799,18 @@ begin
     aSQL.Add('Select');
     aSQL.Add('    e.*');
     aSQL.Add('  , (Select CNPJ from CONFIG_ORGAO c where c.id = 1) as CNPJ ');
+    aSQL.Add('  , x.ano_mes_min');
+    aSQL.Add('  , x.ano_mes_max');
     aSQL.Add('from EVENTO e');
+    aSQL.Add('  left join (');
+    aSQL.Add('    Select');
+    aSQL.Add('        l.id_evento');
+    aSQL.Add('      , min(l.ano_mes) as ano_mes_min');
+    aSQL.Add('      , max(l.ano_mes) as ano_mes_max');
+    aSQL.Add('    from LANCTO_EVENTO_CALC l');
+    aSQL.Add('    group by');
+    aSQL.Add('        l.id_evento');
+    aSQL.Add('  ) x on (x.id_evento = e.id)');
     aSQL.Add('where (coalesce(e.nat_rubrica, '''') <> '''')');
 
     case aModoLancamento of
@@ -753,6 +846,9 @@ begin
         evtTabRubrica.IdeEmpregador.TpInsc := tiCNPJ;
         evtTabRubrica.IdeEmpregador.NrInsc := Criptografa(cdsTabela.FieldByName('CNPJ').AsString, '2', 14);
 
+        with ACBrESocial.Configuracoes.Geral do
+          IdEmpregador := evtTabRubrica.IdeEmpregador.NrInsc;
+
         evtTabRubrica.ModoLancamento := aModoLancamento;
 
         evtTabRubrica.infoRubrica.IdeRubrica.CodRubr    := Trim(cdsTabela.FieldByName('codigo').AsString);
@@ -769,48 +865,62 @@ begin
         if (Trim(cdsTabela.FieldByName('tipo').AsString) = 'D') then
           evtTabRubrica.infoRubrica.DadosRubrica.tpRubr := tpDesconto;
 
-        evtTabRubrica.infoRubrica.DadosRubrica.codIncCP   := tpCodIncCP(1);
-        evtTabRubrica.infoRubrica.DadosRubrica.codIncIRRF := tpCodIncIRRF(1);
-        evtTabRubrica.infoRubrica.DadosRubrica.codIncFGTS := tpCodIncFGTS(1);
-        evtTabRubrica.infoRubrica.DadosRubrica.codIncSIND := tpCodIncSIND(1);
+//        evtTabRubrica.infoRubrica.DadosRubrica.codIncCP   := tpCodIncCP(1);
+//        evtTabRubrica.infoRubrica.DadosRubrica.codIncIRRF := tpCodIncIRRF(1);
+//        evtTabRubrica.infoRubrica.DadosRubrica.codIncFGTS := tpCodIncFGTS(1);
+//        evtTabRubrica.infoRubrica.DadosRubrica.codIncSIND := tpCodIncSIND(1);
         evtTabRubrica.infoRubrica.DadosRubrica.observacao := AnsiUpperCase(Trim(cdsTabela.FieldByName('descr_categ_tcm').AsString));
 
         evtTabRubrica.infoRubrica.DadosRubrica.IdeProcessoCP.Clear;
+        if (StrToIntDef(eSCodIncCPToStr(evtTabRubrica.infoRubrica.DadosRubrica.codIncCP), 0) >= 91) then
+          with evtTabRubrica.infoRubrica.DadosRubrica.IdeProcessoCP.Add do
+          begin
+            nrProc     := EmptyStr;
+            ExtDecisao := edContribPatronaisSegurados;
+            codSusp    := '1';
+          end;
 
-//        with evtTabRubrica.infoRubrica.DadosRubrica.IdeProcessoCP.Add do
-//        begin
-//          nrProc := '1020';
-//          ExtDecisao := tpExtDecisao(1);
-//          codSusp := '1';
-//        end;
-//
-//        evtTabRubrica.infoRubrica.DadosRubrica.IdeProcessoIRRF.Clear;
-//
-//        with evtTabRubrica.infoRubrica.DadosRubrica.IdeProcessoIRRF.Add do
-//        begin
-//          nrProc := '1020';
-//          codSusp := '2';
-//        end;
-//
-//        evtTabRubrica.infoRubrica.DadosRubrica.IdeProcessoFGTS.Clear;
-//
-//        with evtTabRubrica.infoRubrica.DadosRubrica.IdeProcessoFGTS.Add do
-//        begin
-//          nrProc := '50740';
-//        end;
-//
-//        evtTabRubrica.infoRubrica.DadosRubrica.IdeProcessoSIND.Clear;
-//
-//        with evtTabRubrica.infoRubrica.DadosRubrica.IdeProcessoSIND.Add do
-//        begin
-//          nrProc := '50';
-//        end;
+        evtTabRubrica.infoRubrica.DadosRubrica.IdeProcessoIRRF.Clear;
+        if (StrToIntDef(eSCodIncIRRFToStr(evtTabRubrica.infoRubrica.DadosRubrica.codIncIRRF), 0) >= 91) then
+          with evtTabRubrica.infoRubrica.DadosRubrica.IdeProcessoIRRF.Add do
+          begin
+            nrProc  := EmptyStr;
+            codSusp := '2';
+          end;
 
-        if (evtTabRubrica.ModoLancamento = mlAlteracao) then
+        evtTabRubrica.infoRubrica.DadosRubrica.IdeProcessoFGTS.Clear;
+        if (StrToIntDef(eSCodIncFGTSToStr(evtTabRubrica.infoRubrica.DadosRubrica.codIncFGTS), 0) = 91) then
+          with evtTabRubrica.infoRubrica.DadosRubrica.IdeProcessoFGTS.Add do
+          begin
+            nrProc := EmptyStr;
+          end;
+
+        evtTabRubrica.infoRubrica.DadosRubrica.IdeProcessoSIND.Clear;
+        if (StrToIntDef(eSCodIncSINDToStr(evtTabRubrica.infoRubrica.DadosRubrica.codIncSIND), 0) = 91) then
+          with evtTabRubrica.infoRubrica.DadosRubrica.IdeProcessoSIND.Add do
+          begin
+            nrProc := EmptyStr;
+          end;
+
+        evtTabRubrica.infoRubrica.NovaValidade.IniValid := aCompetencia;
+        evtTabRubrica.infoRubrica.NovaValidade.FimValid := '2099-12';
+
+        if (AnsiUpperCase(Trim(cdsTabela.FieldByName('SEM_USO').AsString)) = FLAG_SIM) then
         begin
-          evtTabRubrica.infoRubrica.NovaValidade.IniValid := aCompetencia;
-          evtTabRubrica.infoRubrica.NovaValidade.FimValid := '2099-12';
+          aInicio := Trim(cdsTabela.FieldByName('ANO_MES_MIN').AsString);
+          aFim    := Trim(cdsTabela.FieldByName('ANO_MES_MAX').AsString);
+
+          aInicio := Copy(aInicio, 1, 4) + '-' + Copy(aInicio, 5, 2);
+
+          if (StrToIntDef(Copy(aFim, 5, 2), 0) > 12) then
+            aFim := Copy(aFim, 1, 4) + '-12'
+          else
+            aFim := Copy(aFim, 1, 4) + '-' + Copy(aFim, 5, 2);
+
+          evtTabRubrica.infoRubrica.NovaValidade.IniValid := aInicio;
+          evtTabRubrica.infoRubrica.NovaValidade.FimValid := aFim;
         end;
+
       end;
 
       aLabel.Caption     := Trim(cdsTabela.FieldByName('DESCRICAO').AsString);

@@ -27,10 +27,10 @@ type
     gpbOperacao: TRadioGroup;
     lblAnoMes: TLabel;
     cmbAnoMes: TComboBox;
-    Checb_ZeraBase: TCheckBox;
     pnlProcesso: TPanel;
     gagProcesso: TGauge;
     lblProcesso: TLabel;
+    Checb_ZeraBase: TCheckBox;
     procedure FormCreate(Sender: TObject);
     procedure btnOkClick(Sender: TObject);
 

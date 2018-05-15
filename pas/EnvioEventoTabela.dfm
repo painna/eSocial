@@ -92,7 +92,7 @@ inherited frmEnvioEventoTabela: TfrmEnvioEventoTabela
         'Inclus'#227'o'
         'Altera'#231#227'o'
         'Exclus'#227'o')
-      TabOrder = 2
+      TabOrder = 1
     end
     object cmbAnoMes: TComboBox
       Left = 12
@@ -101,14 +101,6 @@ inherited frmEnvioEventoTabela: TfrmEnvioEventoTabela
       Height = 21
       Style = csDropDownList
       TabOrder = 0
-    end
-    object Checb_ZeraBase: TCheckBox
-      Left = 119
-      Top = 38
-      Width = 222
-      Height = 17
-      Caption = 'Limpar base p/ novo envio'
-      TabOrder = 1
     end
   end
   object gpbEvento: TGroupBox
@@ -119,6 +111,9 @@ inherited frmEnvioEventoTabela: TfrmEnvioEventoTabela
     Align = alClient
     Caption = 'Eventos'
     TabOrder = 1
+    DesignSize = (
+      672
+      218)
     object cbS1000: TCheckBox
       Left = 12
       Top = 20
@@ -232,6 +227,23 @@ inherited frmEnvioEventoTabela: TfrmEnvioEventoTabela
       Enabled = False
       ParentCtl3D = False
       TabOrder = 10
+    end
+    object Checb_ZeraBase: TCheckBox
+      AlignWithMargins = True
+      Left = 490
+      Top = 196
+      Width = 177
+      Height = 17
+      Alignment = taLeftJustify
+      Anchors = [akRight, akBottom]
+      Caption = 'Limpar base p/ novo envio'
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clWindowText
+      Font.Height = -11
+      Font.Name = 'Tahoma'
+      Font.Style = [fsBold]
+      ParentFont = False
+      TabOrder = 11
     end
   end
 end
