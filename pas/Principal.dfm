@@ -1,7 +1,7 @@
 object frmPrincipal: TfrmPrincipal
   Left = 0
   Top = 0
-  Caption = 'REMUNERATU$ - eSocial'
+  Caption = 'eSocial - Remuneratu$'
   ClientHeight = 545
   ClientWidth = 1045
   Color = clBtnFace
@@ -1131,13 +1131,6 @@ object frmPrincipal: TfrmPrincipal
         Caption = 'Trocar Usu'#225'rio ...'
       end
     end
-    object Ajuda1: TMenuItem
-      Caption = 'Aj&uda'
-      object Sobre1: TMenuItem
-        Caption = '&Sobre'
-        OnClick = Sobre1Click
-      end
-    end
     object Janelas1: TMenuItem
       Caption = '&Janelas'
       object Tile1: TMenuItem
@@ -1149,13 +1142,20 @@ object frmPrincipal: TfrmPrincipal
         Action = WindowClose1
       end
     end
+    object Ajuda1: TMenuItem
+      Caption = 'Aj&uda'
+      object Sobre1: TMenuItem
+        Caption = '&Sobre'
+        OnClick = Sobre1Click
+      end
+    end
   end
-  object ActionManager1: TActionManager
+  object ActionManager: TActionManager
     ActionBars = <
       item
       end>
-    Left = 1000
-    Top = 8
+    Left = 496
+    Top = 232
     StyleName = 'XP Style'
     object WindowCascade1: TWindowCascade
       Category = 'Janela'
@@ -1174,7 +1174,7 @@ object frmPrincipal: TfrmPrincipal
   object XPManifest1: TXPManifest
     Left = 1072
   end
-  object dxBarManager1: TdxBarManager
+  object BrManager: TdxBarManager
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
     Font.Height = -12
@@ -1188,8 +1188,8 @@ object frmPrincipal: TfrmPrincipal
       True)
     PopupMenuLinks = <>
     UseSystemFont = True
-    Left = 528
-    Top = 8
+    Left = 496
+    Top = 184
     DockControlHeights = (
       0
       0

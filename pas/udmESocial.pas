@@ -277,7 +277,9 @@ var
   aDataHora2 ,
   aDataHora3 ,
   aDataHora4 ,
-  aDataHora5 : TDateTime;
+  aDataHora5 ,
+  aDataHora6 ,
+  aDataHora7 : TDateTime;
   aRetorno   : Boolean;
   I : Integer;
   sPath    ,
@@ -309,6 +311,9 @@ begin
       aDataHora3 := aDataHora1 + StrToTime('00:00:02');
       aDataHora4 := aDataHora1 + StrToTime('00:00:03');
       aDataHora5 := aDataHora1 + StrToTime('00:00:04');
+      aDataHora6 := aDataHora1 + StrToTime('00:00:05');
+      aDataHora7 := aDataHora1 + StrToTime('00:00:06');
+
       aRetorno   := ACBrESocial.Enviar(aGrupo);
 
       Sleep(3000);
@@ -352,7 +357,19 @@ begin
                   begin
                     sArquivo := sPath + '\' + FormatDateTime('yyyymmddhhmmss', aDataHora5);
                     if FileExists(sArquivo + '-rec.xml') then
-                      aProtocolo.Arquivos.Add(sArquivo + '-rec.xml');
+                      aProtocolo.Arquivos.Add(sArquivo + '-rec.xml')
+                    else
+                    begin
+                      sArquivo := sPath + '\' + FormatDateTime('yyyymmddhhmmss', aDataHora6);
+                      if FileExists(sArquivo + '-rec.xml') then
+                        aProtocolo.Arquivos.Add(sArquivo + '-rec.xml')
+                      else
+                      begin
+                        sArquivo := sPath + '\' + FormatDateTime('yyyymmddhhmmss', aDataHora7);
+                        if FileExists(sArquivo + '-rec.xml') then
+                          aProtocolo.Arquivos.Add(sArquivo + '-rec.xml');
+                      end;
+                    end;
                   end;
                 end;
               end;
@@ -401,6 +418,7 @@ var
   aRetorno : Boolean;
   aSQL : TStringList;
   ok   : Boolean;
+  aEventoID,
   I    : Integer;
 begin
   aRetorno := False;
@@ -509,12 +527,15 @@ begin
     aProcesso.Progress := 0;
     Application.ProcessMessages;
 
+    if not cdsTabela.IsEmpty then
+      aEventoID := StrToInt(IncrementGenerator('GEN_ESOCIAL_EVENTO_S1000', 1));
+
     cdsTabela.First;
     while not cdsTabela.Eof do
     begin
       with ACBrESocial.Eventos.Iniciais.S1000.Add do
       begin
-        evtInfoEmpregador.Sequencial := StrToInt(IncrementGenerator('GEN_ESOCIAL_EVENTO_S1000', 1));
+        evtInfoEmpregador.Sequencial := aEventoID;
 
         if AmbienteWebServiceProducao then
           evtInfoEmpregador.IdeEvento.TpAmb := TpTpAmb(0) //taProducao
@@ -786,6 +807,7 @@ var
   aRetorno : Boolean;
   aSQL : TStringList;
   ok   : Boolean;
+  aEventoID,
   I    : Integer;
   aInicio,
   aFim   : String;
@@ -828,12 +850,15 @@ begin
     aProcesso.Progress := 0;
     Application.ProcessMessages;
 
+    if not cdsTabela.IsEmpty then
+      aEventoID := StrToInt(IncrementGenerator('GEN_ESOCIAL_EVENTO_S1010', 1));
+
     cdsTabela.First;
     while not cdsTabela.Eof do
     begin
       with ACBrESocial.Eventos.Tabelas.S1010.Add do
       begin
-        evtTabRubrica.Sequencial := StrToInt(IncrementGenerator('GEN_ESOCIAL_EVENTO_S1010', 1));
+        evtTabRubrica.Sequencial := aEventoID;
 
         if AmbienteWebServiceProducao then
           evtTabRubrica.IdeEvento.TpAmb := TpTpAmb(0) //taProducao
@@ -944,6 +969,7 @@ var
   aRetorno : Boolean;
   aSQL : TStringList;
   ok   : Boolean;
+  aEventoID,
   I    : Integer;
 begin
   aRetorno := False;
@@ -978,12 +1004,15 @@ begin
     aProcesso.Progress := 0;
     Application.ProcessMessages;
 
+    if not cdsTabela.IsEmpty then
+      aEventoID := StrToInt(IncrementGenerator('GEN_ESOCIAL_EVENTO_S1030', 1));
+
     cdsTabela.First;
     while not cdsTabela.Eof do
     begin
       with ACBrESocial.Eventos.Tabelas.S1030.Add do
       begin
-        evtTabCargo.Sequencial := 0;
+        evtTabCargo.Sequencial := aEventoID;
 
         if AmbienteWebServiceProducao then
           evtTabCargo.IdeEvento.TpAmb := TpTpAmb(0) //taProducao
@@ -995,6 +1024,9 @@ begin
 
         evtTabCargo.IdeEmpregador.TpInsc := tiCNPJ;
         evtTabCargo.IdeEmpregador.NrInsc := Criptografa(cdsTabela.FieldByName('CNPJ').AsString, '2', 14);
+
+        with ACBrESocial.Configuracoes.Geral do
+          IdEmpregador := evtTabCargo.IdeEmpregador.NrInsc;
 
         evtTabCargo.ModoLancamento := aModoLancamento;
 

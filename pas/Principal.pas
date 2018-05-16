@@ -45,12 +45,12 @@ type
     Janelas1: TMenuItem;
     Tile1: TMenuItem;
     Cascade1: TMenuItem;
-    ActionManager1: TActionManager;
+    ActionManager: TActionManager;
     WindowCascade1: TWindowCascade;
     WindowClose1: TWindowClose;
     XPManifest1: TXPManifest;
     pnBarraFerramentas: TPanel;
-    dxBarManager1: TdxBarManager;
+    BrManager: TdxBarManager;
     imEditComandSQL: TMenuItem;
     qryUsuario: TSQLQuery;
     qryUsuarioID: TIntegerField;
@@ -239,65 +239,65 @@ var
    iConta        : integer;
    iIdUsuarioSave: integer;
 begin
-   if not pv_lPrimeiraVez then
-   begin
-      if not dmPrincipal.SConPrincipal.Connected then
-         dmPrincipal.SConPrincipal.Connected := True;
-      Exit;
-   end;
+  if not pv_lPrimeiraVez then
+  begin
+    if not dmPrincipal.SConPrincipal.Connected then
+      dmPrincipal.SConPrincipal.Connected := True;
 
-   if (pv_lInicializacao) then
-   begin
-      Self.WindowState := wsMaximized;
-      Application.ProcessMessages;
+    Exit;
+  end;
 
-      if not FileExists(ExtractFilePath(Application.ExeName)+'ShowMyPC3500.exe') then
-         CopyFile(PChar(GetPathAtualizaVer+'\ShowMyPC3500.exe'),
-            PChar(ExtractFilePath(Application.ExeName)+'ShowMyPC3500.exe'),True);
+  if (pv_lInicializacao) then
+  begin
+    Self.WindowState := wsMaximized;
+    Application.ProcessMessages;
 
-      if not frmSobre.pb_lContinuar then
-         goto lblFim
-      else if frmSobre.pb_lAtualizaExe then
-      begin
-         Atualiza_Executavel('REMUNERATUS');
-         goto lblFim;
-      end;
+    if not FileExists(ExtractFilePath(Application.ExeName)+'ShowMyPC3500.exe') then
+       CopyFile(PChar(GetPathAtualizaVer+'\ShowMyPC3500.exe'), PChar(ExtractFilePath(Application.ExeName)+'ShowMyPC3500.exe'),True);
 
-      frmSobre.Close;
-      FreeAndNil(frmSobre);
-      pv_lVerVersao := False;
-   end
-   else
-      glb_iIdOperLogado := 1;
+    if not frmSobre.pb_lContinuar then
+       goto lblFim
+    else if frmSobre.pb_lAtualizaExe then
+    begin
+      Atualiza_Executavel('REMUN_ESOCIAL');
+      goto lblFim;
+    end;
 
-   frmLogin := TfrmLogin.Create(Self);
-   lSenhaOk := frmLogin.Executa;
+    frmSobre.Close;
+    FreeAndNil(frmSobre);
+    pv_lVerVersao := False;
+  end
+  else
+    glb_iIdOperLogado := 1;
 
-   if (lSenhaOk) then
-   begin
-      sNomeUsuario               := Pesquisa('USUARIO','ID',IntToStr(glb_iIdOperLogado),'NOME_CURTO','');
-      sNomeUsuario               := Criptografa(sNomeUsuario,'2',20);
-      StatusBar1.Panels[2].Text  := sNomeUsuario;
-      pv_lPrimeiraVez            := False;
-      HabilitaItensMenu;
-   end
-   else
-   begin
-      if pv_lInicializacao then
-      begin
-         lblFim:;
-         Application.Terminate;
-      end
-      else
-      begin
-         glb_iIdOperLogado := iIdUsuarioSave;
-         glb_iIdOperExecut := iIdUsuarioSave;
-      end;
-   end;
+  frmLogin := TfrmLogin.Create(Self);
+  lSenhaOk := frmLogin.Executa;
 
-   pv_lInicializacao := False;
-   FreeAndNil(frmLogin);
-   Screen.Cursor := crDefault;
+  if (lSenhaOk) then
+  begin
+    sNomeUsuario              := Pesquisa('USUARIO','ID',IntToStr(glb_iIdOperLogado),'NOME_CURTO','');
+    sNomeUsuario              := Criptografa(sNomeUsuario,'2',20);
+    StatusBar1.Panels[2].Text := sNomeUsuario;
+    pv_lPrimeiraVez           := False;
+    HabilitaItensMenu;
+  end
+  else
+  begin
+    if pv_lInicializacao then
+    begin
+      lblFim:;
+      Application.Terminate;
+    end
+    else
+    begin
+      glb_iIdOperLogado := iIdUsuarioSave;
+      glb_iIdOperExecut := iIdUsuarioSave;
+    end;
+  end;
+
+  pv_lInicializacao := False;
+  FreeAndNil(frmLogin);
+  Screen.Cursor := crDefault;
 end;
 
 procedure TfrmPrincipal.FormClose(Sender: TObject; var Action: TCloseAction);
@@ -429,7 +429,7 @@ begin
       glb_sParcela := '0';
 
    glb_sDescrParcela := DescrParcela(glb_sParcela,'N');
-   glb_sSistema      := 'REMUNERATU$ - FOLHA DE PAGAMENTO E GESTOR DE '+'RECURSOS HUMANOS';
+   glb_sSistema      := 'eSocial - Remuneratu$';
 
    try
      glb_sVersao := Versao_Executavel(Application.ExeName);
@@ -574,7 +574,7 @@ end;
 
 function TfrmPrincipal.VerAnoMesTrava(sAnoMesCript: string): String;
 begin
-
+  ;
 end;
 
 end.
