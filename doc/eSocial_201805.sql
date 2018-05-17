@@ -323,3 +323,49 @@ ADD CONSTRAINT FK_EVENTO_NATRUB
 FOREIGN KEY (NAT_RUBRICA)
 REFERENCES ESOCIAL_NATUREZA_RUBRICA(CODIGO);
 
+
+
+
+/*------ GERASYS.TI 17/05/2018 10:05:43 --------*/
+
+COMMENT ON COLUMN UNID_GESTORA.TIPO_OPERACAO IS
+'eSocial - Operacao do registro:
+I - Inclusao
+A - Alteracao
+E - Exclusao
+P - Processado/Enviado';
+
+
+
+
+/*------ GERASYS.TI 17/05/2018 10:06:48 --------*/
+
+ALTER TABLE CONFIG_ORGAO
+    ADD TIPO_OPERACAO ESOCIAL_OPERACAO;
+
+COMMENT ON COLUMN CONFIG_ORGAO.TIPO_OPERACAO IS
+'eSocial - Operacao do registro:
+I - Inclusao
+A - Alteracao
+E - Exclusao
+P - Processado/Enviado';
+
+
+
+
+/*------ GERASYS.TI 17/05/2018 10:06:54 --------*/
+
+UPDATE CONFIG_ORGAO
+SET TIPO_OPERACAO = 'I';
+
+
+
+
+/*------ GERASYS.TI 17/05/2018 10:07:18 --------*/
+
+COMMENT ON DOMAIN ESOCIAL_OPERACAO IS 'eSocial - Operacao do registro:
+I - Inclusao
+A - Alteracao
+E - Exclusao
+P - Processado/Enviado';
+

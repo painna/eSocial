@@ -105,7 +105,7 @@ type
     function Gerar_eSocial1010(aCompetencia : String; aZerarBase : Boolean;
       aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge) : Boolean;
     function Gerar_eSocial1020(aCompetencia : String; aZerarBase : Boolean;
-      aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge) : Boolean; virtual; abstract;
+      aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge) : Boolean;
     function Gerar_eSocial1030(aCompetencia : String; aZerarBase : Boolean;
       aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge) : Boolean;
     function Gerar_eSocial1035(aCompetencia : String; aZerarBase : Boolean;
@@ -666,6 +666,7 @@ begin
     aSQL.Add('    ug.*');
     aSQL.Add('  , ' + QuotedStr(eSAliqRatToStr(arat2)) + ' as aliquota_rat ');
     aSQL.Add('  , coalesce(fp.valor, 0.0) as aliquota_fap ');
+    aSQL.Add('  , coalesce(nullif(trim(ug.cnae_prep), ''''), (Select cast(o.cod_cnae as varchar(10)) from CONFIG_ORGAO o where o.id = 1)) as cnae_prepoderante');
     aSQL.Add('from UNID_GESTORA ug');
 //    aSQL.Add('  inner join (');
 //    aSQL.Add('    Select distinct');
@@ -738,7 +739,7 @@ begin
 
             with DadosEstab do
             begin
-              cnaePrep := cdsTabela.FieldByName('CNAE_PREP').AsString;
+              cnaePrep := cdsTabela.FieldByName('CNAE_PREPODERANTE').AsString;
 
               with aliqGilrat do
               begin
@@ -779,7 +780,7 @@ begin
                   infoPCD.contPCD := eSStrToTpContPCD(ok, cdsTabela.FieldByName('contrata_pcd').AsString);
               end;
             end;
-//
+
             NovaValidade.IniValid := FormatDateTime('yyyy"-"mm', aDataImplantacao);
             NovaValidade.FimValid := '2099-12';
           end;
@@ -890,10 +891,26 @@ begin
         if (Trim(cdsTabela.FieldByName('tipo').AsString) = 'D') then
           evtTabRubrica.infoRubrica.DadosRubrica.tpRubr := tpDesconto;
 
-//        evtTabRubrica.infoRubrica.DadosRubrica.codIncCP   := tpCodIncCP(1);
-//        evtTabRubrica.infoRubrica.DadosRubrica.codIncIRRF := tpCodIncIRRF(1);
-//        evtTabRubrica.infoRubrica.DadosRubrica.codIncFGTS := tpCodIncFGTS(1);
-//        evtTabRubrica.infoRubrica.DadosRubrica.codIncSIND := tpCodIncSIND(1);
+        if (AnsiUpperCase(Trim(cdsTabela.FieldByName('INCIDE_PREVID').AsString)) = FLAG_NAO) then
+          evtTabRubrica.infoRubrica.DadosRubrica.codIncCP := cicNaoeBasedeCalculo
+        else
+          evtTabRubrica.infoRubrica.DadosRubrica.codIncCP := eSStrToCodIncCP(ok, '11'); // cicBasedeCalculodoSalariodeContribuicaoMensal
+
+        if (AnsiUpperCase(Trim(cdsTabela.FieldByName('INCIDE_IRRF').AsString)) = FLAG_NAO) then
+          evtTabRubrica.infoRubrica.DadosRubrica.codIncIRRF := ciiNaoeBasedeCalculo
+        else
+          evtTabRubrica.infoRubrica.DadosRubrica.codIncIRRF := eSStrToCodIncIRRF(ok, '11'); // ciiBasedeCalculoIRRFRemMensal
+
+        if (AnsiUpperCase(Trim(cdsTabela.FieldByName('INCIDE_FGTS').AsString)) = FLAG_NAO) then
+          evtTabRubrica.infoRubrica.DadosRubrica.codIncFGTS := cdfNaoeBasedeCalculo
+        else
+          evtTabRubrica.infoRubrica.DadosRubrica.codIncFGTS := eSStrToCodIncFGTS(ok, '11'); // cdfBasedeCalculoFGTS
+
+        if (AnsiUpperCase(Trim(cdsTabela.FieldByName('INCIDE_SIND').AsString)) = FLAG_NAO) then
+          evtTabRubrica.infoRubrica.DadosRubrica.codIncSIND := cisNaoebasedecalculo
+        else
+          evtTabRubrica.infoRubrica.DadosRubrica.codIncSIND := eSStrToCodIncSIND(ok, '11'); // cisBasedecalculo
+
         evtTabRubrica.infoRubrica.DadosRubrica.observacao := AnsiUpperCase(Trim(cdsTabela.FieldByName('descr_categ_tcm').AsString));
 
         evtTabRubrica.infoRubrica.DadosRubrica.IdeProcessoCP.Clear;
@@ -956,6 +973,195 @@ begin
       cdsTabela.Next;
     end;
 
+    aRetorno := True;
+  finally
+    aSQL.Free;
+    Result := aRetorno;
+  end;
+end;
+
+function TdmESocial.Gerar_eSocial1020(aCompetencia: String; aZerarBase: Boolean; aModoLancamento: TModoLancamento;
+  aLabel: TLabel; aProcesso: TGauge): Boolean;
+var
+  aRetorno : Boolean;
+  aSQL : TStringList;
+  ok   : Boolean;
+  aEventoID,
+  I    : Integer;
+begin
+  aRetorno := False;
+  aSQL := TStringList.Create;
+  ok   := True;
+  try
+    aSQL.BeginUpdate;
+    aSQL.Clear;
+    aSQL.Add('Select');
+    aSQL.Add('    u.RAZAO_SOCIAL as ENTE_FERERATIVO');
+    aSQL.Add('  , u.cnpj as ENTE_CNPJ');
+    aSQL.Add('  , c.*');
+    aSQL.Add('from CONFIG_ORGAO c');
+    aSQL.Add('  inner join CONFIG_ESOCIAL e on (e.id_config_orgao = c.id)');
+    aSQL.Add('  inner join UNID_GESTORA   u on (u.id = e.id_unid_gestora and u.id = 1)');
+
+    case aModoLancamento of
+      mlInclusao  : aSQL.Add('  and c.tipo_operacao = ' + QuotedStr(FLAG_OPERACAO_INSERIR));
+      mlAlteracao : aSQL.Add('  and c.tipo_operacao = ' + QuotedStr(FLAG_OPERACAO_ALTERAR));
+      mlExclusao  : aSQL.Add('  and c.tipo_operacao = ' + QuotedStr(FLAG_OPERACAO_EXCLUIR));
+    end;
+
+    aSQL.EndUpdate;
+    SetSQL(aSQL);
+
+    I := 1;
+
+    aProcesso.MaxValue := cdsTabela.RecordCount;
+    aProcesso.Progress := 0;
+    Application.ProcessMessages;
+
+    if not cdsTabela.IsEmpty then
+      aEventoID := StrToInt(IncrementGenerator('GEN_ESOCIAL_EVENTO_S1020', 1));
+
+
+    cdsTabela.First;
+    while not cdsTabela.Eof do
+    begin
+      with ACBrESocial.Eventos.Tabelas.S1020.Add do
+      begin
+        with EvtTabLotacao do
+        begin
+          Sequencial := aEventoID;
+
+          if AmbienteWebServiceProducao then
+            IdeEvento.TpAmb := TpTpAmb(0) //taProducao
+          else
+            IdeEvento.TpAmb := taProducaoRestrita;
+
+          IdeEvento.ProcEmi := peAplicEmpregador;
+          IdeEvento.VerProc := Versao_Executavel(ParamStr(0));
+
+          IdeEmpregador.TpInsc := tiCNPJ;
+          IdeEmpregador.NrInsc := Criptografa(cdsTabela.FieldByName('CNPJ').AsString, '2', 14);
+
+          with ACBrESocial.Configuracoes.Geral do
+            IdEmpregador := EvtTabLotacao.IdeEmpregador.NrInsc;
+
+          ModoLancamento := aModoLancamento;
+
+          with infoLotacao do
+          begin
+            IdeLotacao.codLotacao := FormatFloat('0000000', cdsTabela.FieldByName('ID').AsInteger);
+            IdeLotacao.IniValid   := aCompetencia;
+            IdeLotacao.FimValid   := '2099-12';
+
+            with dadosLotacao do
+            begin
+              tpLotacao := '01';
+              TpInsc    := tiCNPJ;
+              NrInsc    := Criptografa(cdsTabela.FieldByName('CNPJ').AsString, '2', 14);
+
+              with fPasLotacao do
+              begin
+                Fpas         := cdsTabela.FieldByName('COD_FPAS').AsString;
+                codTercs     := '0000';
+                codTercsSusp := EmptyStr;
+
+//                // Informações de Processos Judiciais relativos às Contribuições Destinadas a outras Entidades
+//                with infoProcJudTerceiros do
+//                begin
+//                  procJudTerceiro.Clear;
+//
+//                  with procJudTerceiro.Add do
+//                  begin
+//                    codTerc   := '1111';
+//                    nrProcJud := '1234567891239-1345';
+//                    codSusp   := '1';
+//                  end;
+//                end;
+              end;
+//              // Não se aplica a Órgãos Públicos
+//              with infoEmprParcial do
+//              begin
+//                tpInscContrat := tpTpInscContratante(0);
+//                NrInscContrat := '74563214500045';
+//                tpInscProp    := TpTpInscProp(0);
+//                nrInscProp    := '654234523416';
+//              end;
+            end;
+
+            NovaValidade.IniValid := aCompetencia;
+            NovaValidade.FimValid := '2099-12';
+          end;
+        end;
+      end;
+
+      aLabel.Caption     := Trim(cdsTabela.FieldByName('ENTE_FERERATIVO').AsString);
+      aProcesso.Progress := I;
+      Application.ProcessMessages;
+      Inc(I);
+
+      cdsTabela.Next;
+    end;
+(*
+  with ACBreSocial1.Eventos.Tabelas.S1020.Add do
+  begin
+    with EvtTabLotacao do
+    begin
+      Sequencial := 0;
+      ModoLancamento := GetTipoOperacao;
+
+      IdeEvento.TpAmb := taProducaoRestrita;
+      IdeEvento.ProcEmi := TpProcEmi(0);
+      IdeEvento.VerProc := '1.0';
+
+      IdeEmpregador.TpInsc := tiCPF;
+      IdeEmpregador.NrInsc := '0123456789';
+
+      with infoLotacao do
+      begin
+        IdeLotacao.codLotacao := '300000';
+        IdeLotacao.IniValid := '2015-06';
+        IdeLotacao.FimValid := '2099-12';
+
+        with dadosLotacao do
+        begin
+          tpLotacao := '01';
+          TpInsc := tiCAEPF;
+          NrInsc := '6564646565';
+
+          with fPasLotacao do
+          begin
+            Fpas := '515';
+            codTercs := '0015';
+            codTercsSusp := '0506';
+
+            with infoProcJudTerceiros do
+            begin
+              procJudTerceiro.Clear;
+
+              with procJudTerceiro.Add do
+              begin
+                codTerc := '1111';
+                nrProcJud := '1234567891239-1345';
+                codSusp := '1';
+              end;
+            end;
+          end;
+
+          with infoEmprParcial do
+          begin
+            tpInscContrat := tpTpInscContratante(0);
+            NrInscContrat := '74563214500045';
+            tpInscProp := TpTpInscProp(0);
+            nrInscProp := '654234523416';
+          end;
+        end;
+
+        NovaValidade.IniValid := '2015-06';
+        NovaValidade.FimValid := '2099-12';
+      end;
+    end;
+  end;
+*)
     aRetorno := True;
   finally
     aSQL.Free;

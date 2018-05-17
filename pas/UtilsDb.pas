@@ -547,33 +547,33 @@ function IncrementGenerator(Generator_: String; N_: Integer): String;
 Var
   oQry1: TSQLQuery;
 begin
-//  try
-//    GetFieldValue('CRIA_GERADOR(' + QuotedStr(Generator_) + ')', 'OK', EmptyStr);
-//    FinishTransaction(True);
-//    StartTransaction;
-//  except
-//  end;
-//
   Result := '0';
   oQry1  := TSQLQuery.Create(Nil);
 
-  oQry1.SQLConnection := dmPrincipal.SConPrincipal;
-  oQry1.SQL.Add('select gen_id(' + Generator_ + ', 1) as NewId from RDB$DATABASE');
   try
+    oQry1.SQLConnection := dmPrincipal.SConPrincipal;
     try
-       oQry1.Open;
-       Result := oQry1.FieldByName('NewId').AsString;
+      oQry1.SQL.Clear;
+      oQry1.SQL.Add('CREATE SEQUENCE ' + Generator_);
+      oQry1.ExecSQL;
     except
-       Mensagem('Não foi possível incrementar o Gerador '+#13+Generator_,
-          'Erro !!!',MB_OK+MB_ICONERROR);
+    end;
+
+    if oQry1.Active then
+      oQry1.Close;
+
+    oQry1.SQL.Clear;
+    oQry1.SQL.Add('select gen_id(' + Generator_ + ', 1) as NewId from RDB$DATABASE');
+    try
+      oQry1.Open;
+      Result := oQry1.FieldByName('NewId').AsString;
+    except
+      Mensagem('Não foi possível incrementar o Gerador ' + #13 + Generator_, 'Erro !!!',MB_OK+MB_ICONERROR);
     end;
   finally
     oQry1.Close;
     FreeAndNil(oQry1);
   end;
-
-  //Result := GetFieldValue('RDB$DATABASE', 'gen_id('+Generator_+', '+IntToStr(N_)+')', EmptyStr);
-
 end;
 
 procedure CancelGenerator(oDataSetState: TDataSetState;

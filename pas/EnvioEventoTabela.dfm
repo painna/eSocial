@@ -149,7 +149,7 @@ inherited frmEnvioEventoTabela: TfrmEnvioEventoTabela
       Top = 82
       Width = 236
       Height = 17
-      Caption = 'S-1020 Tabela de Lota'#231#245'es/Departamentos'
+      Caption = 'S-1020 Tabela de Lota'#231#245'es Tribut'#225'rias'
       Ctl3D = False
       ParentCtl3D = False
       TabOrder = 3
