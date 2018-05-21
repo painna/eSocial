@@ -824,6 +824,8 @@ begin
     aSQL.Add('  , (Select CNPJ from CONFIG_ORGAO c where c.id = 1) as CNPJ ');
     aSQL.Add('  , x.ano_mes_min');
     aSQL.Add('  , x.ano_mes_max');
+    aSQL.Add('  , ' + QuotedStr(FLAG_NAO) + ' as INCIDE_FGTS');
+    aSQL.Add('  , ' + QuotedStr(FLAG_NAO) + ' as INCIDE_SIND');
     aSQL.Add('from EVENTO e');
     aSQL.Add('  left join (');
     aSQL.Add('    Select');
