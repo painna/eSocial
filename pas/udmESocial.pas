@@ -109,7 +109,7 @@ type
     function Gerar_eSocial1030(aCompetencia : String; aZerarBase : Boolean;
       aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge) : Boolean;
     function Gerar_eSocial1035(aCompetencia : String; aZerarBase : Boolean;
-      aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge) : Boolean; virtual; abstract;
+      aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge) : Boolean;
     function Gerar_eSocial1040(aCompetencia : String; aZerarBase : Boolean;
       aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge) : Boolean; virtual; abstract;
     function Gerar_eSocial1050(aCompetencia : String; aZerarBase : Boolean;
@@ -853,14 +853,15 @@ begin
     aProcesso.Progress := 0;
     Application.ProcessMessages;
 
-    if not cdsTabela.IsEmpty then
-      aEventoID := StrToInt(IncrementGenerator('GEN_ESOCIAL_EVENTO_S1010', 1));
+//    if not cdsTabela.IsEmpty then
+//      aEventoID := StrToInt(IncrementGenerator('GEN_ESOCIAL_EVENTO_S1010', 1));
 
     cdsTabela.First;
     while not cdsTabela.Eof do
     begin
       with ACBrESocial.Eventos.Tabelas.S1010.Add do
       begin
+        aEventoID := StrToInt(IncrementGenerator('GEN_ESOCIAL_EVENTO_S1010', 1));
         evtTabRubrica.Sequencial := aEventoID;
 
         if AmbienteWebServiceProducao then
@@ -1279,6 +1280,28 @@ begin
     end;
 
     aRetorno := True;
+  finally
+    aSQL.Free;
+    Result := aRetorno;
+  end;
+end;
+
+function TdmESocial.Gerar_eSocial1035(aCompetencia: String; aZerarBase: Boolean; aModoLancamento: TModoLancamento;
+  aLabel: TLabel; aProcesso: TGauge): Boolean;
+var
+  aRetorno : Boolean;
+  aSQL : TStringList;
+  ok   : Boolean;
+  aEventoID,
+  I    : Integer;
+begin
+  aRetorno := False;
+  aSQL := TStringList.Create;
+  ok   := True;
+  try
+
+    Mensagem('Evento não disponível para esta versão.'#13'Favor entrar em contato com o fornecedor do software.' , 'Alerta', MB_ICONWARNING);
+
   finally
     aSQL.Free;
     Result := aRetorno;

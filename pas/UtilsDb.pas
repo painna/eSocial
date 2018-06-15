@@ -159,7 +159,7 @@ Begin
    Try
      oQry1.Open;
      Try
-         Result := oQry1.FieldByName(UpperCase(sCampoRet)).AsString;
+         Result := Trim(oQry1.FieldByName(UpperCase(sCampoRet)).AsString);
      except
          Result := '';
      End;

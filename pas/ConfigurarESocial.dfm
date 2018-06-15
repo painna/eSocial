@@ -235,15 +235,15 @@ inherited frmConfigurarESocial: TfrmConfigurarESocial
         end
         object dbeDATA_IMPLANTACAO: TcxDBDateEdit
           Left = 153
-          Top = 166
+          Top = 191
           DataBinding.DataField = 'DATA_IMPLANTACAO'
           DataBinding.DataSource = ds1
-          TabOrder = 11
+          TabOrder = 13
           Width = 121
         end
-        object cxLabel1: TcxLabel
+        object lblDATA_IMPLANTACAO: TcxLabel
           Left = 6
-          Top = 169
+          Top = 194
           Caption = 'Data de Implata'#231#227'o e-Social:'
           FocusControl = dbeSUBTETO_VENCTO_VALOR
           ParentFont = False
@@ -251,6 +251,24 @@ inherited frmConfigurarESocial: TfrmConfigurarESocial
           Properties.Alignment.Horz = taRightJustify
           Transparent = True
           AnchorX = 146
+        end
+        object dbePOSSUI_TABELA_CARREIRA: TcxDBCheckBox
+          Left = 153
+          Top = 166
+          Caption = 'Possui Tabela de Carreira P'#250'blica'
+          DataBinding.DataField = 'POSSUI_TABELA_CARREIRA'
+          DataBinding.DataSource = ds1
+          ParentFont = False
+          Properties.ValueChecked = 'S'
+          Properties.ValueUnchecked = 'N'
+          Style.Font.Charset = DEFAULT_CHARSET
+          Style.Font.Color = clDefault
+          Style.Font.Height = -11
+          Style.Font.Name = 'Arial'
+          Style.Font.Style = [fsBold]
+          Style.IsFontAssigned = True
+          TabOrder = 11
+          Transparent = True
         end
       end
       object tbsContador: TcxTabSheet
@@ -480,6 +498,13 @@ inherited frmConfigurarESocial: TfrmConfigurarESocial
       FixedChar = True
       Size = 1
     end
+    object sds1POSSUI_TABELA_CARREIRA: TStringField
+      DisplayWidth = 1
+      FieldName = 'POSSUI_TABELA_CARREIRA'
+      Required = True
+      FixedChar = True
+      Size = 1
+    end
     object sds1TIPO_OPERACAO: TStringField
       FieldName = 'TIPO_OPERACAO'
       ProviderFlags = [pfInUpdate]
@@ -563,6 +588,12 @@ inherited frmConfigurarESocial: TfrmConfigurarESocial
         Size = 1
       end
       item
+        Name = 'POSSUI_TABELA_CARREIRA'
+        Attributes = [faRequired, faFixed]
+        DataType = ftString
+        Size = 10
+      end
+      item
         Name = 'TIPO_OPERACAO'
         Attributes = [faRequired, faFixed]
         DataType = ftString
@@ -644,6 +675,12 @@ inherited frmConfigurarESocial: TfrmConfigurarESocial
     object cds1POSSUI_RPPS: TStringField
       FieldName = 'POSSUI_RPPS'
       ProviderFlags = [pfInUpdate]
+      Required = True
+      FixedChar = True
+      Size = 1
+    end
+    object cds1POSSUI_TABELA_CARREIRA: TStringField
+      FieldName = 'POSSUI_TABELA_CARREIRA'
       Required = True
       FixedChar = True
       Size = 1

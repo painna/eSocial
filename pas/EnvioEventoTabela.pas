@@ -56,6 +56,7 @@ implementation
 
 uses
   gsLib,
+  UtilsDb,
   udmPrincipal,
   udmESocial,
   pcesConversaoeSocial;
@@ -98,6 +99,7 @@ begin
   inherited;
   dmESocial.ListarCompetencias(cmbAnoMes);
   LimparPainelProcesso(False);
+  cbS1035.Enabled := (Pesquisa('CONFIG_ESOCIAL', 'ID_CONFIG_ORGAO', '1', 'POSSUI_TABELA_CARREIRA', '') = FLAG_SIM);
 end;
 
 function TfrmEnvioEventoTabela.GeradoEnviado: Boolean;

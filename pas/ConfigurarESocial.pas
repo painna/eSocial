@@ -86,7 +86,10 @@ type
     sds1DATA_IMPLANTACAO: TDateField;
     cds1DATA_IMPLANTACAO: TDateField;
     dbeDATA_IMPLANTACAO: TcxDBDateEdit;
-    cxLabel1: TcxLabel;
+    lblDATA_IMPLANTACAO: TcxLabel;
+    dbePOSSUI_TABELA_CARREIRA: TcxDBCheckBox;
+    sds1POSSUI_TABELA_CARREIRA: TStringField;
+    cds1POSSUI_TABELA_CARREIRA: TStringField;
     procedure FormCreate(Sender: TObject);
     procedure cds1NewRecord(DataSet: TDataSet);
     procedure FormShow(Sender: TObject);
@@ -124,7 +127,9 @@ end;
 procedure TfrmConfigurarESocial.cds1NewRecord(DataSet: TDataSet);
 begin
   inherited;
-  cds1ID_CONFIG_ORGAO.AsInteger := 1;
+  cds1ID_CONFIG_ORGAO.AsInteger       := 1;
+  cds1POSSUI_RPPS.AsString            := FLAG_NAO;
+  cds1POSSUI_TABELA_CARREIRA.AsString := FLAG_NAO;
 end;
 
 procedure TfrmConfigurarESocial.FormCreate(Sender: TObject);
