@@ -1246,12 +1246,9 @@ begin
         evtTabCargo.infoCargo.DadosCargo.nmCargo := AnsiUpperCase(Trim(cdsTabela.FieldByName('descricao').AsString));
         evtTabCargo.infoCargo.DadosCargo.codCBO  := cdsTabela.FieldByName('cbo').AsString;
 
-//        evtTabCargo.infoCargo.DadosCargo.cargoPublico.acumCargo   := tpAcumCargo(0);
-//        evtTabCargo.infoCargo.DadosCargo.cargoPublico.contagemEsp := tpContagemEsp(0);
-//        evtTabCargo.infoCargo.DadosCargo.cargoPublico.dedicExcl   := tpSimNao(0);
-        evtTabCargo.infoCargo.DadosCargo.cargoPublico.acumCargo   := acNaoAcumulavel;
-        evtTabCargo.infoCargo.DadosCargo.cargoPublico.contagemEsp := ceNao;
-        evtTabCargo.infoCargo.DadosCargo.cargoPublico.dedicExcl   := tpSim;
+        evtTabCargo.infoCargo.DadosCargo.cargoPublico.acumCargo   := eSStrToAcumCargo(ok, cdsTabela.FieldByName('acumula_cargo').AsString);
+        evtTabCargo.infoCargo.DadosCargo.cargoPublico.contagemEsp := eSStrToContagemEsp(ok, cdsTabela.FieldByName('contagem_especial').AsString);
+        evtTabCargo.infoCargo.DadosCargo.cargoPublico.dedicExcl   := eSStrToSimNao(ok, cdsTabela.FieldByName('dedicacao_exclusiva').AsString);
 
         if (not cdsTabela.FieldByName('data_ato_criacao').IsNull) then
         begin
