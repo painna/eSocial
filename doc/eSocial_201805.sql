@@ -369,3 +369,82 @@ A - Alteracao
 E - Exclusao
 P - Processado/Enviado';
 
+
+
+
+/*------ GERASYS.TI 15/06/2018 10:50:31 --------*/
+
+COMMENT ON COLUMN CARGO_FUNCAO.TIPO_OPERACAO IS
+'eSocial - Operacao do registro no eSocial:
+I - Inclusao
+A - Alteracao
+E - Exclusao
+P - Processado/Enviado';
+
+
+
+
+/*------ GERASYS.TI 15/06/2018 12:01:59 --------*/
+
+CREATE DOMAIN ESOCIAL_TIPO_4 AS
+CHAR(10)
+DEFAULT '1'
+NOT NULL
+CHECK (value in ('1', '2', '3', '4'));COMMENT ON DOMAIN ESOCIAL_TIPO_4 IS 'eSocial - Tipo 4:
+1 -
+2 -
+3 -
+4 -';
+
+
+
+
+/*------ GERASYS.TI 15/06/2018 12:09:29 --------*/
+
+CREATE DOMAIN SIM_NAO AS
+CHAR(10)
+DEFAULT 'N'
+NOT NULL
+CHECK (Value in ('S', 'N'));COMMENT ON DOMAIN SIM_NAO IS 'Valor Logico:
+S - Sim
+N - Nao';
+
+
+
+
+/*------ GERASYS.TI 15/06/2018 12:10:04 --------*/
+
+ALTER TABLE CARGO_FUNCAO
+    ADD ACUMULA_CARGO ESOCIAL_TIPO_4,
+    ADD CONTAGEM_ESPECIAL ESOCIAL_TIPO_4,
+    ADD DEDICACAO_EXCLUSIVA SIM_NAO;
+
+COMMENT ON COLUMN CARGO_FUNCAO.ACUMULA_CARGO IS
+'eSocial - Acumula Cargo:
+1 - Nao acumulavel
+2 - Profissional de Saude
+3 - Professor
+4 - Tecnico/Cientista';
+
+COMMENT ON COLUMN CARGO_FUNCAO.CONTAGEM_ESPECIAL IS
+'eSocial - Codigo correspondente a possibilidade de Contagem de tempo Especial:
+1 - Nao
+2 - Professor (Infantil, Fundamental e Medio)
+3 - Professor de Ensino Superior, Magistrado, Membro de Ministerio Publico, Membro do Tribunal de Contas (com ingresso anterior a 16/12/1998 EC nro. 20/98)
+4 - Atividade de Risco';
+
+COMMENT ON COLUMN CARGO_FUNCAO.DEDICACAO_EXCLUSIVA IS
+'eSocial - Dedicao exclusiva:
+S - Sim
+N - Nao';
+
+
+
+
+/*------ GERASYS.TI 15/06/2018 12:10:55 --------*/
+
+UPDATE CARGO_FUNCAO
+SET ACUMULA_CARGO = '1',
+    CONTAGEM_ESPECIAL = '1',
+    DEDICACAO_EXCLUSIVA = 'N';
+
