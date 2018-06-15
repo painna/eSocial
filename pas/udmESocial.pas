@@ -329,7 +329,7 @@ begin
             aProtocolo.NumeroInscricao := IdeTransmissor.NrInsc;
 
             sPath    := PathWithDelim(ACBrESocial.Configuracoes.Arquivos.GetPatheSocial(aProtocolo.DataHora, ACBrESocial.Configuracoes.Geral.IdEmpregador));
-            sArquivo := sPath + '\' + FormatDateTime('yyyymmddhhmmss', aDataHora1);
+            sArquivo := StringReplace(sPath + '\' + FormatDateTime('yyyymmddhhmmss', aDataHora1), '\\', '\', [rfReplaceAll]);
 
             // Pegar Arquivo de Envio
             if FileExists(sArquivo + '-env-lot.xml') then
@@ -340,32 +340,32 @@ begin
               aProtocolo.Arquivos.Add(sArquivo + '-rec.xml')
             else
             begin
-              sArquivo := sPath + '\' + FormatDateTime('yyyymmddhhmmss', aDataHora2);
+              sArquivo := StringReplace(sPath + '\' + FormatDateTime('yyyymmddhhmmss', aDataHora2), '\\', '\', [rfReplaceAll]);
               if FileExists(sArquivo + '-rec.xml') then
                 aProtocolo.Arquivos.Add(sArquivo + '-rec.xml')
               else
               begin
-                sArquivo := sPath + '\' + FormatDateTime('yyyymmddhhmmss', aDataHora3);
+                sArquivo := StringReplace(sPath + '\' + FormatDateTime('yyyymmddhhmmss', aDataHora3), '\\', '\', [rfReplaceAll]);
                 if FileExists(sArquivo + '-rec.xml') then
                   aProtocolo.Arquivos.Add(sArquivo + '-rec.xml')
                 else
                 begin
-                  sArquivo := sPath + '\' + FormatDateTime('yyyymmddhhmmss', aDataHora4);
+                  sArquivo := StringReplace(sPath + '\' + FormatDateTime('yyyymmddhhmmss', aDataHora4), '\\', '\', [rfReplaceAll]);
                   if FileExists(sArquivo + '-rec.xml') then
                     aProtocolo.Arquivos.Add(sArquivo + '-rec.xml')
                   else
                   begin
-                    sArquivo := sPath + '\' + FormatDateTime('yyyymmddhhmmss', aDataHora5);
+                    sArquivo := StringReplace(sPath + '\' + FormatDateTime('yyyymmddhhmmss', aDataHora5), '\\', '\', [rfReplaceAll]);
                     if FileExists(sArquivo + '-rec.xml') then
                       aProtocolo.Arquivos.Add(sArquivo + '-rec.xml')
                     else
                     begin
-                      sArquivo := sPath + '\' + FormatDateTime('yyyymmddhhmmss', aDataHora6);
+                      sArquivo := StringReplace(sPath + '\' + FormatDateTime('yyyymmddhhmmss', aDataHora6), '\\', '\', [rfReplaceAll]);
                       if FileExists(sArquivo + '-rec.xml') then
                         aProtocolo.Arquivos.Add(sArquivo + '-rec.xml')
                       else
                       begin
-                        sArquivo := sPath + '\' + FormatDateTime('yyyymmddhhmmss', aDataHora7);
+                        sArquivo := StringReplace(sPath + '\' + FormatDateTime('yyyymmddhhmmss', aDataHora7), '\\', '\', [rfReplaceAll]);
                         if FileExists(sArquivo + '-rec.xml') then
                           aProtocolo.Arquivos.Add(sArquivo + '-rec.xml');
                       end;
@@ -1186,7 +1186,7 @@ begin
   try
     aSQL.BeginUpdate;
     aSQL.Clear;
-    aSQL.Add('Select');
+    aSQL.Add('Select '); // first 1
     aSQL.Add('    f.*');
     aSQL.Add('  , c.codigo as cbo ');
     aSQL.Add('  , e.cod_rais as escolaridade ');
@@ -1212,14 +1212,15 @@ begin
     aProcesso.Progress := 0;
     Application.ProcessMessages;
 
-    if not cdsTabela.IsEmpty then
-      aEventoID := StrToInt(IncrementGenerator('GEN_ESOCIAL_EVENTO_S1030', 1));
+//    if not cdsTabela.IsEmpty then
+//      aEventoID := StrToInt(IncrementGenerator('GEN_ESOCIAL_EVENTO_S1030', 1));
 
     cdsTabela.First;
     while not cdsTabela.Eof do
     begin
       with ACBrESocial.Eventos.Tabelas.S1030.Add do
       begin
+        aEventoID := StrToInt(IncrementGenerator('GEN_ESOCIAL_EVENTO_S1030', 1));
         evtTabCargo.Sequencial := aEventoID;
 
         if AmbienteWebServiceProducao then
@@ -1248,6 +1249,9 @@ begin
 //        evtTabCargo.infoCargo.DadosCargo.cargoPublico.acumCargo   := tpAcumCargo(0);
 //        evtTabCargo.infoCargo.DadosCargo.cargoPublico.contagemEsp := tpContagemEsp(0);
 //        evtTabCargo.infoCargo.DadosCargo.cargoPublico.dedicExcl   := tpSimNao(0);
+        evtTabCargo.infoCargo.DadosCargo.cargoPublico.acumCargo   := acNaoAcumulavel;
+        evtTabCargo.infoCargo.DadosCargo.cargoPublico.contagemEsp := ceNao;
+        evtTabCargo.infoCargo.DadosCargo.cargoPublico.dedicExcl   := tpSim;
 
         if (not cdsTabela.FieldByName('data_ato_criacao').IsNull) then
         begin
