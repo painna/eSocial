@@ -1052,6 +1052,10 @@ object frmPrincipal: TfrmPrincipal
         Caption = 'Tabela S1010 - Eventos'
         ImageIndex = 3
       end
+      object imArquivoAmbienteTrabalho: TMenuItem
+        Caption = 'Tabela S1060 - Ambiente de Trabalho (Departamentos)'
+        ImageIndex = 3
+      end
       object N31: TMenuItem
         Caption = '-'
       end
@@ -1095,13 +1099,13 @@ object frmPrincipal: TfrmPrincipal
         ImageIndex = 0
         OnClick = imEventoTabelaClick
       end
-      object imEventoPeriodico: TMenuItem
-        Caption = 'Eventos Peri'#243'dicos'
-        ImageIndex = 1
-      end
       object imEventoNaoPeriodico: TMenuItem
         Caption = 'Eventos N'#227'o Peri'#243'dicos'
         ImageIndex = 2
+      end
+      object imEventoPeriodico: TMenuItem
+        Caption = 'Eventos Peri'#243'dicos'
+        ImageIndex = 1
       end
     end
     object imFerramentas: TMenuItem

@@ -119,6 +119,7 @@ type
     imConfigurarESocial: TMenuItem;
     imArquivoUnidadeGestora: TMenuItem;
     imArquivoEvento: TMenuItem;
+    imArquivoAmbienteTrabalho: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormActivate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);

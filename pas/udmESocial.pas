@@ -51,6 +51,19 @@ type
       aVersao   ,
       aNumero   : String;
       aArquivos : TStringList;
+
+      aS1000 ,
+      aS1005 ,
+      aS1010 ,
+      aS1020 ,
+      aS1030 ,
+      aS1035 ,
+      aS1040 ,
+      aS1050 ,
+      aS1060 ,
+      aS1070 ,
+      aS1080 : Boolean;
+
       procedure SetNumeroInscricao(Value : String);
       procedure SetVersao(Value : String);
       procedure SetNumero(Value : String);
@@ -60,6 +73,18 @@ type
       property Versao   : String read aVersao write SetVersao;
       property Numero   : String read aNumero write SetNumero;
       property Arquivos : TStringList read aArquivos write aArquivos;
+
+      property S1000 : Boolean read aS1000 write aS1000;
+      property S1005 : Boolean read aS1005 write aS1005;
+      property S1010 : Boolean read aS1010 write aS1010;
+      property S1020 : Boolean read aS1020 write aS1020;
+      property S1030 : Boolean read aS1030 write aS1030;
+      property S1035 : Boolean read aS1035 write aS1035;
+      property S1040 : Boolean read aS1040 write aS1040;
+      property S1050 : Boolean read aS1050 write aS1050;
+      property S1060 : Boolean read aS1060 write aS1060;
+      property S1070 : Boolean read aS1070 write aS1070;
+      property S1080 : Boolean read aS1080 write aS1080;
 
       constructor Create(Value : String); overload;
       destructor Destroy; override;
@@ -72,6 +97,26 @@ type
     cdsTabela: TClientDataSet;
     qryTabela: TSQLQuery;
     ACBrValidador: TACBrValidador;
+    dspDetalhe: TDataSetProvider;
+    cdsDetalhe: TClientDataSet;
+    qryDetalhe: TSQLQuery;
+    dspProtocolo: TDataSetProvider;
+    cdsProtocolo: TClientDataSet;
+    qryProtocolo: TSQLQuery;
+    cdsProtocoloID: TLargeintField;
+    cdsProtocoloNUMERO: TStringField;
+    cdsProtocoloINSCRICAO: TStringField;
+    cdsProtocoloDATA_HORA: TSQLTimeStampField;
+    cdsProtocoloVERSAO: TStringField;
+    cdsProtocoloARQUIVO_ENVIADO: TBlobField;
+    cdsProtocoloARQUIVO_RETORNO: TBlobField;
+    qryProtocoloID: TLargeintField;
+    qryProtocoloNUMERO: TStringField;
+    qryProtocoloINSCRICAO: TStringField;
+    qryProtocoloDATA_HORA: TSQLTimeStampField;
+    qryProtocoloVERSAO: TStringField;
+    qryProtocoloARQUIVO_ENVIADO: TBlobField;
+    qryProtocoloARQUIVO_RETORNO: TBlobField;
     procedure DataModuleCreate(Sender: TObject);
     procedure DataModuleDestroy(Sender: TObject);
     procedure btnSalvar(Sender: TObject);
@@ -82,6 +127,7 @@ type
     procedure AtualizaSSLLibsCombo;
     procedure GravarConfiguracao;
     procedure SetSQL(aSQL : TStringList);
+    procedure SetSQL_Detalhe(aSQL : TStringList);
 
     function GetMensagemRetorno : TStringList;
     function ProximaCompetencia(aCompetencia : String) : String;
@@ -91,6 +137,8 @@ type
 
     procedure ListarCompetencias(aLista : TComboBox);
     procedure LerConfiguracao;
+    procedure GravarProtocoloRetorno(aProtocolo : TProtocoloESocial);
+    procedure AtualizarOperacoes(aModoLancamento: TModoLancamento; aProtocolo: TProtocoloESocial); virtual; abstract;
 
     function CertificadoInstalado : Boolean;
     function CertificadoValido : Boolean;
@@ -99,27 +147,38 @@ type
 
     // procedures eventos de tabela
     function Gerar_eSocial1000(aCompetencia : String; aZerarBase : Boolean;
-      aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge) : Boolean;
+      aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge;
+      var aProtocolo : TProtocoloESocial) : Boolean;
     function Gerar_eSocial1005(aCompetencia : String; aZerarBase : Boolean;
-      aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge) : Boolean;
+      aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge;
+      var aProtocolo : TProtocoloESocial) : Boolean;
     function Gerar_eSocial1010(aCompetencia : String; aZerarBase : Boolean;
-      aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge) : Boolean;
+      aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge;
+      var aProtocolo : TProtocoloESocial) : Boolean;
     function Gerar_eSocial1020(aCompetencia : String; aZerarBase : Boolean;
-      aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge) : Boolean;
+      aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge;
+      var aProtocolo : TProtocoloESocial) : Boolean;
     function Gerar_eSocial1030(aCompetencia : String; aZerarBase : Boolean;
-      aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge) : Boolean;
+      aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge;
+      var aProtocolo : TProtocoloESocial) : Boolean;
     function Gerar_eSocial1035(aCompetencia : String; aZerarBase : Boolean;
-      aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge) : Boolean;
+      aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge;
+      var aProtocolo : TProtocoloESocial) : Boolean;
     function Gerar_eSocial1040(aCompetencia : String; aZerarBase : Boolean;
-      aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge) : Boolean; virtual; abstract;
+      aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge;
+      var aProtocolo : TProtocoloESocial) : Boolean;
     function Gerar_eSocial1050(aCompetencia : String; aZerarBase : Boolean;
-      aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge) : Boolean; virtual; abstract;
+      aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge;
+      var aProtocolo : TProtocoloESocial) : Boolean;
     function Gerar_eSocial1060(aCompetencia : String; aZerarBase : Boolean;
-      aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge) : Boolean; virtual; abstract;
+      aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge;
+      var aProtocolo : TProtocoloESocial) : Boolean;
     function Gerar_eSocial1070(aCompetencia : String; aZerarBase : Boolean;
-      aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge) : Boolean; virtual; abstract;
+      aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge;
+      var aProtocolo : TProtocoloESocial) : Boolean;                        virtual; abstract;
     function Gerar_eSocial1080(aCompetencia : String; aZerarBase : Boolean;
-      aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge) : Boolean; virtual; abstract;
+      aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge;
+      var aProtocolo : TProtocoloESocial) : Boolean;                        virtual; abstract;
 
     function ConfigurarCertificado(const AOwner : TComponent) : Boolean;
     function EventoEnviado_eSocial(aGrupo : TeSocialGrupo; aCompetencia : String;
@@ -279,7 +338,8 @@ var
   aDataHora4 ,
   aDataHora5 ,
   aDataHora6 ,
-  aDataHora7 : TDateTime;
+  aDataHora7 ,
+  aDataHora8 : TDateTime;
   aRetorno   : Boolean;
   I : Integer;
   sPath    ,
@@ -313,6 +373,7 @@ begin
       aDataHora5 := aDataHora1 + StrToTime('00:00:04');
       aDataHora6 := aDataHora1 + StrToTime('00:00:05');
       aDataHora7 := aDataHora1 + StrToTime('00:00:06');
+      aDataHora8 := aDataHora1 + StrToTime('00:00:07');
 
       aRetorno   := ACBrESocial.Enviar(aGrupo);
 
@@ -367,7 +428,13 @@ begin
                       begin
                         sArquivo := StringReplace(sPath + '\' + FormatDateTime('yyyymmddhhmmss', aDataHora7), '\\', '\', [rfReplaceAll]);
                         if FileExists(sArquivo + '-rec.xml') then
-                          aProtocolo.Arquivos.Add(sArquivo + '-rec.xml');
+                          aProtocolo.Arquivos.Add(sArquivo + '-rec.xml')
+                        else
+                        begin
+                          sArquivo := StringReplace(sPath + '\' + FormatDateTime('yyyymmddhhmmss', aDataHora8), '\\', '\', [rfReplaceAll]);
+                          if FileExists(sArquivo + '-rec.xml') then
+                            aProtocolo.Arquivos.Add(sArquivo + '-rec.xml');
+                        end;
                       end;
                     end;
                   end;
@@ -392,10 +459,10 @@ begin
               with Status.Ocorrencias.Items[I] do
               begin
                 aMensagemRetorno.Add('Ocorrencia '     + FormatFloat('###00', I + 1));
-                aMensagemRetorno.Add('  Código.....: ' + FormatFloat('##00000', Codigo));
-                aMensagemRetorno.Add('  Descrição..: ' + Descricao);
-                aMensagemRetorno.Add('  Tipo.......: ' + IntToStr(Tipo));
-                aMensagemRetorno.Add('  Localização: ' + Localizacao + #13#13);
+                aMensagemRetorno.Add('* Código.....: ' + FormatFloat('##00000', Codigo));
+                aMensagemRetorno.Add('* Descrição..: ' + Descricao);
+                aMensagemRetorno.Add('* Tipo.......: ' + IntToStr(Tipo));
+                aMensagemRetorno.Add('* Localização: ' + Localizacao + #13#13);
               end;
             end;
 
@@ -413,7 +480,7 @@ end;
 
 function TdmESocial.Gerar_eSocial1000(aCompetencia: String;  aZerarBase : Boolean;
   aModoLancamento : TModoLancamento;
-  aLabel: TLabel; aProcesso: TGauge): Boolean;
+  aLabel: TLabel; aProcesso: TGauge; var aProtocolo : TProtocoloESocial): Boolean;
 var
   aRetorno : Boolean;
   aSQL : TStringList;
@@ -549,8 +616,8 @@ begin
         evtInfoEmpregador.IdeEmpregador.NrInsc := Criptografa(cdsTabela.FieldByName('CNPJ').AsString, '2', 14);
         //evtInfoEmpregador.IdeEmpregador.NrInsc := cdsTabela.FieldByName('CNPJ').AsString;
 
-        with ACBrESocial.Configuracoes.Geral do
-          IdEmpregador := evtInfoEmpregador.IdeEmpregador.NrInsc;
+        with ACBrESocial.Configuracoes do
+          Geral.IdEmpregador := evtInfoEmpregador.IdeEmpregador.NrInsc;
 
         evtInfoEmpregador.ModoLancamento := aModoLancamento;
         evtInfoEmpregador.InfoEmpregador.IdePeriodo.IniValid := aCompetencia;
@@ -639,6 +706,7 @@ begin
     end;
 
     aRetorno := True;
+    aProtocolo.s1000 := aRetorno;
   finally
     aSQL.Free;
     Result := aRetorno;
@@ -646,7 +714,7 @@ begin
 end;
 
 function TdmESocial.Gerar_eSocial1005(aCompetencia: String; aZerarBase: Boolean; aModoLancamento: TModoLancamento;
-  aLabel: TLabel; aProcesso: TGauge): Boolean;
+  aLabel: TLabel; aProcesso: TGauge; var aProtocolo : TProtocoloESocial): Boolean;
 var
   aRetorno : Boolean;
   aSQL : TStringList;
@@ -724,8 +792,8 @@ begin
           IdeEmpregador.TpInsc := tiCNPJ;
           IdeEmpregador.NrInsc := cdsTabela.FieldByName('CNPJ_PRINCIPAL').AsString;
 
-          with ACBrESocial.Configuracoes.Geral do
-            IdEmpregador := IdeEmpregador.NrInsc;
+          with ACBrESocial.Configuracoes do
+            Geral.IdEmpregador := IdeEmpregador.NrInsc;
 
           with infoEstab do
           begin
@@ -796,6 +864,7 @@ begin
     end;
 
     aRetorno := True;
+    aProtocolo.S1005  := aRetorno;
   finally
     aSQL.Free;
     Result := aRetorno;
@@ -803,7 +872,7 @@ begin
 end;
 
 function TdmESocial.Gerar_eSocial1010(aCompetencia: String; aZerarBase: Boolean; aModoLancamento: TModoLancamento;
-  aLabel: TLabel; aProcesso: TGauge): Boolean;
+  aLabel: TLabel; aProcesso: TGauge; var aProtocolo : TProtocoloESocial): Boolean;
 var
   aRetorno : Boolean;
   aSQL : TStringList;
@@ -875,8 +944,8 @@ begin
         evtTabRubrica.IdeEmpregador.TpInsc := tiCNPJ;
         evtTabRubrica.IdeEmpregador.NrInsc := Criptografa(cdsTabela.FieldByName('CNPJ').AsString, '2', 14);
 
-        with ACBrESocial.Configuracoes.Geral do
-          IdEmpregador := evtTabRubrica.IdeEmpregador.NrInsc;
+        with ACBrESocial.Configuracoes do
+          Geral.IdEmpregador := evtTabRubrica.IdeEmpregador.NrInsc;
 
         evtTabRubrica.ModoLancamento := aModoLancamento;
 
@@ -977,6 +1046,7 @@ begin
     end;
 
     aRetorno := True;
+    aProtocolo.S1010 := aRetorno;
   finally
     aSQL.Free;
     Result := aRetorno;
@@ -984,7 +1054,7 @@ begin
 end;
 
 function TdmESocial.Gerar_eSocial1020(aCompetencia: String; aZerarBase: Boolean; aModoLancamento: TModoLancamento;
-  aLabel: TLabel; aProcesso: TGauge): Boolean;
+  aLabel: TLabel; aProcesso: TGauge; var aProtocolo : TProtocoloESocial): Boolean;
 var
   aRetorno : Boolean;
   aSQL : TStringList;
@@ -1045,8 +1115,8 @@ begin
           IdeEmpregador.TpInsc := tiCNPJ;
           IdeEmpregador.NrInsc := Criptografa(cdsTabela.FieldByName('CNPJ').AsString, '2', 14);
 
-          with ACBrESocial.Configuracoes.Geral do
-            IdEmpregador := EvtTabLotacao.IdeEmpregador.NrInsc;
+          with ACBrESocial.Configuracoes do
+            Geral.IdEmpregador := EvtTabLotacao.IdeEmpregador.NrInsc;
 
           ModoLancamento := aModoLancamento;
 
@@ -1166,6 +1236,7 @@ begin
   end;
 *)
     aRetorno := True;
+    aProtocolo.S1020 := aRetorno;
   finally
     aSQL.Free;
     Result := aRetorno;
@@ -1173,7 +1244,7 @@ begin
 end;
 
 function TdmESocial.Gerar_eSocial1030(aCompetencia: String; aZerarBase: Boolean; aModoLancamento: TModoLancamento;
-  aLabel: TLabel; aProcesso: TGauge): Boolean;
+  aLabel: TLabel; aProcesso: TGauge; var aProtocolo : TProtocoloESocial): Boolean;
 var
   aRetorno : Boolean;
   aSQL : TStringList;
@@ -1194,9 +1265,9 @@ begin
     aSQL.Add('  , Case when coalesce(f.dt_extinsao, current_date) > cast(' + QuotedStr(aCompetencia + '-01') + ' as date) then 0 else 1 end extinto');
     aSQL.Add('  , (Select CNPJ from CONFIG_ORGAO c where c.id = 1) as CNPJ ');
     aSQL.Add('from CARGO_FUNCAO f');
-    aSQL.Add('  left join CBO c on (c.id = f.id_cbo)');
+    aSQL.Add('  inner join CBO c on (c.id = f.id_cbo)');
     aSQL.Add('  left join ESCOLARIDADE e on (e.id = f.id_escolaridade)');
-    aSQL.Add('where (c.id > 0)');
+    aSQL.Add('where (f.id > 0)');
 
     case aModoLancamento of
       mlInclusao  : aSQL.Add('  and f.tipo_operacao = ' + QuotedStr(FLAG_OPERACAO_INSERIR));
@@ -1235,8 +1306,8 @@ begin
         evtTabCargo.IdeEmpregador.TpInsc := tiCNPJ;
         evtTabCargo.IdeEmpregador.NrInsc := Criptografa(cdsTabela.FieldByName('CNPJ').AsString, '2', 14);
 
-        with ACBrESocial.Configuracoes.Geral do
-          IdEmpregador := evtTabCargo.IdeEmpregador.NrInsc;
+        with ACBrESocial.Configuracoes do
+          Geral.IdEmpregador := evtTabCargo.IdeEmpregador.NrInsc;
 
         evtTabCargo.ModoLancamento := aModoLancamento;
 
@@ -1280,6 +1351,7 @@ begin
     end;
 
     aRetorno := True;
+    aProtocolo.S1030 := aRetorno;
   finally
     aSQL.Free;
     Result := aRetorno;
@@ -1287,7 +1359,7 @@ begin
 end;
 
 function TdmESocial.Gerar_eSocial1035(aCompetencia: String; aZerarBase: Boolean; aModoLancamento: TModoLancamento;
-  aLabel: TLabel; aProcesso: TGauge): Boolean;
+  aLabel: TLabel; aProcesso: TGauge; var aProtocolo : TProtocoloESocial): Boolean;
 var
   aRetorno : Boolean;
   aSQL : TStringList;
@@ -1302,6 +1374,337 @@ begin
 
     Mensagem('Evento não disponível para esta versão.'#13'Favor entrar em contato com o fornecedor do software.' , 'Alerta', MB_ICONWARNING);
 
+    aProtocolo.S1035 := aRetorno;
+  finally
+    aSQL.Free;
+    Result := aRetorno;
+  end;
+end;
+
+function TdmESocial.Gerar_eSocial1040(aCompetencia: String; aZerarBase: Boolean; aModoLancamento: TModoLancamento;
+  aLabel: TLabel; aProcesso: TGauge; var aProtocolo : TProtocoloESocial): Boolean;
+var
+  aRetorno : Boolean;
+  aSQL : TStringList;
+  ok   : Boolean;
+  aEventoID,
+  I    : Integer;
+begin
+  aRetorno := False;
+  aSQL := TStringList.Create;
+  ok   := True;
+  try
+    aSQL.BeginUpdate;
+    aSQL.Clear;
+    aSQL.Add('Select '); // first 1
+    aSQL.Add('    f.*');
+    aSQL.Add('  , c.codigo as cbo ');
+    aSQL.Add('  , Case when coalesce(f.dt_extinsao, current_date) > cast(' + QuotedStr(aCompetencia + '-01') + ' as date) then 0 else 1 end extinto');
+    aSQL.Add('  , (Select CNPJ from CONFIG_ORGAO c where c.id = 1) as CNPJ ');
+    aSQL.Add('from CARGO_FUNCAO f');
+    aSQL.Add('  inner join CBO c on (c.id = f.id_cbo)');
+    aSQL.Add('where (f.id > 0)');
+    aSQL.Add('  and (f.id_tipo_cargo_tcm = 10)'); // COMISSIONADO
+
+    case aModoLancamento of
+      mlInclusao  : aSQL.Add('  and f.tipo_operacao = ' + QuotedStr(FLAG_OPERACAO_INSERIR));
+      mlAlteracao : aSQL.Add('  and f.tipo_operacao = ' + QuotedStr(FLAG_OPERACAO_ALTERAR));
+      mlExclusao  : aSQL.Add('  and f.tipo_operacao = ' + QuotedStr(FLAG_OPERACAO_EXCLUIR));
+    end;
+
+    aSQL.EndUpdate;
+    SetSQL(aSQL);
+
+    I := 1;
+
+    aProcesso.MaxValue := cdsTabela.RecordCount;
+    aProcesso.Progress := 0;
+    Application.ProcessMessages;
+
+    cdsTabela.First;
+    while not cdsTabela.Eof do
+    begin
+      with ACBrESocial.Eventos.Tabelas.S1040.Add, EvtTabFuncao do
+      begin
+        aEventoID := StrToInt(IncrementGenerator('GEN_ESOCIAL_EVENTO_S1040', 1));
+        EvtTabFuncao.Sequencial := aEventoID;
+
+        if AmbienteWebServiceProducao then
+          IdeEvento.TpAmb := TpTpAmb(0) //taProducao
+        else
+          IdeEvento.TpAmb := taProducaoRestrita;
+
+        IdeEvento.ProcEmi := peAplicEmpregador;
+        IdeEvento.VerProc := Versao_Executavel(ParamStr(0));
+
+        IdeEmpregador.TpInsc := tiCNPJ;
+        IdeEmpregador.NrInsc := Criptografa(cdsTabela.FieldByName('CNPJ').AsString, '2', 14);
+
+        with ACBrESocial.Configuracoes do
+          Geral.IdEmpregador := EvtTabFuncao.IdeEmpregador.NrInsc;
+
+        ModoLancamento := aModoLancamento;
+
+        InfoFuncao.IdeFuncao.CodFuncao := cdsTabela.FieldByName('id').AsString;
+        InfoFuncao.IdeFuncao.IniValid  := aCompetencia;
+        InfoFuncao.IdeFuncao.FimValid  := '2099-12';
+
+        InfoFuncao.DadosFuncao.dscFuncao := AnsiUpperCase(Trim(cdsTabela.FieldByName('descricao').AsString));
+        InfoFuncao.DadosFuncao.codCBO    := cdsTabela.FieldByName('cbo').AsString;
+
+        InfoFuncao.NovaValidade.IniValid := aCompetencia;
+        InfoFuncao.NovaValidade.FimValid := '2099-12';
+      end;
+
+      aLabel.Caption     := Trim(cdsTabela.FieldByName('DESCRICAO').AsString);
+      aProcesso.Progress := I;
+      Application.ProcessMessages;
+      Inc(I);
+
+      cdsTabela.Next;
+    end;
+
+    aRetorno := True;
+    aProtocolo.S1040 := aRetorno;
+  finally
+    aSQL.Free;
+    Result := aRetorno;
+  end;
+end;
+
+function TdmESocial.Gerar_eSocial1050(aCompetencia: String; aZerarBase: Boolean; aModoLancamento: TModoLancamento;
+  aLabel: TLabel; aProcesso: TGauge; var aProtocolo : TProtocoloESocial): Boolean;
+var
+  aRetorno : Boolean;
+  aSQL : TStringList;
+  ok   : Boolean;
+  aEventoID,
+  I    : Integer;
+begin
+  aRetorno := False;
+  aSQL := TStringList.Create;
+  ok   := True;
+  try
+    aSQL.BeginUpdate;
+    aSQL.Clear;
+    aSQL.Add('Select ');
+    aSQL.Add('    h.id ');
+    aSQL.Add('  , h.descr_horario as descricao ');
+    aSQL.Add('  , h.hora_entrada1 as hora_entrada ');
+    aSQL.Add('  , coalesce(h.hora_saida2, h.hora_saida) as hora_saida ');
+    aSQL.Add('  , h.duracao_jornada       ');
+    aSQL.Add('  , h.permite_flexibilidade ');
+    aSQL.Add('  , h.tipo_intervalo    ');
+    aSQL.Add('  , h.duracao_intervalo ');
+    aSQL.Add('  , h.intervalo_inicio  ');
+    aSQL.Add('  , h.intervalo_final   ');
+    aSQL.Add('  , (Select CNPJ from CONFIG_ORGAO c where c.id = 1) as CNPJ ');
+    aSQL.Add('from TAB_HORARIO h ');
+    aSQL.Add('where (h.id > 0)   ');
+
+    case aModoLancamento of
+      mlInclusao  : aSQL.Add('  and h.tipo_operacao = ' + QuotedStr(FLAG_OPERACAO_INSERIR));
+      mlAlteracao : aSQL.Add('  and h.tipo_operacao = ' + QuotedStr(FLAG_OPERACAO_ALTERAR));
+      mlExclusao  : aSQL.Add('  and h.tipo_operacao = ' + QuotedStr(FLAG_OPERACAO_EXCLUIR));
+    end;
+
+    aSQL.EndUpdate;
+    SetSQL(aSQL);
+
+    I := 1;
+
+    aProcesso.MaxValue := cdsTabela.RecordCount;
+    aProcesso.Progress := 0;
+    Application.ProcessMessages;
+
+    cdsTabela.First;
+    while not cdsTabela.Eof do
+    begin
+      with ACBrESocial.Eventos.Tabelas.S1050.Add, EvtTabHorContratual do
+      begin
+        aEventoID := StrToInt(IncrementGenerator('GEN_ESOCIAL_EVENTO_S1050', 1));
+        Sequencial:= aEventoID;
+
+        if AmbienteWebServiceProducao then
+          IdeEvento.TpAmb := TpTpAmb(0) //taProducao
+        else
+          IdeEvento.TpAmb := taProducaoRestrita;
+
+        IdeEvento.ProcEmi := peAplicEmpregador;
+        IdeEvento.VerProc := Versao_Executavel(ParamStr(0));
+
+        IdeEmpregador.TpInsc := tiCNPJ;
+        IdeEmpregador.NrInsc := Criptografa(cdsTabela.FieldByName('CNPJ').AsString, '2', 14);
+
+        with ACBrESocial.Configuracoes do
+          Geral.IdEmpregador := EvtTabHorContratual.IdeEmpregador.NrInsc;
+
+        ModoLancamento := aModoLancamento;
+
+        InfoHorContratual.ideHorContratual.codHorContrat := cdsTabela.FieldByName('id').AsString;
+        InfoHorContratual.ideHorContratual.IniValid  := aCompetencia;
+        InfoHorContratual.ideHorContratual.FimValid  := '2099-12';
+
+        with InfoHorContratual.dadosHorContratual do
+        begin
+          hrEntr         := Trim(cdsTabela.FieldByName('hora_entrada').AsString);
+          hrSaida        := Trim(cdsTabela.FieldByName('hora_saida').AsString);
+          durJornada     := StrToIntDef(Trim(cdsTabela.FieldByName('duracao_jornada').AsString), 0);
+          perHorFlexivel := eSStrToSimNao(ok, Trim(cdsTabela.FieldByName('permite_flexibilidade').AsString));
+
+          horarioIntervalo.Clear;
+
+          if (StrToIntDef(Trim(cdsTabela.FieldByName('duracao_intervalo').AsString), 0) > 0) then
+            with horarioIntervalo.Add do
+            begin
+              tpInterv   := eSStrToTpIntervalo(ok, Trim(cdsTabela.FieldByName('tipo_intervalo').AsString));
+              durInterv  := StrToIntDef(Trim(cdsTabela.FieldByName('duracao_intervalo').AsString), 0);
+              iniInterv  := Trim(cdsTabela.FieldByName('intervalo_inicio').AsString);
+              termInterv := Trim(cdsTabela.FieldByName('intervalo_final').AsString);
+            end;
+        end;
+
+        InfoHorContratual.NovaValidade.IniValid := aCompetencia;
+        InfoHorContratual.NovaValidade.FimValid := '2099-12';
+      end;
+
+      aLabel.Caption     := Trim(cdsTabela.FieldByName('descricao').AsString);
+      aProcesso.Progress := I;
+      Application.ProcessMessages;
+      Inc(I);
+
+      cdsTabela.Next;
+    end;
+
+    aRetorno := True;
+    aProtocolo.S1050 := aRetorno;
+  finally
+    aSQL.Free;
+    Result := aRetorno;
+  end;
+end;
+
+function TdmESocial.Gerar_eSocial1060(aCompetencia: String; aZerarBase: Boolean; aModoLancamento: TModoLancamento;
+  aLabel: TLabel; aProcesso: TGauge; var aProtocolo : TProtocoloESocial): Boolean;
+var
+  aRetorno : Boolean;
+  aSQL : TStringList;
+  ok   : Boolean;
+  aEventoID,
+  I    : Integer;
+begin
+  aRetorno := False;
+  aSQL := TStringList.Create;
+  ok   := True;
+  try
+    aSQL.BeginUpdate;
+    aSQL.Clear;
+    aSQL.Add('Select   ');
+    aSQL.Add('    d.id ');
+    aSQL.Add('  , d.descricao  ');
+    aSQL.Add('  , d.local_tipo ');
+    aSQL.Add('  , (Select CNPJ from CONFIG_ORGAO c where c.id = 1) as CNPJ ');
+    aSQL.Add('from DEPTO d ');
+    aSQL.Add('where (d.id > 0)   ');
+
+    case aModoLancamento of
+      mlInclusao  : aSQL.Add('  and d.tipo_operacao = ' + QuotedStr(FLAG_OPERACAO_INSERIR));
+      mlAlteracao : aSQL.Add('  and d.tipo_operacao = ' + QuotedStr(FLAG_OPERACAO_ALTERAR));
+      mlExclusao  : aSQL.Add('  and d.tipo_operacao = ' + QuotedStr(FLAG_OPERACAO_EXCLUIR));
+    end;
+
+    aSQL.EndUpdate;
+    SetSQL(aSQL);
+
+    I := 1;
+
+    aProcesso.MaxValue := cdsTabela.RecordCount;
+    aProcesso.Progress := 0;
+    Application.ProcessMessages;
+
+    cdsTabela.First;
+    while not cdsTabela.Eof do
+    begin
+      with ACBrESocial.Eventos.Tabelas.S1060.Add, EvtTabAmbiente do
+      begin
+        aEventoID := StrToInt(IncrementGenerator('GEN_ESOCIAL_EVENTO_S1060', 1));
+        Sequencial:= aEventoID;
+
+        if AmbienteWebServiceProducao then
+          IdeEvento.TpAmb := TpTpAmb(0) //taProducao
+        else
+          IdeEvento.TpAmb := taProducaoRestrita;
+
+        IdeEvento.ProcEmi := peAplicEmpregador;
+        IdeEvento.VerProc := Versao_Executavel(ParamStr(0));
+
+        IdeEmpregador.TpInsc := tiCNPJ;
+        IdeEmpregador.NrInsc := Criptografa(cdsTabela.FieldByName('CNPJ').AsString, '2', 14);
+
+        with ACBrESocial.Configuracoes do
+          Geral.IdEmpregador := EvtTabAmbiente.IdeEmpregador.NrInsc;
+
+        ModoLancamento := aModoLancamento;
+
+        infoAmbiente.ideAmbiente.codAmb   := Trim(cdsTabela.FieldByName('id').AsString);
+        infoAmbiente.ideAmbiente.IniValid := aCompetencia;
+        infoAmbiente.ideAmbiente.FimValid := '2099-12';
+
+        with infoAmbiente.dadosAmbiente do
+        begin
+          dscAmb   := Trim(cdsTabela.FieldByName('descricao').AsString);
+          localAmb := eSStrToLocalAmb(ok, Trim(cdsTabela.FieldByName('local_tipo').AsString));
+
+          if (localAmb = laEstabProprioEmpregador) then
+          begin
+            TpInsc := atCNPJ;
+            NrInsc := Criptografa(cdsTabela.FieldByName('CNPJ').AsString, '2', 14);
+          end;
+
+          fatorRisco.Clear;
+
+          aSQL.BeginUpdate;
+          aSQL.Clear;
+          aSQL.Add('Select ');
+          aSQL.Add('    f.id_fator_risco as codigo ');
+          aSQL.Add('from DEPTO_FATOR_RISCO f ');
+          aSQL.Add('where (f.id_depto = ' + Trim(cdsTabela.FieldByName('id').AsString) + ') ');
+
+          aSQL.EndUpdate;
+          SetSQL_Detalhe(aSQL);
+
+          cdsDetalhe.First;
+          if (cdsDetalhe.RecordCount > 0) then
+          begin
+            while not cdsDetalhe.Eof do
+            begin
+              with fatorRisco.Add do
+                codFatRis := Trim(cdsDetalhe.FieldByName('codigo').AsString);
+
+              cdsDetalhe.Next;
+            end;
+          end
+          else
+            with fatorRisco.Add do
+              codFatRis := '0901001'; // Ausência de Fator de Risco
+
+          cdsDetalhe.Close;
+        end;
+
+        infoAmbiente.NovaValidade.IniValid := aCompetencia;
+        infoAmbiente.NovaValidade.FimValid := '2099-12';
+      end;
+
+      aLabel.Caption     := Trim(cdsTabela.FieldByName('descricao').AsString);
+      aProcesso.Progress := I;
+      Application.ProcessMessages;
+      Inc(I);
+
+      cdsTabela.Next;
+    end;
+
+    aRetorno := True;
+    aProtocolo.S1060 := aRetorno;
   finally
     aSQL.Free;
     Result := aRetorno;
@@ -1372,6 +1775,31 @@ begin
     end;
   finally
     Ini.Free;
+  end;
+end;
+
+procedure TdmESocial.GravarProtocoloRetorno(aProtocolo: TProtocoloESocial);
+begin
+  with cdsProtocolo do
+  begin
+    Close;
+    ParamByName('numero').AsString := aProtocolo.Numero;
+    OPen;
+    if IsEmpty then
+    begin
+      Append;
+
+      cdsProtocoloID.Value             := StrToInt64(IncrementGenerator('GEN_ESOCIAL_PROTOCOLO_ID', 1));
+      cdsProtocoloNUMERO.AsString      := aProtocolo.Numero;
+      cdsProtocoloINSCRICAO.AsString   := aProtocolo.NumeroInscricao;
+      cdsProtocoloDATA_HORA.AsDateTime := aProtocolo.DataHora;
+      cdsProtocoloVERSAO.AsString      := aProtocolo.Versao;
+      cdsProtocoloARQUIVO_ENVIADO.LoadFromFile(aProtocolo.Arquivos.Strings[0]);
+      cdsProtocoloARQUIVO_RETORNO.LoadFromFile(aProtocolo.Arquivos.Strings[1]);
+
+      Post;
+      ApplyUpdates(0);
+    end;
   end;
 end;
 
@@ -1584,6 +2012,22 @@ begin
   end;
 end;
 
+procedure TdmESocial.SetSQL_Detalhe(aSQL: TStringList);
+begin
+  if cdsDetalhe.Active then
+    cdsDetalhe.Close;
+
+  qryDetalhe.SQL.BeginUpdate;
+  qryDetalhe.SQL.Clear;
+  try
+    qryDetalhe.SQL.AddStrings(aSQL);
+  finally
+    qryDetalhe.SQL.EndUpdate;
+    cdsDetalhe.FetchParams;
+    cdsDetalhe.Open;
+  end;
+end;
+
 { TProtocoloESocial }
 
 constructor TProtocoloESocial.Create(Value : String);
@@ -1595,6 +2039,18 @@ begin
   aNumero   := Trim(Value);
   aArquivos := TStringList.Create;
   aArquivos.Clear;
+
+  aS1000 := False;
+  aS1005 := False;
+  aS1010 := False;
+  aS1020 := False;
+  aS1030 := False;
+  aS1035 := False;
+  aS1040 := False;
+  aS1050 := False;
+  aS1060 := False;
+  aS1070 := False;
+  aS1080 := False;
 end;
 
 procedure TProtocoloESocial.SetNumeroInscricao(Value: String);

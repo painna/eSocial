@@ -3,6 +3,7 @@ unit EnvioEventoTabela;
 interface
 
 uses
+  udmESocial,
   ACBreSocial,
 
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
@@ -35,6 +36,7 @@ type
     procedure btnOkClick(Sender: TObject);
 
     function GetESocial : TACBreSocial;
+    procedure cbS1040Click(Sender: TObject);
   private
     { Private declarations }
     property eSocial : TACBreSocial read GetESocial;
@@ -58,7 +60,6 @@ uses
   gsLib,
   UtilsDb,
   udmPrincipal,
-  udmESocial,
   pcesConversaoeSocial;
 
 procedure TfrmEnvioEventoTabela.btnOkClick(Sender: TObject);
@@ -71,6 +72,17 @@ begin
   else
   if GeradoEnviado then
     ModalResult := mrOk;
+end;
+
+procedure TfrmEnvioEventoTabela.cbS1040Click(Sender: TObject);
+begin
+  if cbS1040.Checked then
+  begin
+    cbS1030.Enabled := False;
+    cbS1030.Checked := True;
+  end
+  else
+    cbS1030.Enabled := True;
 end;
 
 function TfrmEnvioEventoTabela.EventoSelecionado: Boolean;
@@ -102,7 +114,7 @@ begin
   cbS1035.Enabled := (Pesquisa('CONFIG_ESOCIAL', 'ID_CONFIG_ORGAO', '1', 'POSSUI_TABELA_CARREIRA', '') = FLAG_SIM);
 end;
 
-function TfrmEnvioEventoTabela.GeradoEnviado: Boolean;
+function TfrmEnvioEventoTabela.GeradoEnviado : Boolean;
 var
   ok ,
   aRetorno : Boolean;
@@ -136,38 +148,39 @@ begin
         if not aRetorno then
           Mensagem('Certificado não válido!', 'Aviso', MB_ICONINFORMATION);
 
+        aProtocolo := TProtocoloESocial.Create(EmptyStr);
+
         if aRetorno and cbS1000.Checked then
-          aRetorno := dmESocial.Gerar_eSocial1000(cmbAnoMes.Text, Checb_ZeraBase.Checked, aModoLancamento, lblProcesso, gagProcesso);
+          aRetorno := dmESocial.Gerar_eSocial1000(cmbAnoMes.Text, Checb_ZeraBase.Checked, aModoLancamento, lblProcesso, gagProcesso, aProtocolo);
         if aRetorno and cbS1005.Checked  then
-          aRetorno := dmESocial.Gerar_eSocial1005(cmbAnoMes.Text, Checb_ZeraBase.Checked, aModoLancamento, lblProcesso, gagProcesso);
+          aRetorno := dmESocial.Gerar_eSocial1005(cmbAnoMes.Text, Checb_ZeraBase.Checked, aModoLancamento, lblProcesso, gagProcesso, aProtocolo);
         if aRetorno and cbS1010.Checked  then
-          aRetorno := dmESocial.Gerar_eSocial1010(cmbAnoMes.Text, Checb_ZeraBase.Checked, aModoLancamento, lblProcesso, gagProcesso);
+          aRetorno := dmESocial.Gerar_eSocial1010(cmbAnoMes.Text, Checb_ZeraBase.Checked, aModoLancamento, lblProcesso, gagProcesso, aProtocolo);
         if aRetorno and cbS1020.Checked  then
-          aRetorno := dmESocial.Gerar_eSocial1020(cmbAnoMes.Text, Checb_ZeraBase.Checked, aModoLancamento, lblProcesso, gagProcesso);
+          aRetorno := dmESocial.Gerar_eSocial1020(cmbAnoMes.Text, Checb_ZeraBase.Checked, aModoLancamento, lblProcesso, gagProcesso, aProtocolo);
         if aRetorno and cbS1030.Checked  then
-          aRetorno := dmESocial.Gerar_eSocial1030(cmbAnoMes.Text, Checb_ZeraBase.Checked, aModoLancamento, lblProcesso, gagProcesso);
+          aRetorno := dmESocial.Gerar_eSocial1030(cmbAnoMes.Text, Checb_ZeraBase.Checked, aModoLancamento, lblProcesso, gagProcesso, aProtocolo);
         if aRetorno and cbS1035.Checked  then
-          aRetorno := dmESocial.Gerar_eSocial1035(cmbAnoMes.Text, Checb_ZeraBase.Checked, aModoLancamento, lblProcesso, gagProcesso);
+          aRetorno := dmESocial.Gerar_eSocial1035(cmbAnoMes.Text, Checb_ZeraBase.Checked, aModoLancamento, lblProcesso, gagProcesso, aProtocolo);
         if aRetorno and cbS1040.Checked  then
-          aRetorno := dmESocial.Gerar_eSocial1040(cmbAnoMes.Text, Checb_ZeraBase.Checked, aModoLancamento, lblProcesso, gagProcesso);
+          aRetorno := dmESocial.Gerar_eSocial1040(cmbAnoMes.Text, Checb_ZeraBase.Checked, aModoLancamento, lblProcesso, gagProcesso, aProtocolo);
         if aRetorno and cbS1050.Checked  then
-          aRetorno := dmESocial.Gerar_eSocial1050(cmbAnoMes.Text, Checb_ZeraBase.Checked, aModoLancamento, lblProcesso, gagProcesso);
+          aRetorno := dmESocial.Gerar_eSocial1050(cmbAnoMes.Text, Checb_ZeraBase.Checked, aModoLancamento, lblProcesso, gagProcesso, aProtocolo);
         if aRetorno and cbS1060.Checked  then
-          aRetorno := dmESocial.Gerar_eSocial1060(cmbAnoMes.Text, Checb_ZeraBase.Checked, aModoLancamento, lblProcesso, gagProcesso);
+          aRetorno := dmESocial.Gerar_eSocial1060(cmbAnoMes.Text, Checb_ZeraBase.Checked, aModoLancamento, lblProcesso, gagProcesso, aProtocolo);
         if aRetorno and cbS1070.Checked  then
-          aRetorno := dmESocial.Gerar_eSocial1070(cmbAnoMes.Text, Checb_ZeraBase.Checked, aModoLancamento, lblProcesso, gagProcesso);
+          aRetorno := dmESocial.Gerar_eSocial1070(cmbAnoMes.Text, Checb_ZeraBase.Checked, aModoLancamento, lblProcesso, gagProcesso, aProtocolo);
         if aRetorno and cbS1080.Checked  then
-          aRetorno := dmESocial.Gerar_eSocial1080(cmbAnoMes.Text, Checb_ZeraBase.Checked, aModoLancamento, lblProcesso, gagProcesso);
+          aRetorno := dmESocial.Gerar_eSocial1080(cmbAnoMes.Text, Checb_ZeraBase.Checked, aModoLancamento, lblProcesso, gagProcesso, aProtocolo);
 
         if aRetorno then
-        begin
-          aProtocolo := TProtocoloESocial.Create(EmptyStr);
           aRetorno   := dmESocial.EventoEnviado_eSocial(egIniciais, cmbAnoMes.Text, lblProcesso, gagProcesso, aProtocolo);
-        end;
 
         if aRetorno then
         begin
-          Mensagem('Protocolo : ' + aProtocolo.Numero + #13#13 + aProtocolo.Arquivos.Text, 'T E S T E !', MB_ICONINFORMATION);
+          dmESocial.GravarProtocoloRetorno(aProtocolo);
+          dmESocial.AtualizarOperacoes(aModoLancamento, aProtocolo);
+          Mensagem('Protocolo : ' + aProtocolo.Numero + #13#13 + aProtocolo.Arquivos.Text, 'Informe', MB_ICONINFORMATION);
         end
         else
         if not aRetorno then
@@ -182,6 +195,7 @@ begin
       end;
     end;
   finally
+    aProtocolo.Free;
     LimparPainelProcesso(False);
     Screen.Cursor := crDefault;
     Result := aRetorno;
