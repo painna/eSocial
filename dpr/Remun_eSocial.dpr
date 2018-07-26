@@ -24,7 +24,8 @@ uses
   SelecionarCertificado in '..\pas\SelecionarCertificado.pas' {frmSelecionarCertificado},
   DialogoPadrao in '..\pas\DialogoPadrao.pas' {frmDialogoPadrao},
   EnvioEventoTabela in '..\pas\EnvioEventoTabela.pas' {frmEnvioEventoTabela},
-  ConfigurarESocial in '..\pas\ConfigurarESocial.pas' {frmConfigurarESocial};
+  ConfigurarESocial in '..\pas\ConfigurarESocial.pas' {frmConfigurarESocial},
+  EnvioEventoNaoPeriodico in '..\pas\EnvioEventoNaoPeriodico.pas' {frmEnvioEventoNaoPeriodico};
 
 {$R *.res}
 

@@ -129,6 +129,8 @@ type
     procedure SetSQL(aSQL : TStringList);
     procedure SetSQL_Detalhe(aSQL : TStringList);
 
+    procedure CorrigirCidadeNascimento;
+
     function GetMensagemRetorno : TStringList;
     function ProximaCompetencia(aCompetencia : String) : String;
   public
@@ -175,10 +177,18 @@ type
       var aProtocolo : TProtocoloESocial) : Boolean;
     function Gerar_eSocial1070(aCompetencia : String; aZerarBase : Boolean;
       aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge;
-      var aProtocolo : TProtocoloESocial) : Boolean;                        virtual; abstract;
+      var aProtocolo : TProtocoloESocial) : Boolean;                         virtual; abstract;
     function Gerar_eSocial1080(aCompetencia : String; aZerarBase : Boolean;
       aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge;
-      var aProtocolo : TProtocoloESocial) : Boolean;                        virtual; abstract;
+      var aProtocolo : TProtocoloESocial) : Boolean;                         virtual; abstract;
+
+    // procedures eventos de tabela
+    function Gerar_eSocial2190(aCompetencia : String; aZerarBase : Boolean;
+      aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge;
+      var aProtocolo : TProtocoloESocial) : Boolean;                         virtual; abstract;
+    function Gerar_eSocial2200(aCompetencia : String; aZerarBase : Boolean;
+      aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge;
+      var aProtocolo : TProtocoloESocial) : Boolean;
 
     function ConfigurarCertificado(const AOwner : TComponent) : Boolean;
     function EventoEnviado_eSocial(aGrupo : TeSocialGrupo; aCompetencia : String;
@@ -304,6 +314,76 @@ begin
     LerConfiguracao;
     Result := (aForm.ShowModal = mrOk);
   finally
+  end;
+end;
+
+procedure TdmESocial.CorrigirCidadeNascimento;
+var
+  aSQL : TStringList;
+begin
+  aSQL := TStringList.Create;
+  try
+    aSQL.BeginUpdate;
+    aSQL.Clear;
+{
+execute block
+as
+  declare variable id Integer;
+  declare variable natural_cidade varchar(40);
+  declare variable natural_uf char(40);
+begin
+  for
+    Select
+        y.id
+      , Case when right(y.natural_cidade_nova, 3) <> y.uf
+          then y.natural_cidade || y.uf
+          else y.natural_cidade_nova
+        end as natural_cidade
+      , right(y.uf, 2) as  natural_uf
+    from (
+        Select
+            x.*
+          , case
+              when (coalesce(x.natural_uf, '')  = '') and (left(right(x.natural_cidade_nova, 3), 1)  = '-') then right(x.natural_cidade_nova, 3)
+              when (coalesce(x.natural_uf, '') <> '') and (left(right(x.natural_cidade_nova, 3), 1) <> '-') then '-' || x.natural_uf
+              when (coalesce(x.natural_uf, '') <> '') and (left(right(x.natural_cidade_nova, 3), 1)  = '-') then right(x.natural_cidade_nova, 3)
+            end as uf
+        from (
+            Select
+                p.id
+              , p.natural_cidade
+              , p.natural_uf
+              , Case when right(trim(replace(p.natural_cidade, ' - ', '-')) , 1) = '-'
+                  then substring(trim(replace(p.natural_cidade, ' - ', '-')) from 1 for char_length(trim(replace(p.natural_cidade, ' - ', '-'))) - 1)
+                  else trim(replace(p.natural_cidade, ' - ', '-'))
+                end natural_cidade_nova
+            from PESSOA_FISICA p
+            where p.natural_cidade is not null
+        ) x
+        where coalesce(trim(x.natural_cidade_nova), '') <> ''
+    ) y
+    where y.uf is not null
+    Into
+        id
+      , natural_cidade
+      , natural_uf
+  do
+  begin
+
+    Update PESSOA_FISICA p Set
+        p.natural_cidade = :natural_cidade
+      , p.natural_uf     = :natural_uf
+    where p.id = :id;
+
+  end
+end
+}
+    aSQL.EndUpdate;
+
+    // Em desenvolvimento
+
+  finally
+    aSQL.Free;
   end;
 end;
 
@@ -1694,6 +1774,442 @@ begin
         infoAmbiente.NovaValidade.IniValid := aCompetencia;
         infoAmbiente.NovaValidade.FimValid := '2099-12';
       end;
+
+      aLabel.Caption     := Trim(cdsTabela.FieldByName('descricao').AsString);
+      aProcesso.Progress := I;
+      Application.ProcessMessages;
+      Inc(I);
+
+      cdsTabela.Next;
+    end;
+
+    aRetorno := True;
+    aProtocolo.S1060 := aRetorno;
+  finally
+    aSQL.Free;
+    Result := aRetorno;
+  end;
+end;
+
+function TdmESocial.Gerar_eSocial2200(aCompetencia: String; aZerarBase: Boolean; aModoLancamento: TModoLancamento;
+  aLabel: TLabel; aProcesso: TGauge; var aProtocolo: TProtocoloESocial): Boolean;
+var
+  aRetorno : Boolean;
+  aSQL : TStringList;
+  ok   : Boolean;
+  aEventoID,
+  I    : Integer;
+begin
+  aRetorno := False;
+  aSQL := TStringList.Create;
+  ok   := True;
+  try
+    aSQL.BeginUpdate;
+    aSQL.Clear;
+    aSQL.Add('Select ');
+    aSQL.Add('    p.* ');
+    aSQL.Add('  , coalesce(nullif(trim(p.apelido)), p.nome) as nome_social ');
+    aSQL.Add('  , coalesce(r.id_esocial, 6) as id_raca ');
+    aSQL.Add('  , coalesce(e.id_esocial, 1) as id_estado_civil ');
+    aSQL.Add('  , coalesce(c.id_esocial, ''01'') as id_escola  ');
+    aSQL.Add('  , ''N'' as primeiro_emprego ');
+    aSQL.Add('  , coalesce(p.id_natural_pais, ''105'') as id_pais_nascimento   ');
+    aSQL.Add('  , coalesce(p.id_natural_pais, ''105'') as id_pais_naturalidade ');
+    //aSQL.Add('  , (Select CNPJ from CONFIG_ORGAO c where c.id = 1) as CNPJ ');
+    aSQL.Add('from SERVIDOR s');
+    aSQL.Add('  inner join PESSOA_FISICA p on (p.id = s.id_pessoa_fisica)');
+    aSQL.Add('  left join TAB_RACA_COR r on (r.id = p.id_raca_cor)');
+    aSQL.Add('  left join ESTADO_CIVIL e on (e.id = p.id_estado_civil)');
+    aSQL.Add('  left join ESCOLARIDADE c on (c.id = p.id_escolaridade)');
+    aSQL.Add('where (s.id > 0)   ');
+
+    case aModoLancamento of
+      mlInclusao  : aSQL.Add('  and s.tipo_operacao = ' + QuotedStr(FLAG_OPERACAO_INSERIR));
+      mlAlteracao : aSQL.Add('  and s.tipo_operacao = ' + QuotedStr(FLAG_OPERACAO_ALTERAR));
+      mlExclusao  : aSQL.Add('  and s.tipo_operacao = ' + QuotedStr(FLAG_OPERACAO_EXCLUIR));
+    end;
+
+    aSQL.EndUpdate;
+    SetSQL(aSQL);
+
+    I := 1;
+
+    aProcesso.MaxValue := cdsTabela.RecordCount;
+    aProcesso.Progress := 0;
+    Application.ProcessMessages;
+
+    cdsTabela.First;
+    while not cdsTabela.Eof do
+    begin
+      with ACBrESocial.Eventos.NaoPeriodicos.S2200.Add, EvtAdmissao do
+      begin
+        aEventoID := StrToInt(IncrementGenerator('GEN_ESOCIAL_EVENTO_S2200', 1));
+        Sequencial:= aEventoID;
+
+        if AmbienteWebServiceProducao then
+          IdeEvento.TpAmb := TpTpAmb(0) //taProducao
+        else
+          IdeEvento.TpAmb := taProducaoRestrita;
+
+        IdeEvento.indRetif := ireOriginal; // (ireOriginal, ireRetificacao);
+
+        if (IdeEvento.indRetif = ireRetificacao) then
+          IdeEvento.NrRecibo := '65.5454.987798798798' // Preencher com o número do recibo do arquivo a ser retificado.
+        else
+          IdeEvento.NrRecibo := EmptyStr;
+
+        IdeEvento.ProcEmi  := peAplicEmpregador;
+        IdeEvento.VerProc  := Versao_Executavel(ParamStr(0));
+
+        IdeEmpregador.TpInsc := tiCNPJ;
+        IdeEmpregador.NrInsc := Criptografa(Pesquisa('CONFIG_ORGAO', 'ID', '1', 'CNPJ', ''),'2', 14); //Criptografa(cdsTabela.FieldByName('CNPJ').AsString, '2', 14);
+
+        with ACBrESocial.Configuracoes do
+          Geral.IdEmpregador := EvtAdmissao.IdeEmpregador.NrInsc;
+
+//        ModoLancamento := aModoLancamento;
+//
+//        infoAmbiente.ideAmbiente.codAmb   := Trim(cdsTabela.FieldByName('id').AsString);
+//        infoAmbiente.ideAmbiente.IniValid := aCompetencia;
+//        infoAmbiente.ideAmbiente.FimValid := '2099-12';
+
+        with Trabalhador do
+        begin
+          CpfTrab    := Trim(cdsTabela.FieldByName('cpf').AsString);
+          NisTrab    := Trim(cdsTabela.FieldByName('pis_pasep').AsString);
+          NmTrab     := Trim(cdsTabela.FieldByName('nome').AsString);
+          Sexo       := Trim(cdsTabela.FieldByName('sexo').AsString);
+          RacaCor    := cdsTabela.FieldByName('id_raca').AsInteger;
+          EstCiv     := cdsTabela.FieldByName('id_estadocivil').AsInteger;
+          GrauInstr  := Trim(cdsTabela.FieldByName('id_escola').AsString);
+          IndPriEmpr := eSStrToSimNao(ok, Trim(cdsTabela.FieldByName('primeiro_emprego').AsString));
+          nmSoc      := Trim(cdsTabela.FieldByName('nome_social').AsString);
+
+          with Nascimento do
+          begin
+            DtNascto   := cdsTabela.FieldByName('dt_nascimento').AsDateTime;
+            codMunic   := 51268;
+            uf         := Trim(cdsTabela.FieldByName('natural_uf').AsString);
+            PaisNascto := Trim(cdsTabela.FieldByName('id_pais_nascimento').AsString);
+            PaisNac    := Trim(cdsTabela.FieldByName('id_pais_naturalidade').AsString);
+            NmMae      := Trim(cdsTabela.FieldByName('filiacao_pai').AsString);
+            NmPai      := Trim(cdsTabela.FieldByName('filiacao_mae').AsString);
+          end;
+
+
+
+
+        end;
+
+        with Vinculo do
+        begin
+
+
+
+        end;
+      end;
+{
+  with ACBreSocial1.Eventos.NaoPeriodicos.S2200.Add do
+  begin
+    with EvtAdmissao do
+    begin
+      Sequencial := 0;
+
+      with IdeEvento do
+      begin
+        // indRetif := tpIndRetificacao(1);
+        NrRecibo := '65.5454.987798798798';
+        TpAmb := taProducaoRestrita;
+        ProcEmi := TpProcEmi(0);
+        VerProc := '1.0';
+      end;                                      --> OK
+
+      IdeEmpregador.TpInsc := tiCNPJ;
+      IdeEmpregador.NrInsc := '12345678901234'; --> OK
+
+      with Trabalhador do
+      begin
+        CpfTrab := '54564654564';
+        NisTrab := '12345678901';
+        NmTrab := 'Empregado teste';
+        Sexo := 'M';
+        RacaCor := 1;
+        EstCiv := 1;
+        GrauInstr := '10';
+        IndPriEmpr := tpNao;
+        nmSoc := 'Nome social';                 --> OK
+
+        with Nascimento do
+        begin
+          DtNascto := date;
+          codMunic := 51268;
+          uf := 'PR';
+          PaisNascto := '565';
+          PaisNac := '545';
+          NmMae := 'teste mae';
+          NmPai := 'teste pai';
+        end;
+
+        with Documentos do
+        begin
+          CTPS.NrCtps := '56454';
+          CTPS.SerieCtps := '646';
+          CTPS.UfCtps := 'PR';
+
+          RIC.NrRic := '123123';
+          RIC.OrgaoEmissor := 'SSP';
+          RIC.DtExped := date;
+
+          RG.NrRg := '123123';
+          RG.OrgaoEmissor := 'SSP';
+          RG.DtExped := date;
+
+          RNE.NrRne := '123123';
+          RNE.OrgaoEmissor := 'SSP';
+          RNE.DtExped := date;
+
+          OC.NrOc := '999';
+          OC.OrgaoEmissor := 'SSP';
+          OC.DtExped := date;
+          OC.DtValid := date;
+
+          CNH.nrRegCnh := '999';
+          CNH.DtExped := date;
+          CNH.ufCnh := tpuf(ufPR);
+          CNH.DtValid := date;
+          CNH.dtPriHab := date;
+          CNH.categoriaCnh := tpCnh(cnA);
+        end;
+
+        with Endereco do
+        begin
+          with Brasil do
+          begin
+            TpLograd := 'RUA';
+            DscLograd := 'TESTE';
+            NrLograd := '777';
+            Complemento := 'AP 101';
+            Bairro := 'CENTRO';
+            Cep := '85500000';
+            codMunic := 11111;
+            uf := tpuf(ufPR);
+          end;
+
+          with Exterior do
+          begin
+            PaisResid := '545';
+            DscLograd := 'TESTE';
+            NrLograd := '777';
+            Complemento := 'AP 101';
+            Bairro := 'CENTRO';
+            NmCid := 'CIDADE EXTERIOR';
+            CodPostal := '50000';
+          end;
+        end;
+
+        with TrabEstrangeiro do
+        begin
+          DtChegada := date;
+          ClassTrabEstrang := tpClassTrabEstrang(ctVistoPermanente);
+          CasadoBr := 'N';
+          FilhosBr := 'N';
+        end;
+
+        with InfoDeficiencia do
+        begin
+          DefFisica := tpNao;
+          DefVisual := tpNao;
+          DefAuditiva := tpNao;
+          DefMental := tpNao;
+          DefIntelectual := tpNao;
+          ReabReadap := tpSim;
+          infoCota := tpNao;
+          observacao := 'sem deficiencia';
+        end;
+
+        Dependente.Clear;
+
+        with Dependente.Add do
+        begin
+          tpDep := tdConjuge;
+          nmDep := 'Dependente 1';
+          DtNascto := date;
+          cpfDep := '12345678901';
+          depIRRF := tpSim;
+          depSF := tpNao;
+          incTrab := tpNao;
+        end;
+
+        with Dependente.Add do
+        begin
+          tpDep := tdFilhoOuEnteado;
+          nmDep := 'Dependente 2';
+          DtNascto := date;
+          cpfDep := '12345678901';
+          depIRRF := tpSim;
+          depSF := tpNao;
+          incTrab := tpNao;
+        end;
+
+        Aposentadoria.TrabAposent := tpNao;
+
+        with Contato do
+        begin
+          FonePrinc := '91067240';
+          FoneAlternat := '91067240';
+          EmailPrinc := 'TESTE@email.com.br';
+          EmailAlternat := 'teste@teste.com';
+        end;
+      end;
+
+      with Vinculo do
+      begin
+        Matricula := '54545';
+        TpRegTrab := tpTpRegTrab(1);
+        TpRegPrev := tpTpRegPrev(1);
+        NrRecInfPrelim := '9999999999';
+
+        with InfoRegimeTrab do
+        begin
+          with InfoCeletista do
+          begin
+            DtAdm := date;
+            TpAdmissao := tpTpAdmissao(1);
+            IndAdmissao := tpTpIndAdmissao(iaNormal);
+            TpRegJor := tpTpRegJor(1);
+            NatAtividade := tpNatAtividade(navUrbano);
+            dtBase := 03;
+            cnpjSindCategProf := '12345678901234';
+
+            FGTS.OpcFGTS := tpOpcFGTS(ofOptante);
+            FGTS.DtOpcFGTS := date;
+
+            with TrabTemporario do
+            begin
+              hipLeg := 1;
+              justContr := 'teste';
+              tpinclContr := icLocaisSemFiliais;
+
+              with IdeTomadorServ do
+              begin
+                TpInsc := tiCNPJ;
+                NrInsc := '12345678901234';
+                ideEstabVinc.TpInsc := tiCNPJ;
+                ideEstabVinc.NrInsc := '12345678901234';
+              end;
+
+              IdeTrabSubstituido.Clear;
+
+              with IdeTrabSubstituido.Add do
+                CpfTrabSubst := '12345678912';
+            end;
+
+            aprend.TpInsc := tpTpInsc(1);
+            aprend.NrInsc := '98765432109';
+          end;
+
+          // enviar apenas um tipo de admissao
+          (*
+          with InfoEstatutario do
+          begin
+            IndProvim   := tpIndProvim(ipNormal);
+            TpProv      := tpTpProv(tpNomeacaoCargoEfetivo);
+            DtNomeacao  := Date;
+            DtPosse     := Date;
+            DtExercicio := Date;
+          end;
+          *)
+        end;
+
+        with InfoContrato do
+        begin
+          CodCargo := '545';
+          CodFuncao := '5456';
+          CodCateg := 111;
+          codCarreira := '1';
+          dtIngrCarr := Now;
+
+          Remuneracao.VrSalFx := 5000;
+          Remuneracao.UndSalFixo := tpUndSalFixo(5);
+          Remuneracao.DscSalVar := 'nada a declarar';
+
+          Duracao.TpContr := tpTpContr(1);
+          Duracao.dtTerm := date;
+
+          with LocalTrabalho do
+          begin
+            LocalTrabGeral.TpInsc := tiCNPJ;
+            LocalTrabGeral.NrInsc := '21354632';
+            LocalTrabGeral.DescComp := 'Descricao local geral teste';
+
+            with LocalTrabDom do
+            begin
+              TpLograd    := '123';
+              DscLograd   := 'LOCAL DOMESTICO';
+              NrLograd    := '111';
+              Complemento := 'Complemento';
+              Bairro      := 'Bairro';
+              Cep         := '85202630';
+              CodMunic    := 123;
+              Uf          := tpuf(ufPR);
+            end;
+          end;
+
+          with HorContratual do
+          begin
+            QtdHrsSem := 44;
+            TpJornada := tpTpJornada(1);
+            DscTpJorn := 'horario contratual';
+            tmpParc := tpNaoeTempoParcial;
+
+            horario.Clear;
+
+            with horario.Add do
+            begin
+              Dia := tpTpDia(diSegundaFeira);
+              codHorContrat := '54';
+            end;
+
+            with horario.Add do
+            begin
+              Dia := tpTpDia(diTercaFeira);
+              codHorContrat := '10';
+            end;
+          end;
+
+          FiliacaoSindical.Clear;
+
+          with FiliacaoSindical.Add do
+            CnpjSindTrab := '12345678901234';
+
+          AlvaraJudicial.nrProcJud := '123';
+
+          observacoes.Clear;
+
+          with observacoes.Add do
+            observacao := 'Observacao';
+        end;
+
+        with SucessaoVinc do
+        begin
+          cnpjEmpregAnt := '12345678901234';
+          MatricAnt := '123';
+          dtTransf := date;
+          observacao := 'transferido';
+        end;
+
+        transfDom.cpfSubstituido := '12345678901';
+        transfDom.MatricAnt := '123';
+        transfDom.dtTransf := date;
+
+        Afastamento.DtIniAfast := Now;
+        Afastamento.codMotAfast := mtvAcidenteDoencaTrabalho;
+
+        Desligamento.DtDeslig := Now;
+      end;
+    end;
+  end;
+}
 
       aLabel.Caption     := Trim(cdsTabela.FieldByName('descricao').AsString);
       aProcesso.Progress := I;

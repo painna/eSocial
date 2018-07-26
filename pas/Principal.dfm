@@ -1102,6 +1102,7 @@ object frmPrincipal: TfrmPrincipal
       object imEventoNaoPeriodico: TMenuItem
         Caption = 'Eventos N'#227'o Peri'#243'dicos'
         ImageIndex = 2
+        OnClick = imEventoNaoPeriodicoClick
       end
       object imEventoPeriodico: TMenuItem
         Caption = 'Eventos Peri'#243'dicos'

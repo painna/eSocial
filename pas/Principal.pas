@@ -136,6 +136,7 @@ type
     procedure imConfigurarCertificadoClick(Sender: TObject);
     procedure imEventoTabelaClick(Sender: TObject);
     procedure imConfigurarESocialClick(Sender: TObject);
+    procedure imEventoNaoPeriodicoClick(Sender: TObject);
 
   private
     pv_lPerguntaFechar,
@@ -168,7 +169,8 @@ uses
 
   udmESocial,
   ConfigurarESocial,
-  EnvioEventoTabela;
+  EnvioEventoTabela,
+  EnvioEventoNaoPeriodico;
 
 {$R *.dfm}
 
@@ -214,6 +216,21 @@ begin
    frmEditComandosSQL := TfrmEditComandosSQL.Create(Self);
    frmEditComandosSQL.ShowModal;
    FreeAndNil(frmEditComandosSQL);
+end;
+
+procedure TfrmPrincipal.imEventoNaoPeriodicoClick(Sender: TObject);
+begin
+  if (MDIChildCount > 0) then
+    Mensagem('Você precisa Fechar todas as Janelas deste Programa, ' + #13 +
+             'antes de Executar essa Operação ...',
+             'Aviso !!!', MB_ICONEXCLAMATION)
+  else
+    try
+      frmEnvioEventoNaoPeriodico := TfrmEnvioEventoNaoPeriodico.Create(Self);
+      frmEnvioEventoNaoPeriodico.ShowModal;
+    finally
+      FreeAndNil(frmEnvioEventoNaoPeriodico);
+    end;
 end;
 
 procedure TfrmPrincipal.imEventoTabelaClick(Sender: TObject);

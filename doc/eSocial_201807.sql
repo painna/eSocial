@@ -405,3 +405,313 @@ ALTER TABLE ESOCIAL_RETORNO_PROTOCOLO
 ADD CONSTRAINT UNQ_ESOCIAL_RETORNO_PROTOCOLO
 UNIQUE (ID);
 
+
+
+
+/*------ GERASYS.TI 26/07/2018 18:24:38 --------*/
+
+CREATE DOMAIN ESOCIAL_SMALLINT AS
+SMALLINT;COMMENT ON DOMAIN ESOCIAL_SMALLINT IS 'eSocial - Inteiro de baixo valor';
+
+
+
+
+/*------ GERASYS.TI 26/07/2018 18:25:39 --------*/
+
+ALTER TABLE TAB_RACA_COR
+    ADD ID_ESOCIAL ESOCIAL_SMALLINT;
+
+COMMENT ON COLUMN TAB_RACA_COR.ID_ESOCIAL IS
+'eSocial - Inteiro de baixo valor';
+
+
+
+
+/*------ GERASYS.TI 26/07/2018 18:39:48 --------*/
+
+COMMENT ON COLUMN TAB_RACA_COR.ID_ESOCIAL IS
+'eSocial - Identificacao no eSocial';
+
+
+
+
+/*------ GERASYS.TI 26/07/2018 18:39:54 --------*/
+
+COMMENT ON COLUMN TAB_RACA_COR.ID_ESOCIAL IS
+'eSocial - Identificacao';
+
+
+
+
+/*------ GERASYS.TI 26/07/2018 18:40:06 --------*/
+
+ALTER TABLE ESTADO_CIVIL
+    ADD ID_ESOCIAL ESOCIAL_SMALLINT;
+
+COMMENT ON COLUMN ESTADO_CIVIL.ID_ESOCIAL IS
+'eSocial - Identificacao';
+
+
+
+
+/*------ GERASYS.TI 26/07/2018 18:46:51 --------*/
+
+ALTER TABLE ESCOLARIDADE
+    ADD ID_ESOCIAL "CHAR(2)";
+
+COMMENT ON COLUMN ESCOLARIDADE.ID_ESOCIAL IS
+'eSocial - Identificacao';
+
+
+
+/*------ GERASYS.TI 26/07/2018 19:16:49 --------*/
+
+/*!!! Error occured !!!
+Invalid token.
+Dynamic SQL Error.
+SQL error code = -104.
+Token unknown - line 4, column 41.
+,.
+
+*/
+
+/*------ GERASYS.TI 26/07/2018 19:20:54 --------*/
+
+/*!!! Error occured !!!
+Invalid token.
+Dynamic SQL Error.
+SQL error code = -104.
+Token unknown - line 5, column 11.
+(.
+
+*/
+
+/*------ GERASYS.TI 26/07/2018 19:20:57 --------*/
+
+/*!!! Error occured !!!
+Invalid token.
+Dynamic SQL Error.
+SQL error code = -104.
+Token unknown - line 7, column 65.
+=.
+
+*/
+
+/*------ GERASYS.TI 26/07/2018 19:21:07 --------*/
+
+/*!!! Error occured !!!
+An error was found in the application program input parameters for the SQL statement.
+Dynamic SQL Error.
+SQL error code = -804.
+Function unknown.
+LEN.
+
+*/
+
+/*------ GERASYS.TI 26/07/2018 19:21:26 --------*/
+
+/*!!! Error occured !!!
+Invalid token.
+Dynamic SQL Error.
+SQL error code = -104.
+Token unknown - line 5, column 11.
+(.
+
+*/
+
+/*------ GERASYS.TI 26/07/2018 19:24:47 --------*/
+
+/*!!! Error occured !!!
+Invalid token.
+Dynamic SQL Error.
+SQL error code = -104.
+Invalid command.
+no column name specified for column number 3 in derived table <unnamed>.
+
+*/
+
+/*------ GERASYS.TI 26/07/2018 19:30:36 --------*/
+
+/*!!! Error occured !!!
+Column does not belong to referenced table.
+Dynamic SQL Error.
+SQL error code = -206.
+Column unknown.
+P.NATURAL_UF.
+At line 4, column 24.
+
+*/
+
+/*------ GERASYS.TI 26/07/2018 19:37:13 --------*/
+
+/*!!! Error occured !!!
+Invalid token.
+Dynamic SQL Error.
+SQL error code = -104.
+Token unknown - line 2, column 1.
+from.
+
+*/
+
+
+/*------ GERASYS.TI 26/07/2018 20:03:53 --------*/
+
+CREATE TABLE ESOCIAL_PAIS (
+    CODIGO "CHAR(3)" NOT NULL,
+    DESCRICAO "VARCHAR(100)");
+
+ALTER TABLE ESOCIAL_PAIS
+ADD CONSTRAINT PK_ESOCIAL_PAIS
+PRIMARY KEY (CODIGO);
+
+GRANT ALL ON ESOCIAL_PAIS TO "PUBLIC";
+
+
+
+/*------ GERASYS.TI 26/07/2018 20:08:11 --------*/
+
+ALTER TABLE PESSOA_FISICA
+    ADD ID_NATURAL_PAIS "CHAR(3)";
+
+COMMENT ON COLUMN PESSOA_FISICA.ID_NATURAL_PAIS IS
+'eSocial - Pais de Nascimento:
+Anexo I dos Leiautes do eSocial versao 2.4 - Tabela 06';
+
+alter table PESSOA_FISICA
+alter ID position 1;
+
+alter table PESSOA_FISICA
+alter NOME position 2;
+
+alter table PESSOA_FISICA
+alter APELIDO position 3;
+
+alter table PESSOA_FISICA
+alter SEXO position 4;
+
+alter table PESSOA_FISICA
+alter ID_RACA_COR position 5;
+
+alter table PESSOA_FISICA
+alter DT_NASCIMENTO position 6;
+
+alter table PESSOA_FISICA
+alter NATURAL_CIDADE position 7;
+
+alter table PESSOA_FISICA
+alter NATURAL_UF position 8;
+
+alter table PESSOA_FISICA
+alter ID_NATURAL_PAIS position 9;
+
+alter table PESSOA_FISICA
+alter RG_NUM position 10;
+
+alter table PESSOA_FISICA
+alter RG_ORGAO_EMISSOR position 11;
+
+alter table PESSOA_FISICA
+alter RG_UF position 12;
+
+alter table PESSOA_FISICA
+alter RG_DT_EMISSAO position 13;
+
+alter table PESSOA_FISICA
+alter CPF position 14;
+
+alter table PESSOA_FISICA
+alter PIS_PASEP position 15;
+
+alter table PESSOA_FISICA
+alter CNH_NUM position 16;
+
+alter table PESSOA_FISICA
+alter CNH_DT_VENCTO position 17;
+
+alter table PESSOA_FISICA
+alter TIT_ELEITOR_NUM position 18;
+
+alter table PESSOA_FISICA
+alter TIT_ELEITOR_ZONA position 19;
+
+alter table PESSOA_FISICA
+alter TIT_ELEITOR_SECAO position 20;
+
+alter table PESSOA_FISICA
+alter RESERVISTA position 21;
+
+alter table PESSOA_FISICA
+alter ID_ESTADO_CIVIL position 22;
+
+alter table PESSOA_FISICA
+alter CONJUGE_NOME position 23;
+
+alter table PESSOA_FISICA
+alter CONJUGE_CPF position 24;
+
+alter table PESSOA_FISICA
+alter FILIACAO_PAI position 25;
+
+alter table PESSOA_FISICA
+alter FILIACAO_MAE position 26;
+
+alter table PESSOA_FISICA
+alter ENDER_LOGRAD position 27;
+
+alter table PESSOA_FISICA
+alter ENDER_NUM position 28;
+
+alter table PESSOA_FISICA
+alter ENDER_BAIRRO position 29;
+
+alter table PESSOA_FISICA
+alter ENDER_CIDADE position 30;
+
+alter table PESSOA_FISICA
+alter ENDER_CEP position 31;
+
+alter table PESSOA_FISICA
+alter ENDER_UF position 32;
+
+alter table PESSOA_FISICA
+alter TELEFONE position 33;
+
+alter table PESSOA_FISICA
+alter E_MAIL position 34;
+
+alter table PESSOA_FISICA
+alter FOTO position 35;
+
+alter table PESSOA_FISICA
+alter DESCR_ESTADO_CIVIL position 36;
+
+alter table PESSOA_FISICA
+alter CPF_FTDO position 37;
+
+alter table PESSOA_FISICA
+alter PIS_PASEP_FTDO position 38;
+
+alter table PESSOA_FISICA
+alter ENDER_COMPLEM position 39;
+
+alter table PESSOA_FISICA
+alter ANO_CHEGADA_BRASIL position 40;
+
+alter table PESSOA_FISICA
+alter ID_NACIONALIDADE position 41;
+
+alter table PESSOA_FISICA
+alter DESCR_NACIONALIDADE position 42;
+
+alter table PESSOA_FISICA
+alter CNH_CATEG position 43;
+
+alter table PESSOA_FISICA
+alter ID_ESCOLARIDADE position 44;
+
+alter table PESSOA_FISICA
+alter DESCR_ESCOLARIDADE position 45;
+
+alter table PESSOA_FISICA
+alter ANO_PRIM_EMPREGO position 46;
+
