@@ -211,6 +211,8 @@ const
   FLAG_OPERACAO_EXCLUIR = 'E';
   FLAG_OPERACAO_ENVIADO = 'P';
 
+  ID_NACIONALIDADE_BRASIL = '105';
+
 implementation
 
 {%CLASSGROUP 'Vcl.Controls.TControl'}
@@ -1808,19 +1810,43 @@ begin
     aSQL.Clear;
     aSQL.Add('Select ');
     aSQL.Add('    p.* ');
-    aSQL.Add('  , coalesce(nullif(trim(p.apelido)), p.nome) as nome_social ');
+    aSQL.Add('  , coalesce(p.cnh_categ, ''B'') as cnh_categoria');
+
+    aSQL.Add('  , coalesce(nullif(trim(p.apelido), ''''), p.nome) as nome_social ');
+
     aSQL.Add('  , coalesce(r.id_esocial, 6) as id_raca ');
     aSQL.Add('  , coalesce(e.id_esocial, 1) as id_estado_civil ');
     aSQL.Add('  , coalesce(c.id_esocial, ''01'') as id_escola  ');
+
     aSQL.Add('  , ''N'' as primeiro_emprego ');
-    aSQL.Add('  , coalesce(p.id_natural_pais, ''105'') as id_pais_nascimento   ');
-    aSQL.Add('  , coalesce(p.id_natural_pais, ''105'') as id_pais_naturalidade ');
+
+    aSQL.Add('  , coalesce(n.id_esocial, ''105'') as id_pais_nascimento   ');
+    aSQL.Add('  , coalesce(n.id_esocial, ''105'') as id_pais_naturalidade ');
+    aSQL.Add('  , coalesce(p.ender_tipo, ''IND'') as ender_tipo_lograd');
+
+    aSQL.Add('  , null as ctps_num ');
+    aSQL.Add('  , null as ctps_serie ');
+    aSQL.Add('  , null as ctps_uf ');
+
+    aSQL.Add('  , null as rne_num ');
+    aSQL.Add('  , null as rne_orgao ');
+    aSQL.Add('  , null as rne_uf ');
+    aSQL.Add('  , null as rne_dt_emissao ');
+
+
+    aSQL.Add('  , s.conselho_registro ');
+    aSQL.Add('  , s.conselho_orgao    ');
+    aSQL.Add('  , s.conselho_uf       ');
+    aSQL.Add('  , s.conselho_dt_emissao  ');
+    aSQL.Add('  , s.conselho_dt_validade ');
+
     //aSQL.Add('  , (Select CNPJ from CONFIG_ORGAO c where c.id = 1) as CNPJ ');
     aSQL.Add('from SERVIDOR s');
     aSQL.Add('  inner join PESSOA_FISICA p on (p.id = s.id_pessoa_fisica)');
     aSQL.Add('  left join TAB_RACA_COR r on (r.id = p.id_raca_cor)');
     aSQL.Add('  left join ESTADO_CIVIL e on (e.id = p.id_estado_civil)');
     aSQL.Add('  left join ESCOLARIDADE c on (c.id = p.id_escolaridade)');
+    aSQL.Add('  left join NACIONALIDADE n on (n.id = p.id_nacionalidade)');
     aSQL.Add('where (s.id > 0)   ');
 
     case aModoLancamento of
@@ -1888,7 +1914,7 @@ begin
           with Nascimento do
           begin
             DtNascto   := cdsTabela.FieldByName('dt_nascimento').AsDateTime;
-            codMunic   := 51268;
+            codMunic   := cdsTabela.FieldByName('id_natural_cidade').AsInteger;
             uf         := Trim(cdsTabela.FieldByName('natural_uf').AsString);
             PaisNascto := Trim(cdsTabela.FieldByName('id_pais_nascimento').AsString);
             PaisNac    := Trim(cdsTabela.FieldByName('id_pais_naturalidade').AsString);
@@ -1896,7 +1922,91 @@ begin
             NmPai      := Trim(cdsTabela.FieldByName('filiacao_mae').AsString);
           end;
 
+          with Documentos do
+          begin
+            // Informações da Carteira de Trabalho e Previdência Social
+            CTPS.NrCtps    := Trim(cdsTabela.FieldByName('ctps_num').AsString);
+            CTPS.SerieCtps := Trim(cdsTabela.FieldByName('ctps_serie').AsString);
+            CTPS.UfCtps    := Trim(cdsTabela.FieldByName('ctps_uf').AsString);
 
+//            // Informações do Documento Nacional de Identidade - DNI (Registro de Identificação Civil - RIC)
+//            RIC.NrRic        := '123123';
+//            RIC.OrgaoEmissor := 'SSP';
+//            RIC.DtExped      := date;
+//
+            RG.NrRg         := Trim(cdsTabela.FieldByName('rg_num').AsString);
+            RG.OrgaoEmissor := Trim(cdsTabela.FieldByName('rg_orgao_emissor').AsString) + '/' + Trim(cdsTabela.FieldByName('rg_uf').AsString);
+            RG.DtExped      := cdsTabela.FieldByName('rg_dt_emissao').AsDateTime;
+
+            // Informações do Registro Nacional de Estrangeiro
+            if (Nascimento.PaisNac <> ID_NACIONALIDADE_BRASIL) then
+            begin
+              RNE.NrRne        := Trim(cdsTabela.FieldByName('rne_num').AsString);
+              RNE.OrgaoEmissor := Trim(cdsTabela.FieldByName('rne_orgao').AsString) + '/' + Trim(cdsTabela.FieldByName('rne_uf').AsString);
+              RNE.DtExped      := cdsTabela.FieldByName('rne_dt_emissao').AsDateTime;
+            end;
+
+            // Informações do número de registro em Órgão de Classe (OC)
+            OC.NrOc         := Trim(cdsTabela.FieldByName('conselho_registro').AsString);
+            OC.OrgaoEmissor := Trim(cdsTabela.FieldByName('conselho_orgao').AsString) + '/' + Trim(cdsTabela.FieldByName('conselho_uf').AsString);
+            if not cdsTabela.FieldByName('conselho_dt_emissao').IsNull then
+              OC.DtExped    := cdsTabela.FieldByName('conselho_dt_emissao').AsDateTime;
+            if not cdsTabela.FieldByName('conselho_dt_validade').IsNull then
+              OC.DtValid    := cdsTabela.FieldByName('conselho_dt_validade').AsDateTime;
+
+            CNH.nrRegCnh     := Trim(cdsTabela.FieldByName('cnh_num').AsString);
+            CNH.DtExped      := cdsTabela.FieldByName('cnh_dt_emissao').AsDateTime;
+            CNH.ufCnh        := tpuf(ufPR);
+            CNH.DtValid      := cdsTabela.FieldByName('cnh_dt_vencto').AsDateTime;
+            CNH.categoriaCnh := eSStrToCnh(ok, Trim(cdsTabela.FieldByName('cnh_categoria').AsString));
+            //CNH.dtPriHab     := date;
+          end;
+
+          with Endereco do
+          begin
+            with Brasil do
+            begin
+              TpLograd    := Trim(cdsTabela.FieldByName('ender_tipo_lograd').AsString);
+              DscLograd   := Trim(cdsTabela.FieldByName('ender_lograd').AsString);
+              NrLograd    := Trim(cdsTabela.FieldByName('ender_num').AsString);
+              Complemento := Trim(cdsTabela.FieldByName('ender_complem').AsString);
+              Bairro      := Trim(cdsTabela.FieldByName('ender_bairro').AsString);
+              Cep         := Trim(cdsTabela.FieldByName('ender_cep').AsString);
+              codMunic    := cdsTabela.FieldByName('id_ender_cidade').AsInteger;
+              uf          := eSStrTouf(ok, Trim(cdsTabela.FieldByName('ender_uf').AsString));
+            end;
+//
+//            with Exterior do
+//            begin
+//              PaisResid   := '545';
+//              DscLograd   := 'TESTE';
+//              NrLograd    := '777';
+//              Complemento := 'AP 101';
+//              Bairro      := 'CENTRO';
+//              NmCid       := 'CIDADE EXTERIOR';
+//              CodPostal   := '50000';
+//            end;
+          end;
+
+//          with TrabEstrangeiro do
+//          begin
+//            DtChegada        := date;
+//            ClassTrabEstrang := tpClassTrabEstrang(ctVistoPermanente);
+//            CasadoBr := 'N';
+//            FilhosBr := 'N';
+//          end;
+
+          with InfoDeficiencia do
+          begin
+            DefFisica      := tpNao;
+            DefVisual      := tpNao;
+            DefAuditiva    := tpNao;
+            DefMental      := tpNao;
+            DefIntelectual := tpNao;
+            ReabReadap     := tpSim;
+            infoCota       := tpNao;
+            observacao     := 'sem deficiencia';
+          end;
 
 
         end;
@@ -1948,7 +2058,7 @@ begin
           PaisNac := '545';
           NmMae := 'teste mae';
           NmPai := 'teste pai';
-        end;
+        end;                                    --> OK
 
         with Documentos do
         begin
@@ -1979,7 +2089,7 @@ begin
           CNH.DtValid := date;
           CNH.dtPriHab := date;
           CNH.categoriaCnh := tpCnh(cnA);
-        end;
+        end;                                    --> OK
 
         with Endereco do
         begin
@@ -2005,7 +2115,7 @@ begin
             NmCid := 'CIDADE EXTERIOR';
             CodPostal := '50000';
           end;
-        end;
+        end;                                    --> OK
 
         with TrabEstrangeiro do
         begin
@@ -2013,7 +2123,7 @@ begin
           ClassTrabEstrang := tpClassTrabEstrang(ctVistoPermanente);
           CasadoBr := 'N';
           FilhosBr := 'N';
-        end;
+        end;                                    --> OK
 
         with InfoDeficiencia do
         begin
