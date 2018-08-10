@@ -211,6 +211,8 @@ const
   FLAG_OPERACAO_EXCLUIR = 'E';
   FLAG_OPERACAO_ENVIADO = 'P';
 
+  EMPTY_DATE = '30/12/1899';
+
   ID_NACIONALIDADE_BRASIL = '105';
 
 implementation
@@ -1810,6 +1812,7 @@ begin
     aSQL.Clear;
     aSQL.Add('Select ');
     aSQL.Add('    p.* ');
+    aSQL.Add('  , s.id as id_servidor ');
     aSQL.Add('  , coalesce(p.cnh_categ, ''B'') as cnh_categoria');
 
     aSQL.Add('  , coalesce(nullif(trim(p.apelido), ''''), p.nome) as nome_social ');
@@ -1819,6 +1822,12 @@ begin
     aSQL.Add('  , coalesce(c.id_esocial, ''01'') as id_escola  ');
 
     aSQL.Add('  , ''N'' as primeiro_emprego ');
+    aSQL.Add('  , ''N'' as serv_aposentado ');
+    aSQL.Add('  , u.tipo_previd ');
+    aSQL.Add('  , s.matricula   ');
+    aSQL.Add('  , s.dt_admissao ');
+    aSQL.Add('  , a.cnpj as cnpj_sindicato');
+    aSQL.Add('  , s.id_situacao_tcm');
 
     aSQL.Add('  , coalesce(n.id_esocial, ''105'') as id_pais_nascimento   ');
     aSQL.Add('  , coalesce(n.id_esocial, ''105'') as id_pais_naturalidade ');
@@ -1847,6 +1856,9 @@ begin
     aSQL.Add('  left join ESTADO_CIVIL e on (e.id = p.id_estado_civil)');
     aSQL.Add('  left join ESCOLARIDADE c on (c.id = p.id_escolaridade)');
     aSQL.Add('  left join NACIONALIDADE n on (n.id = p.id_nacionalidade)');
+    aSQL.Add('  left join SUB_UNID_ORCAMENT u on (u.id = s.id_sub_unid_orcament)');
+    aSQL.Add('  left join CARGO_FUNCAO f on (f.id = coalesce(s.id_cargo_origem, s.id_cargo_atual))');
+    aSQL.Add('  left join ENTID_SINDICAL a on (a.id = s.id_entid_sindical)');
     aSQL.Add('where (s.id > 0)   ');
 
     case aModoLancamento of
@@ -1998,21 +2010,155 @@ begin
 
           with InfoDeficiencia do
           begin
-            DefFisica      := tpNao;
-            DefVisual      := tpNao;
-            DefAuditiva    := tpNao;
-            DefMental      := tpNao;
-            DefIntelectual := tpNao;
-            ReabReadap     := tpSim;
-            infoCota       := tpNao;
-            observacao     := 'sem deficiencia';
+            DefFisica      := eSStrToSimNao(ok, Trim(cdsTabela.FieldByName('deficiente_fisico').AsString));
+            DefVisual      := eSStrToSimNao(ok, Trim(cdsTabela.FieldByName('deficiente_visual').AsString));
+            DefAuditiva    := eSStrToSimNao(ok, Trim(cdsTabela.FieldByName('deficiente_auditivo').AsString));
+            DefMental      := eSStrToSimNao(ok, Trim(cdsTabela.FieldByName('deficiente_mental').AsString));
+            DefIntelectual := eSStrToSimNao(ok, Trim(cdsTabela.FieldByName('deficiente_intelectual').AsString));
+            ReabReadap     := eSStrToSimNao(ok, Trim(cdsTabela.FieldByName('deficiente_readaptado').AsString));
+            infoCota       := eSStrToSimNao(ok, Trim(cdsTabela.FieldByName('deficiente_cota').AsString));
+            observacao     := Trim(cdsTabela.FieldByName('deficiente_obs').AsString);
           end;
 
+          Dependente.Clear;
 
+          aSQL.BeginUpdate;
+          aSQL.Clear;
+          aSQL.Add('Select');
+          aSQL.Add('    coalesce(p.id_tipo_dependente, d.id_tipo_dependente, ''99'') as tipo_dependente');
+          aSQL.Add('  , d.nome');
+          aSQL.Add('  , d.dt_nascimento');
+          aSQL.Add('  , p.cpf');
+          aSQL.Add('  , d.ativo_irrf');
+          aSQL.Add('  , d.ativo_sal_familia');
+          aSQL.Add('  , d.deficiente');
+          aSQL.Add('from SERVIDOR_DEPENDENTE d');
+          aSQL.Add('  inner join PESSOA_FISICA_DEPENDENTE p on (p.id = d.id)');
+          aSQL.Add('where (d.id_servidor   = ' + Trim(cdsTabela.FieldByName('id_servidor').AsString) + ') ');
+          aSQL.Add('  and (d.dt_nascimento < current_date)');
+          aSQL.Add('order by');
+          aSQL.Add('    d.nome');
+          aSQL.EndUpdate;
+          SetSQL_Detalhe(aSQL);
+
+          cdsDetalhe.First;
+          if (cdsDetalhe.RecordCount > 0) then
+          begin
+            while not cdsDetalhe.Eof do
+            begin
+              with Dependente.Add do
+              begin
+                tpDep    := eSStrToTpDep(ok, Trim(cdsTabela.FieldByName('tipo_dependente').AsString));
+                nmDep    := Trim(cdsTabela.FieldByName('nome').AsString);
+                DtNascto := cdsTabela.FieldByName('dt_nascimento').AsDateTime;
+                cpfDep   := Trim(cdsTabela.FieldByName('cpf').AsString);
+                depIRRF  := eSStrToSimNao(ok, Trim(cdsTabela.FieldByName('ativo_irrf').AsString));
+                depSF    := eSStrToSimNao(ok, Trim(cdsTabela.FieldByName('ativo_sal_familia').AsString));
+                incTrab  := eSStrToSimNao(ok, Trim(cdsTabela.FieldByName('deficiente').AsString));
+              end;
+
+              cdsDetalhe.Next;
+            end;
+          end;
+          cdsDetalhe.Close;
+
+          Aposentadoria.TrabAposent := eSStrToSimNao(ok, Trim(cdsTabela.FieldByName('serv_aposentado').AsString));
+
+          with Contato do
+          begin
+            FonePrinc     := OnlyNumber(Trim(cdsTabela.FieldByName('telefone').AsString));
+            FoneAlternat  := EmptyStr;
+            EmailPrinc    := AnsiLowerCase(Trim(cdsTabela.FieldByName('e_mail').AsString));
+            EmailAlternat := EmptyStr
+          end;
         end;
 
         with Vinculo do
         begin
+          Matricula      := Trim(cdsTabela.FieldByName('matricula').AsString);
+          TpRegTrab      := trEstatutario; // Servidor Público
+
+          if (StrToIntDef(Trim(cdsTabela.FieldByName('tipo_previd').AsString), 0) < 2) then
+            TpRegPrev    := rpRGPS  // Regime Geral da Previdência Social - RGPS
+          else
+            TpRegPrev    := rpRPPS; // Regime Próprio de Previdência Social - RPPS
+
+          NrRecInfPrelim := EmptyStr;
+
+          if ( StrToIntDef(OnlyNumber(aCompetencia), 0) < (StrToInt(FormatDateTime('YYYYMM', Date)) - 1) ) then
+            cadIni := tpSim
+          else
+            cadIni := tpNao;
+
+          with InfoRegimeTrab do
+          begin
+            with InfoCeletista do
+            begin
+              DtAdm             := cdsTabela.FieldByName('dt_admissao').AsDateTime;
+              TpAdmissao        := taAdmissao;
+              IndAdmissao       := iaNormal;
+              TpRegJor          := rjSubmetidosHorarioTrabalho;
+              NatAtividade      := navNaoInformar;
+              dtBase            := 01;               // JANEIRO
+              cnpjSindCategProf := Trim(cdsTabela.FieldByName('cnpj_sindicato').AsString);
+
+              FGTS.OpcFGTS   := ofNaoOptante;
+              FGTS.DtOpcFGTS := StrToDate(EMPTY_DATE);
+
+//              with TrabTemporario do
+//              begin
+//                hipLeg      := 1;
+//                justContr   := 'teste';
+//                tpinclContr := icLocaisSemFiliais;
+//
+//                with IdeTomadorServ do
+//                begin
+//                  TpInsc := tiCNPJ;
+//                  NrInsc := '12345678901234';
+//                  ideEstabVinc.TpInsc := tiCNPJ;
+//                  ideEstabVinc.NrInsc := '12345678901234';
+//                end;
+//
+//                IdeTrabSubstituido.Clear;
+//
+//                with IdeTrabSubstituido.Add do
+//                  CpfTrabSubst := '12345678912';
+//              end;
+//
+//              aprend.TpInsc := tpTpInsc(1);
+//              aprend.NrInsc := '98765432109';
+            end;
+
+            // Enviar apenas um tipo de admissao, que no caso de órgãos públicos é esta abaixo
+            with InfoEstatutario do
+            begin
+              IndProvim := ipNormal;
+
+              Case cdsTabela.FieldByName('id_situacao_tcm').AsInteger of
+                10:
+                  TpProv := tpNomeacaoCargoComissao;
+                20..35:
+                  TpProv := tpNomeacaoCargoEfetivo;
+                else
+                  TpProv := tpOutros;
+              end;
+
+              DtNomeacao  := Date;
+              DtPosse     := Date;
+              DtExercicio := Date;
+            end;
+
+
+
+          end;
+
+          with InfoContrato do
+          begin
+
+
+
+          end;
+
 
 
 
@@ -2103,7 +2249,7 @@ begin
             Cep := '85500000';
             codMunic := 11111;
             uf := tpuf(ufPR);
-          end;
+          end;                                  --> OK
 
           with Exterior do
           begin
@@ -2135,7 +2281,7 @@ begin
           ReabReadap := tpSim;
           infoCota := tpNao;
           observacao := 'sem deficiencia';
-        end;
+        end;                                    --> OK
 
         Dependente.Clear;
 
@@ -2148,7 +2294,7 @@ begin
           depIRRF := tpSim;
           depSF := tpNao;
           incTrab := tpNao;
-        end;
+        end;                                    --> OK
 
         with Dependente.Add do
         begin
@@ -2159,7 +2305,7 @@ begin
           depIRRF := tpSim;
           depSF := tpNao;
           incTrab := tpNao;
-        end;
+        end;                                    --> OK
 
         Aposentadoria.TrabAposent := tpNao;
 
@@ -2170,14 +2316,14 @@ begin
           EmailPrinc := 'TESTE@email.com.br';
           EmailAlternat := 'teste@teste.com';
         end;
-      end;
+      end;                                      --> OK
 
       with Vinculo do
       begin
         Matricula := '54545';
         TpRegTrab := tpTpRegTrab(1);
         TpRegPrev := tpTpRegPrev(1);
-        NrRecInfPrelim := '9999999999';
+        NrRecInfPrelim := '9999999999';         --> OK
 
         with InfoRegimeTrab do
         begin
