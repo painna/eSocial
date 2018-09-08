@@ -655,3 +655,134 @@ ADD CONSTRAINT FK_SERVIDOR_9
 FOREIGN KEY (ID_ENTID_SINDICAL)
 REFERENCES ENTID_SINDICAL(ID);
 
+
+
+/*------ GERASYS.TI 08/09/2018 10:33:10 --------*/
+
+/*!!! Error occured !!!
+Unsuccessful execution caused by a system error that precludes successful execution of subsequent statements.
+Dynamic SQL Error.
+expression evaluation not supported.
+Strings cannot be divided in dialect 3.
+
+*/
+
+/*------ GERASYS.TI 08/09/2018 10:33:38 --------*/
+
+/*!!! Error occured !!!
+Invalid token.
+Dynamic SQL Error.
+SQL error code = -104.
+Token unknown - line 44, column 52.
+,.
+
+*/
+
+/*------ GERASYS.TI 08/09/2018 10:56:03 --------*/
+
+/*!!! Error occured !!!
+Unsuccessful execution caused by a system error that precludes successful execution of subsequent statements.
+Dynamic SQL Error.
+expression evaluation not supported.
+Invalid data type for division in dialect 3.
+
+*/
+
+/*------ GERASYS.TI 08/09/2018 10:56:04 --------*/
+
+/*!!! Error occured !!!
+Unsuccessful execution caused by a system error that precludes successful execution of subsequent statements.
+Dynamic SQL Error.
+expression evaluation not supported.
+Invalid data type for division in dialect 3.
+
+*/
+
+/*------ GERASYS.TI 08/09/2018 10:56:07 --------*/
+
+/*!!! Error occured !!!
+Unsuccessful execution caused by a system error that precludes successful execution of subsequent statements.
+Dynamic SQL Error.
+expression evaluation not supported.
+Invalid data type for division in dialect 3.
+
+*/
+
+/*------ GERASYS.TI 08/09/2018 10:56:07 --------*/
+
+/*!!! Error occured !!!
+Unsuccessful execution caused by a system error that precludes successful execution of subsequent statements.
+Dynamic SQL Error.
+expression evaluation not supported.
+Invalid data type for division in dialect 3.
+
+*/
+
+/*------ GERASYS.TI 08/09/2018 10:56:08 --------*/
+
+/*!!! Error occured !!!
+Unsuccessful execution caused by a system error that precludes successful execution of subsequent statements.
+Dynamic SQL Error.
+expression evaluation not supported.
+Invalid data type for division in dialect 3.
+
+*/
+
+/*------ GERASYS.TI 08/09/2018 10:56:11 --------*/
+
+/*!!! Error occured !!!
+Unsuccessful execution caused by a system error that precludes successful execution of subsequent statements.
+Dynamic SQL Error.
+expression evaluation not supported.
+Invalid data type for division in dialect 3.
+
+*/
+
+/*------ GERASYS.TI 08/09/2018 10:56:12 --------*/
+
+/*!!! Error occured !!!
+Unsuccessful execution caused by a system error that precludes successful execution of subsequent statements.
+Dynamic SQL Error.
+expression evaluation not supported.
+Invalid data type for division in dialect 3.
+
+*/
+
+/*------ GERASYS.TI 08/09/2018 10:56:21 --------*/
+
+/*!!! Error occured !!!
+Unsuccessful execution caused by a system error that precludes successful execution of subsequent statements.
+Dynamic SQL Error.
+expression evaluation not supported.
+Invalid data type for division in dialect 3.
+
+*/
+
+
+/*------ GERASYS.TI 08/09/2018 11:54:41 --------*/
+
+ALTER TABLE SERVIDOR
+    ADD TIPO_OPERACAO ESOCIAL_OPERACAO;
+
+COMMENT ON COLUMN SERVIDOR.TIPO_OPERACAO IS
+'eSocial - Operacao do registro:
+I - Inclusao
+A - Alteracao
+E - Exclusao
+P - Processado/Enviado';
+
+
+
+
+/*------ GERASYS.TI 08/09/2018 11:54:49 --------*/
+
+UPDATE SERVIDOR
+SET TIPO_OPERACAO = 'I';
+
+
+
+
+/*------ GERASYS.TI 08/09/2018 12:00:57 --------*/
+
+ALTER TABLE PESSOA_FISICA ALTER DEFIFIENTE_COTA TO DEFICIENTE_COTA;
+

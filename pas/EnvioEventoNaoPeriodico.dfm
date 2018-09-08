@@ -8,6 +8,7 @@ inherited frmEnvioEventoNaoPeriodico: TfrmEnvioEventoNaoPeriodico
   inherited pnlControle: TPanel
     Top = 361
     TabOrder = 2
+    ExplicitTop = 361
     inherited btnCancelar: TBitBtn
       ExplicitLeft = 584
     end
@@ -114,7 +115,6 @@ inherited frmEnvioEventoNaoPeriodico: TfrmEnvioEventoNaoPeriodico
     Align = alClient
     Caption = 'Eventos'
     TabOrder = 1
-    ExplicitHeight = 218
     DesignSize = (
       672
       296)
@@ -134,7 +134,6 @@ inherited frmEnvioEventoNaoPeriodico: TfrmEnvioEventoNaoPeriodico
       Font.Style = [fsBold]
       ParentFont = False
       TabOrder = 0
-      ExplicitTop = 196
     end
     object cbS2190: TCheckBox
       Left = 16
@@ -154,7 +153,6 @@ inherited frmEnvioEventoNaoPeriodico: TfrmEnvioEventoNaoPeriodico
       Height = 17
       Caption = 'S-2200 -  Evento Admiss'#227'o'
       Ctl3D = False
-      Enabled = False
       ParentCtl3D = False
       TabOrder = 2
     end

@@ -154,9 +154,9 @@ begin
         aProtocolo := TProtocoloESocial.Create(EmptyStr);
 
         if aRetorno and cbS2190.Checked then
-          aRetorno := dmESocial.Gerar_eSocial2190(cmbAnoMes.Text, Checb_ZeraBase.Checked, aModoLancamento, lblProcesso, gagProcesso, aProtocolo);
+          aRetorno := dmESocial.Gerar_eSocial2190(cmbAnoMes.Text, Checb_ZeraBase.Checked, mlInclusao, lblProcesso, gagProcesso, aProtocolo);
         if aRetorno and cbS2200.Checked  then
-          aRetorno := dmESocial.Gerar_eSocial2200(cmbAnoMes.Text, Checb_ZeraBase.Checked, aModoLancamento, lblProcesso, gagProcesso, aProtocolo);
+          aRetorno := dmESocial.Gerar_eSocial2200(cmbAnoMes.Text, Checb_ZeraBase.Checked, mlInclusao, lblProcesso, gagProcesso, aProtocolo);
 //        if aRetorno and cbS1010.Checked  then
 //          aRetorno := dmESocial.Gerar_eSocial1010(cmbAnoMes.Text, Checb_ZeraBase.Checked, aModoLancamento, lblProcesso, gagProcesso, aProtocolo);
 //        if aRetorno and cbS1020.Checked  then

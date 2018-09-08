@@ -62,7 +62,8 @@ type
       aS1050 ,
       aS1060 ,
       aS1070 ,
-      aS1080 : Boolean;
+      aS1080 ,
+      aS2200 : Boolean;
 
       procedure SetNumeroInscricao(Value : String);
       procedure SetVersao(Value : String);
@@ -85,6 +86,7 @@ type
       property S1060 : Boolean read aS1060 write aS1060;
       property S1070 : Boolean read aS1070 write aS1070;
       property S1080 : Boolean read aS1080 write aS1080;
+      property S2200 : Boolean read aS2200 write aS2200;
 
       constructor Create(Value : String); overload;
       destructor Destroy; override;
@@ -1811,10 +1813,13 @@ begin
     aSQL.Add('  , coalesce(p.cnh_categ, ''B'') as cnh_categoria');
 
     aSQL.Add('  , coalesce(nullif(trim(p.apelido), ''''), p.nome) as nome_social ');
+    aSQL.Add('  , left(replace(replace(trim(p.telefone), ''-'', ''''), '' '', ''''), 10) as nr_telefone');
+    aSQL.Add('  , coalesce(nullif(nullif(trim(p.ender_num), ''''), ''0''), ''S/N'') as ender_numero');
 
     aSQL.Add('  , coalesce(r.id_esocial, 6) as id_raca ');
     aSQL.Add('  , coalesce(e.id_esocial, 1) as id_estado_civil ');
     aSQL.Add('  , coalesce(c.id_esocial, ''01'') as id_escola  ');
+    aSQL.Add('  , cast((Select first 1 idade.r_qtd_anos || ''.'' || idade.r_qtd_meses from SP_CALC_IDADE(current_date, p.dt_nascimento) idade) as NUMERIC(15,2)) as nr_idade');
 
     aSQL.Add('  , ''N'' as primeiro_emprego ');
     aSQL.Add('  , ''N'' as serv_aposentado ');
@@ -1827,6 +1832,12 @@ begin
     aSQL.Add('  , s.id_cargo_atual');
     aSQL.Add('  , f.id_tipo_cargo_tcm');
     aSQL.Add('  , coalesce(s.vencto_base, f.vencto_base) as vencto_base');
+    aSQL.Add('  , s.observacao');
+    aSQL.Add('  , coalesce(nullif(trim(s.pis_pasep_pf), ''''), nullif(trim(p.pis_pasep), ''''), ''00000000000'') as nis_trabalhador');
+
+    aSQL.Add('  , coalesce(s.dt_readmissao, s.dt_admissao, current_date) as dt_nomeacao');
+    aSQL.Add('  , coalesce(s.dt_readmissao, s.dt_admissao, current_date) as dt_posse');
+    aSQL.Add('  , coalesce(s.dt_readmissao, s.dt_admissao, current_date) as dt_exercicio');
 
     aSQL.Add('  , coalesce(n.id_esocial, ''105'') as id_pais_nascimento   ');
     aSQL.Add('  , coalesce(n.id_esocial, ''105'') as id_pais_naturalidade ');
@@ -1848,6 +1859,8 @@ begin
     aSQL.Add('  , s.conselho_dt_emissao  ');
     aSQL.Add('  , s.conselho_dt_validade ');
 
+    aSQL.Add('  , coalesce(s.id_horario, 0) as id_horario');
+    aSQL.Add('  , (cast(coalesce(cast(nullif(trim(h.duracao_jornada), '''') as integer), 0) / 60 as integer) * 5) as jornada_semanal');
     //aSQL.Add('  , (Select CNPJ from CONFIG_ORGAO c where c.id = 1) as CNPJ ');
     aSQL.Add('from SERVIDOR s');
     aSQL.Add('  inner join PESSOA_FISICA p on (p.id = s.id_pessoa_fisica)');
@@ -1858,6 +1871,7 @@ begin
     aSQL.Add('  left join SUB_UNID_ORCAMENT u on (u.id = s.id_sub_unid_orcament)');
     aSQL.Add('  left join CARGO_FUNCAO f on (f.id = coalesce(s.id_cargo_origem, s.id_cargo_atual))');
     aSQL.Add('  left join ENTID_SINDICAL a on (a.id = s.id_entid_sindical)');
+    aSQL.Add('  left join TAB_HORARIO h on (h.id = s.id_horario)');
     aSQL.Add('where (s.id > 0)   ');
 
     case aModoLancamento of
@@ -1913,11 +1927,11 @@ begin
         with Trabalhador do
         begin
           CpfTrab    := Trim(cdsTabela.FieldByName('cpf').AsString);
-          NisTrab    := Trim(cdsTabela.FieldByName('pis_pasep').AsString);
+          NisTrab    := Trim(cdsTabela.FieldByName('nis_trabalhador').AsString);
           NmTrab     := Trim(cdsTabela.FieldByName('nome').AsString);
           Sexo       := Trim(cdsTabela.FieldByName('sexo').AsString);
           RacaCor    := cdsTabela.FieldByName('id_raca').AsInteger;
-          EstCiv     := cdsTabela.FieldByName('id_estadocivil').AsInteger;
+          EstCiv     := cdsTabela.FieldByName('id_estado_civil').AsInteger;
           GrauInstr  := Trim(cdsTabela.FieldByName('id_escola').AsString);
           IndPriEmpr := eSStrToSimNao(ok, Trim(cdsTabela.FieldByName('primeiro_emprego').AsString));
           nmSoc      := Trim(cdsTabela.FieldByName('nome_social').AsString);
@@ -1945,9 +1959,12 @@ begin
 //            RIC.OrgaoEmissor := 'SSP';
 //            RIC.DtExped      := date;
 //
-            RG.NrRg         := Trim(cdsTabela.FieldByName('rg_num').AsString);
-            RG.OrgaoEmissor := Trim(cdsTabela.FieldByName('rg_orgao_emissor').AsString) + '/' + Trim(cdsTabela.FieldByName('rg_uf').AsString);
-            RG.DtExped      := cdsTabela.FieldByName('rg_dt_emissao').AsDateTime;
+            if (Trim(cdsTabela.FieldByName('rg_num').AsString) <> EmptyStr) and (Trim(cdsTabela.FieldByName('rg_orgao_emissor').AsString) <> EmptyStr) then
+            begin
+              RG.NrRg         := Trim(cdsTabela.FieldByName('rg_num').AsString);
+              RG.OrgaoEmissor := Trim(cdsTabela.FieldByName('rg_orgao_emissor').AsString) + '/' + Trim(cdsTabela.FieldByName('rg_uf').AsString);
+              RG.DtExped      := cdsTabela.FieldByName('rg_dt_emissao').AsDateTime;
+            end;
 
             // Informações do Registro Nacional de Estrangeiro
             if (Nascimento.PaisNac <> ID_NACIONALIDADE_BRASIL) then
@@ -1958,12 +1975,15 @@ begin
             end;
 
             // Informações do número de registro em Órgão de Classe (OC)
-            OC.NrOc         := Trim(cdsTabela.FieldByName('conselho_registro').AsString);
-            OC.OrgaoEmissor := Trim(cdsTabela.FieldByName('conselho_orgao').AsString) + '/' + Trim(cdsTabela.FieldByName('conselho_uf').AsString);
-            if not cdsTabela.FieldByName('conselho_dt_emissao').IsNull then
-              OC.DtExped    := cdsTabela.FieldByName('conselho_dt_emissao').AsDateTime;
-            if not cdsTabela.FieldByName('conselho_dt_validade').IsNull then
-              OC.DtValid    := cdsTabela.FieldByName('conselho_dt_validade').AsDateTime;
+            if (Trim(cdsTabela.FieldByName('conselho_registro').AsString) <> EmptyStr) and (Trim(cdsTabela.FieldByName('conselho_orgao').AsString) <> EmptyStr) then
+            begin
+              OC.NrOc         := Trim(cdsTabela.FieldByName('conselho_registro').AsString);
+              OC.OrgaoEmissor := Trim(cdsTabela.FieldByName('conselho_orgao').AsString) + '/' + Trim(cdsTabela.FieldByName('conselho_uf').AsString);
+              if not cdsTabela.FieldByName('conselho_dt_emissao').IsNull then
+                OC.DtExped    := cdsTabela.FieldByName('conselho_dt_emissao').AsDateTime;
+              if not cdsTabela.FieldByName('conselho_dt_validade').IsNull then
+                OC.DtValid    := cdsTabela.FieldByName('conselho_dt_validade').AsDateTime;
+            end;
 
             CNH.nrRegCnh     := Trim(cdsTabela.FieldByName('cnh_num').AsString);
             CNH.DtExped      := cdsTabela.FieldByName('cnh_dt_emissao').AsDateTime;
@@ -1977,11 +1997,11 @@ begin
           begin
             with Brasil do
             begin
-              TpLograd    := Trim(cdsTabela.FieldByName('ender_tipo_lograd').AsString);
-              DscLograd   := Trim(cdsTabela.FieldByName('ender_lograd').AsString);
-              NrLograd    := Trim(cdsTabela.FieldByName('ender_num').AsString);
+              TpLograd    := IfThen(Trim(cdsTabela.FieldByName('ender_tipo_lograd').AsString) = EmptyStr, 'IND', Trim(cdsTabela.FieldByName('ender_tipo_lograd').AsString));
+              DscLograd   := IfThen(Trim(cdsTabela.FieldByName('ender_lograd').AsString) = EmptyStr, 'NAO INFORMADO', Trim(cdsTabela.FieldByName('ender_lograd').AsString));
+              NrLograd    := Trim(cdsTabela.FieldByName('ender_numero').AsString);
               Complemento := Trim(cdsTabela.FieldByName('ender_complem').AsString);
-              Bairro      := Trim(cdsTabela.FieldByName('ender_bairro').AsString);
+              Bairro      := IfThen(Trim(cdsTabela.FieldByName('ender_bairro').AsString) = EmptyStr, 'NAO INFORMADO', Trim(cdsTabela.FieldByName('ender_bairro').AsString));
               Cep         := Trim(cdsTabela.FieldByName('ender_cep').AsString);
               codMunic    := cdsTabela.FieldByName('id_ender_cidade').AsInteger;
               uf          := eSStrTouf(ok, Trim(cdsTabela.FieldByName('ender_uf').AsString));
@@ -2047,13 +2067,13 @@ begin
             begin
               with Dependente.Add do
               begin
-                tpDep    := eSStrToTpDep(ok, Trim(cdsTabela.FieldByName('tipo_dependente').AsString));
-                nmDep    := Trim(cdsTabela.FieldByName('nome').AsString);
-                DtNascto := cdsTabela.FieldByName('dt_nascimento').AsDateTime;
-                cpfDep   := Trim(cdsTabela.FieldByName('cpf').AsString);
-                depIRRF  := eSStrToSimNao(ok, Trim(cdsTabela.FieldByName('ativo_irrf').AsString));
-                depSF    := eSStrToSimNao(ok, Trim(cdsTabela.FieldByName('ativo_sal_familia').AsString));
-                incTrab  := eSStrToSimNao(ok, Trim(cdsTabela.FieldByName('deficiente').AsString));
+                tpDep    := eSStrToTpDep(ok, Trim(cdsDetalhe.FieldByName('tipo_dependente').AsString));
+                nmDep    := Trim(cdsDetalhe.FieldByName('nome').AsString);
+                DtNascto := cdsDetalhe.FieldByName('dt_nascimento').AsDateTime;
+                cpfDep   := Trim(cdsDetalhe.FieldByName('cpf').AsString);
+                depIRRF  := eSStrToSimNao(ok, Trim(cdsDetalhe.FieldByName('ativo_irrf').AsString));
+                depSF    := eSStrToSimNao(ok, Trim(cdsDetalhe.FieldByName('ativo_sal_familia').AsString));
+                incTrab  := eSStrToSimNao(ok, Trim(cdsDetalhe.FieldByName('deficiente').AsString));
               end;
 
               cdsDetalhe.Next;
@@ -2065,7 +2085,7 @@ begin
 
           with Contato do
           begin
-            FonePrinc     := OnlyNumber(Trim(cdsTabela.FieldByName('telefone').AsString));
+            FonePrinc     := OnlyNumber(Trim(cdsTabela.FieldByName('nr_telefone').AsString));
             FoneAlternat  := EmptyStr;
             EmailPrinc    := AnsiLowerCase(Trim(cdsTabela.FieldByName('e_mail').AsString));
             EmailAlternat := EmptyStr
@@ -2142,9 +2162,9 @@ begin
                   TpProv := tpTpProv(6); //tpOutros;
               end;
 
-              DtNomeacao  := StrToDate(EMPTY_DATE);
-              DtPosse     := StrToDate(EMPTY_DATE);
-              DtExercicio := StrToDate(EMPTY_DATE);
+              DtNomeacao  := cdsTabela.FieldByName('dt_nomeacao').AsDateTime;  // StrToDate(EMPTY_DATE);
+              DtPosse     := cdsTabela.FieldByName('dt_posse').AsDateTime;     // StrToDate(EMPTY_DATE);
+              DtExercicio := cdsTabela.FieldByName('dt_exercicio').AsDateTime; // StrToDate(EMPTY_DATE);
             end;
           end;
 
@@ -2182,342 +2202,93 @@ begin
 //              end;
             end;
 
-            with HorContratual do
-            begin
-              QtdHrsSem := 44;
-              TpJornada := tpTpJornada(1);
-              DscTpJorn := 'horario contratual';
-              tmpParc   := tpNaoeTempoParcial;
-
-              horario.Clear;
-
-              with horario.Add do
+            if (cdsTabela.FieldByName('jornada_semanal').AsInteger > 0) and (cdsTabela.FieldByName('id_horario').AsInteger > 0) then
+              with HorContratual do
               begin
-                Dia := tpTpDia(diSegundaFeira);
-                codHorContrat := '54';
+                QtdHrsSem := cdsTabela.FieldByName('jornada_semanal').AsInteger;
+                TpJornada := tjJornadaComHorarioDiarioFolgaFixos;
+                DscTpJorn := EmptyStr;
+                tmpParc   := tpNaoeTempoParcial;
+
+                horario.Clear;
+
+                with horario.Add do
+                begin
+                  Dia := tpTpDia(diSegundaFeira);
+                  codHorContrat := cdsTabela.FieldByName('id_horario').AsString;
+                end;
+
+                with horario.Add do
+                begin
+                  Dia := tpTpDia(diTercaFeira);
+                  codHorContrat := cdsTabela.FieldByName('id_horario').AsString;
+                end;
+
+                with horario.Add do
+                begin
+                  Dia := tpTpDia(diQuartaFeira);
+                  codHorContrat := cdsTabela.FieldByName('id_horario').AsString;
+                end;
+
+                with horario.Add do
+                begin
+                  Dia := tpTpDia(diQuintaFeira);
+                  codHorContrat := cdsTabela.FieldByName('id_horario').AsString;
+                end;
+
+                with horario.Add do
+                begin
+                  Dia := tpTpDia(diSextaFeira);
+                  codHorContrat := cdsTabela.FieldByName('id_horario').AsString;
+                end;
               end;
 
-              with horario.Add do
-              begin
-                Dia := tpTpDia(diTercaFeira);
-                codHorContrat := '10';
-              end;
-            end;
+            FiliacaoSindical.Clear;
 
+            if (Trim(cdsTabela.FieldByName('cnpj_sindicato').AsString) <> EmptyStr) then
+              with FiliacaoSindical.Add do
+                CnpjSindTrab := cdsTabela.FieldByName('cnpj_sindicato').AsString;
 
+            // Informações do alvará judicial em caso de contratação de menores de 14 anos,
+            // em qualquer categoria, e de maiores de 14 e menores de 16, em categoria diferente de "Aprendiz".
 
+            if (cdsTabela.FieldByName('nr_idade').AsCurrency > 0) and (cdsTabela.FieldByName('nr_idade').AsCurrency < 14) then
+              AlvaraJudicial.nrProcJud := EmptyStr
+            else
+            if (cdsTabela.FieldByName('nr_idade').AsCurrency > 14) and (cdsTabela.FieldByName('nr_idade').AsCurrency < 16) then
+              AlvaraJudicial.nrProcJud := EmptyStr
+            else
+              AlvaraJudicial.nrProcJud := EmptyStr;
 
+            observacoes.Clear;
+
+            if (Trim(cdsTabela.FieldByName('observacao').AsString) <> EmptyStr) then
+              with observacoes.Add do
+                observacao := cdsTabela.FieldByName('observacao').AsString;
           end;
 
+//          // Grupo de informações da sucessão de vínculo trabalhista/estatutário
+//          with SucessaoVinc do
+//          begin
+//            cnpjEmpregAnt := '12345678901234';
+//            MatricAnt     := '123';
+//            dtTransf      := date;
+//            observacao    := 'transferido';
+//          end;
 
+//          // Informações do empregado doméstico transferido de outro representante da mesma unidade familiar
+//          transfDom.cpfSubstituido := '12345678901';
+//          transfDom.MatricAnt      := '123';
+//          transfDom.dtTransf       := date;
 
-
+//          Afastamento.DtIniAfast  := StrToDate(EMPTY_DATE);
+//          Afastamento.codMotAfast := mtvAcidenteDoencaTrabalho;
+//
+//          Desligamento.DtDeslig := StrToDate(EMPTY_DATE);
         end;
       end;
-{
-  with ACBreSocial1.Eventos.NaoPeriodicos.S2200.Add do
-  begin
-    with EvtAdmissao do
-    begin
-      Sequencial := 0;
 
-      with IdeEvento do
-      begin
-        // indRetif := tpIndRetificacao(1);
-        NrRecibo := '65.5454.987798798798';
-        TpAmb := taProducaoRestrita;
-        ProcEmi := TpProcEmi(0);
-        VerProc := '1.0';
-      end;                                      --> OK
-
-      IdeEmpregador.TpInsc := tiCNPJ;
-      IdeEmpregador.NrInsc := '12345678901234'; --> OK
-
-      with Trabalhador do
-      begin
-        CpfTrab := '54564654564';
-        NisTrab := '12345678901';
-        NmTrab := 'Empregado teste';
-        Sexo := 'M';
-        RacaCor := 1;
-        EstCiv := 1;
-        GrauInstr := '10';
-        IndPriEmpr := tpNao;
-        nmSoc := 'Nome social';                 --> OK
-
-        with Nascimento do
-        begin
-          DtNascto := date;
-          codMunic := 51268;
-          uf := 'PR';
-          PaisNascto := '565';
-          PaisNac := '545';
-          NmMae := 'teste mae';
-          NmPai := 'teste pai';
-        end;                                    --> OK
-
-        with Documentos do
-        begin
-          CTPS.NrCtps := '56454';
-          CTPS.SerieCtps := '646';
-          CTPS.UfCtps := 'PR';
-
-          RIC.NrRic := '123123';
-          RIC.OrgaoEmissor := 'SSP';
-          RIC.DtExped := date;
-
-          RG.NrRg := '123123';
-          RG.OrgaoEmissor := 'SSP';
-          RG.DtExped := date;
-
-          RNE.NrRne := '123123';
-          RNE.OrgaoEmissor := 'SSP';
-          RNE.DtExped := date;
-
-          OC.NrOc := '999';
-          OC.OrgaoEmissor := 'SSP';
-          OC.DtExped := date;
-          OC.DtValid := date;
-
-          CNH.nrRegCnh := '999';
-          CNH.DtExped := date;
-          CNH.ufCnh := tpuf(ufPR);
-          CNH.DtValid := date;
-          CNH.dtPriHab := date;
-          CNH.categoriaCnh := tpCnh(cnA);
-        end;                                    --> OK
-
-        with Endereco do
-        begin
-          with Brasil do
-          begin
-            TpLograd := 'RUA';
-            DscLograd := 'TESTE';
-            NrLograd := '777';
-            Complemento := 'AP 101';
-            Bairro := 'CENTRO';
-            Cep := '85500000';
-            codMunic := 11111;
-            uf := tpuf(ufPR);
-          end;                                  --> OK
-
-          with Exterior do
-          begin
-            PaisResid := '545';
-            DscLograd := 'TESTE';
-            NrLograd := '777';
-            Complemento := 'AP 101';
-            Bairro := 'CENTRO';
-            NmCid := 'CIDADE EXTERIOR';
-            CodPostal := '50000';
-          end;
-        end;                                    --> OK
-
-        with TrabEstrangeiro do
-        begin
-          DtChegada := date;
-          ClassTrabEstrang := tpClassTrabEstrang(ctVistoPermanente);
-          CasadoBr := 'N';
-          FilhosBr := 'N';
-        end;                                    --> OK
-
-        with InfoDeficiencia do
-        begin
-          DefFisica := tpNao;
-          DefVisual := tpNao;
-          DefAuditiva := tpNao;
-          DefMental := tpNao;
-          DefIntelectual := tpNao;
-          ReabReadap := tpSim;
-          infoCota := tpNao;
-          observacao := 'sem deficiencia';
-        end;                                    --> OK
-
-        Dependente.Clear;
-
-        with Dependente.Add do
-        begin
-          tpDep := tdConjuge;
-          nmDep := 'Dependente 1';
-          DtNascto := date;
-          cpfDep := '12345678901';
-          depIRRF := tpSim;
-          depSF := tpNao;
-          incTrab := tpNao;
-        end;                                    --> OK
-
-        with Dependente.Add do
-        begin
-          tpDep := tdFilhoOuEnteado;
-          nmDep := 'Dependente 2';
-          DtNascto := date;
-          cpfDep := '12345678901';
-          depIRRF := tpSim;
-          depSF := tpNao;
-          incTrab := tpNao;
-        end;                                    --> OK
-
-        Aposentadoria.TrabAposent := tpNao;
-
-        with Contato do
-        begin
-          FonePrinc := '91067240';
-          FoneAlternat := '91067240';
-          EmailPrinc := 'TESTE@email.com.br';
-          EmailAlternat := 'teste@teste.com';
-        end;
-      end;                                      --> OK
-
-      with Vinculo do
-      begin
-        Matricula := '54545';
-        TpRegTrab := tpTpRegTrab(1);
-        TpRegPrev := tpTpRegPrev(1);
-        NrRecInfPrelim := '9999999999';         --> OK
-
-        with InfoRegimeTrab do
-        begin
-          with InfoCeletista do
-          begin
-            DtAdm := date;
-            TpAdmissao := tpTpAdmissao(1);
-            IndAdmissao := tpTpIndAdmissao(iaNormal);
-            TpRegJor := tpTpRegJor(1);
-            NatAtividade := tpNatAtividade(navUrbano);
-            dtBase := 03;
-            cnpjSindCategProf := '12345678901234';
-
-            FGTS.OpcFGTS := tpOpcFGTS(ofOptante);
-            FGTS.DtOpcFGTS := date;
-
-            with TrabTemporario do
-            begin
-              hipLeg := 1;
-              justContr := 'teste';
-              tpinclContr := icLocaisSemFiliais;
-
-              with IdeTomadorServ do
-              begin
-                TpInsc := tiCNPJ;
-                NrInsc := '12345678901234';
-                ideEstabVinc.TpInsc := tiCNPJ;
-                ideEstabVinc.NrInsc := '12345678901234';
-              end;
-
-              IdeTrabSubstituido.Clear;
-
-              with IdeTrabSubstituido.Add do
-                CpfTrabSubst := '12345678912';
-            end;
-
-            aprend.TpInsc := tpTpInsc(1);
-            aprend.NrInsc := '98765432109';
-          end;
-
-          // enviar apenas um tipo de admissao
-          (*
-          with InfoEstatutario do
-          begin
-            IndProvim   := tpIndProvim(ipNormal);
-            TpProv      := tpTpProv(tpNomeacaoCargoEfetivo);
-            DtNomeacao  := Date;
-            DtPosse     := Date;
-            DtExercicio := Date;
-          end;                                  --> OK
-          *)
-        end;
-
-        with InfoContrato do
-        begin
-          CodCargo := '545';
-          CodFuncao := '5456';
-          CodCateg := 111;
-          codCarreira := '1';
-          dtIngrCarr := Now;
-
-          Remuneracao.VrSalFx := 5000;
-          Remuneracao.UndSalFixo := tpUndSalFixo(5);
-          Remuneracao.DscSalVar := 'nada a declarar';
-
-          Duracao.TpContr := tpTpContr(1);
-          Duracao.dtTerm := date;               --> OK
-
-          with LocalTrabalho do
-          begin
-            LocalTrabGeral.TpInsc := tiCNPJ;
-            LocalTrabGeral.NrInsc := '21354632';
-            LocalTrabGeral.DescComp := 'Descricao local geral teste';
-
-            with LocalTrabDom do
-            begin
-              TpLograd    := '123';
-              DscLograd   := 'LOCAL DOMESTICO';
-              NrLograd    := '111';
-              Complemento := 'Complemento';
-              Bairro      := 'Bairro';
-              Cep         := '85202630';
-              CodMunic    := 123;
-              Uf          := tpuf(ufPR);
-            end;
-          end;                                  --> OK
-
-          with HorContratual do
-          begin
-            QtdHrsSem := 44;
-            TpJornada := tpTpJornada(1);
-            DscTpJorn := 'horario contratual';
-            tmpParc := tpNaoeTempoParcial;
-
-            horario.Clear;
-
-            with horario.Add do
-            begin
-              Dia := tpTpDia(diSegundaFeira);
-              codHorContrat := '54';
-            end;
-
-            with horario.Add do
-            begin
-              Dia := tpTpDia(diTercaFeira);
-              codHorContrat := '10';
-            end;
-          end;
-
-          FiliacaoSindical.Clear;
-
-          with FiliacaoSindical.Add do
-            CnpjSindTrab := '12345678901234';
-
-          AlvaraJudicial.nrProcJud := '123';
-
-          observacoes.Clear;
-
-          with observacoes.Add do
-            observacao := 'Observacao';
-        end;
-
-        with SucessaoVinc do
-        begin
-          cnpjEmpregAnt := '12345678901234';
-          MatricAnt := '123';
-          dtTransf := date;
-          observacao := 'transferido';
-        end;
-
-        transfDom.cpfSubstituido := '12345678901';
-        transfDom.MatricAnt := '123';
-        transfDom.dtTransf := date;
-
-        Afastamento.DtIniAfast := Now;
-        Afastamento.codMotAfast := mtvAcidenteDoencaTrabalho;
-
-        Desligamento.DtDeslig := Now;
-      end;
-    end;
-  end;
-}
-
-      aLabel.Caption     := Trim(cdsTabela.FieldByName('descricao').AsString);
+      aLabel.Caption     := Trim(cdsTabela.FieldByName('nome').AsString);
       aProcesso.Progress := I;
       Application.ProcessMessages;
       Inc(I);
@@ -2526,7 +2297,7 @@ begin
     end;
 
     aRetorno := True;
-    aProtocolo.S1060 := aRetorno;
+    aProtocolo.S2200 := aRetorno;
   finally
     aSQL.Free;
     Result := aRetorno;
@@ -2873,6 +2644,7 @@ begin
   aS1060 := False;
   aS1070 := False;
   aS1080 := False;
+  S2200  := False;
 end;
 
 procedure TProtocoloESocial.SetNumeroInscricao(Value: String);
