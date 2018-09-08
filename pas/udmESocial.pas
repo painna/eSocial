@@ -698,7 +698,6 @@ begin
 
         evtInfoEmpregador.IdeEmpregador.TpInsc := tiCNPJ;
         evtInfoEmpregador.IdeEmpregador.NrInsc := Criptografa(cdsTabela.FieldByName('CNPJ').AsString, '2', 14);
-        //evtInfoEmpregador.IdeEmpregador.NrInsc := cdsTabela.FieldByName('CNPJ').AsString;
 
         with ACBrESocial.Configuracoes do
           Geral.IdEmpregador := evtInfoEmpregador.IdeEmpregador.NrInsc;
@@ -710,7 +709,6 @@ begin
         with evtInfoEmpregador.InfoEmpregador.InfoCadastro do
         begin
           NmRazao   := Criptografa(cdsTabela.FieldByName('RAZAO_SOCIAL').AsString, '2', 60);
-          //NmRazao   := cdsTabela.FieldByName('RAZAO_SOCIAL').AsString;
           ClassTrib := ct01; // CNPJ
           if aZerarBase then
           Begin
@@ -719,7 +717,6 @@ begin
           End;
 
           NatJurid         := Trim(ReplaceStr(cdsTabela.FieldByName('NAT_JURIDICA').AsString, '-', ''));
-          //NatJurid         := Trim(ReplaceStr(cdsTabela.FieldByName('NATUREZA_JURIDICA').AsString, '-', ''));
           IndCoop          := icCooperativadeTrabalho;
           IndConstr        := iconNaoeConstrutora;
           IndDesFolha      := idfNaoAplicavel;
@@ -729,10 +726,8 @@ begin
           nrRegEtt         := EmptyStr;
 
           InfoOp.nrSiafi := Trim(cdsTabela.FieldByName('NRO_SIAFI').AsString);
-          //InfoOp.nrSiafi := Trim(cdsTabela.FieldByName('SIAFI').AsString);
 
           InfoOp.infoEnte.indRPPS   := IfThen(Criptografa(cdsTabela.FieldByName('CNPJ').AsString, '2', 14) = cdsTabela.FieldByName('ENTE_CNPJ').AsString, tpSim, tpNao);
-          //InfoOp.infoEnte.indRPPS   := IfThen(Criptografa(cdsTabela.FieldByName('CNPJ_ENCRIP').AsString, '2', 14) = cdsTabela.FieldByName('ENTE_CNPJ').AsString, tpSim, tpNao);
           InfoOp.infoEnte.nmEnte    := Trim(cdsTabela.FieldByName('ENTE_FERERATIVO').AsString); // Nome do Entidade Federativa ao qual o órgão está vinculado
           InfoOp.infoEnte.uf        := eSStrTouf(ok, Trim(cdsTabela.FieldByName('ENDER_UF').AsString));
           InfoOp.infoEnte.codMunic  := cdsTabela.FieldByName('COD_MUNICIPIO_RAIS').AsInteger;   // Conforme Tabela do IBGE
@@ -1828,6 +1823,10 @@ begin
     aSQL.Add('  , s.dt_admissao ');
     aSQL.Add('  , a.cnpj as cnpj_sindicato');
     aSQL.Add('  , s.id_situacao_tcm');
+    aSQL.Add('  , s.id_cargo_origem');
+    aSQL.Add('  , s.id_cargo_atual');
+    aSQL.Add('  , f.id_tipo_cargo_tcm');
+    aSQL.Add('  , coalesce(s.vencto_base, f.vencto_base) as vencto_base');
 
     aSQL.Add('  , coalesce(n.id_esocial, ''105'') as id_pais_nascimento   ');
     aSQL.Add('  , coalesce(n.id_esocial, ''105'') as id_pais_naturalidade ');
@@ -2140,20 +2139,71 @@ begin
                 20..35:
                   TpProv := tpNomeacaoCargoEfetivo;
                 else
-                  TpProv := tpOutros;
+                  TpProv := tpTpProv(6); //tpOutros;
               end;
 
-              DtNomeacao  := Date;
-              DtPosse     := Date;
-              DtExercicio := Date;
+              DtNomeacao  := StrToDate(EMPTY_DATE);
+              DtPosse     := StrToDate(EMPTY_DATE);
+              DtExercicio := StrToDate(EMPTY_DATE);
             end;
-
-
-
           end;
 
           with InfoContrato do
           begin
+            CodCargo    := cdsTabela.FieldByName('id_cargo_origem').AsString;
+            CodFuncao   := IfThen(cdsTabela.FieldByName('id_tipo_cargo_tcm').AsInteger = 10, cdsTabela.FieldByName('id_cargo_origem').AsString, EmptyStr);
+            CodCateg    := 309; // Agente Público - Outros
+            codCarreira := EmptyStr;
+            dtIngrCarr  := StrToDate(EMPTY_DATE);
+
+            Remuneracao.VrSalFx    := cdsTabela.FieldByName('vencto_base').AsCurrency;
+            Remuneracao.UndSalFixo := sfPorMes;
+            Remuneracao.DscSalVar  := 'NADA A DECLARAR';
+
+            Duracao.TpContr := PrazoIndeterminado;
+            Duracao.dtTerm  := StrToDate(EMPTY_DATE);
+
+            with LocalTrabalho do
+            begin
+              LocalTrabGeral.TpInsc   := tiCNPJ;
+              LocalTrabGeral.NrInsc   := Criptografa(Pesquisa('CONFIG_ORGAO', 'ID', '1', 'CNPJ', ''),'2', 14);
+              LocalTrabGeral.DescComp := Criptografa(Pesquisa('CONFIG_ORGAO', 'ID', '1', 'RAZAO_SOCIAL', ''),'2', 60);
+
+//              with LocalTrabDom do
+//              begin
+//                TpLograd    := '123';
+//                DscLograd   := 'LOCAL DOMESTICO';
+//                NrLograd    := '111';
+//                Complemento := 'Complemento';
+//                Bairro      := 'Bairro';
+//                Cep         := '85202630';
+//                CodMunic    := 123;
+//                Uf          := tpuf(ufPR);
+//              end;
+            end;
+
+            with HorContratual do
+            begin
+              QtdHrsSem := 44;
+              TpJornada := tpTpJornada(1);
+              DscTpJorn := 'horario contratual';
+              tmpParc   := tpNaoeTempoParcial;
+
+              horario.Clear;
+
+              with horario.Add do
+              begin
+                Dia := tpTpDia(diSegundaFeira);
+                codHorContrat := '54';
+              end;
+
+              with horario.Add do
+              begin
+                Dia := tpTpDia(diTercaFeira);
+                codHorContrat := '10';
+              end;
+            end;
+
 
 
 
@@ -2373,7 +2423,7 @@ begin
             DtNomeacao  := Date;
             DtPosse     := Date;
             DtExercicio := Date;
-          end;
+          end;                                  --> OK
           *)
         end;
 
@@ -2390,7 +2440,7 @@ begin
           Remuneracao.DscSalVar := 'nada a declarar';
 
           Duracao.TpContr := tpTpContr(1);
-          Duracao.dtTerm := date;
+          Duracao.dtTerm := date;               --> OK
 
           with LocalTrabalho do
           begin
@@ -2409,7 +2459,7 @@ begin
               CodMunic    := 123;
               Uf          := tpuf(ufPR);
             end;
-          end;
+          end;                                  --> OK
 
           with HorContratual do
           begin
