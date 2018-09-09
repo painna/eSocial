@@ -29,6 +29,7 @@ uses
   Windows,
   Forms,
   Dialogs,
+  DateUtils,
 
   System.SysUtils, System.Classes, Controls, Vcl.StdCtrls, Vcl.Samples.Gauges,
   Data.FMTBcd, Data.SqlExpr, Data.DB, Datasnap.DBClient, Datasnap.Provider, ACBrValidador;
@@ -43,6 +44,38 @@ type
 //      property Ano : Integer read aAno write aAno;
 //      property Mes : Integer read aMes write aMes;
 //  end;
+
+  TConselho = record
+    Numero   : String;
+    Orgao    : String;
+    UF       : String;
+    Emissao  : TDateTime;
+    Validade : TDateTime;
+  end;
+
+  TResponsavel = record
+    ID       : Integer;
+    Nome     : String;
+    NIS      : String;
+    Conselho : TConselho;
+  end;
+
+  TCompetencia = class(TObject)
+    private
+      aCodigo     ,
+      aDescricao  : String;
+      aDataInicial,
+      aDataFinal  : TDateTime;
+      function GetDescricao : String;
+    public
+      property Codigo      : String read aCodigo write aCodigo;
+      property Descricao   : String read GetDescricao write aDescricao;
+      property DataInicial : TDateTime read aDataInicial write aDataInicial;
+      property DataFinal   : TDateTime read aDataFinal write aDataFinal;
+
+      constructor Criar;
+
+  end;
 
   TProtocoloESocial = class(TObject)
     private
@@ -63,7 +96,16 @@ type
       aS1060 ,
       aS1070 ,
       aS1080 ,
-      aS2200 : Boolean;
+      aS2200 ,
+      aS2205 ,
+      aS2206 ,
+      aS2210 ,
+      aS2220 ,
+      aS2230 ,
+      aS2240 ,
+      aS2241 ,
+      aS2250 ,
+      aS2260 : Boolean;
 
       procedure SetNumeroInscricao(Value : String);
       procedure SetVersao(Value : String);
@@ -87,6 +129,15 @@ type
       property S1070 : Boolean read aS1070 write aS1070;
       property S1080 : Boolean read aS1080 write aS1080;
       property S2200 : Boolean read aS2200 write aS2200;
+      property S2205 : Boolean read aS2205 write aS2205;
+      property S2206 : Boolean read aS2206 write aS2206;
+      property S2210 : Boolean read aS2210 write aS2210;
+      property S2220 : Boolean read aS2220 write aS2220;
+      property S2230 : Boolean read aS2230 write aS2230;
+      property S2240 : Boolean read aS2240 write aS2240;
+      property S2241 : Boolean read aS2241 write aS2241;
+      property S2250 : Boolean read aS2250 write aS2250;
+      property S2260 : Boolean read aS2260 write aS2260;
 
       constructor Create(Value : String); overload;
       destructor Destroy; override;
@@ -119,6 +170,9 @@ type
     qryProtocoloVERSAO: TStringField;
     qryProtocoloARQUIVO_ENVIADO: TBlobField;
     qryProtocoloARQUIVO_RETORNO: TBlobField;
+    dspGeral: TDataSetProvider;
+    cdsGeral: TClientDataSet;
+    qryGeral: TSQLQuery;
     procedure DataModuleCreate(Sender: TObject);
     procedure DataModuleDestroy(Sender: TObject);
     procedure btnSalvar(Sender: TObject);
@@ -130,6 +184,7 @@ type
     procedure GravarConfiguracao;
     procedure SetSQL(aSQL : TStringList);
     procedure SetSQL_Detalhe(aSQL : TStringList);
+    procedure SetSQL_Geral(aSQL : TStringList);
 
     procedure CorrigirCidadeNascimento;
 
@@ -140,6 +195,7 @@ type
     property MensagemRetorno : TStringList read GetMensagemRetorno;
 
     procedure ListarCompetencias(aLista : TComboBox);
+    procedure ListarCompetenciasAdmissao(aLista : TComboBox);
     procedure LerConfiguracao;
     procedure GravarProtocoloRetorno(aProtocolo : TProtocoloESocial);
     procedure AtualizarOperacoes(aModoLancamento: TModoLancamento; aProtocolo: TProtocoloESocial); virtual; abstract;
@@ -185,10 +241,28 @@ type
       var aProtocolo : TProtocoloESocial) : Boolean;                         virtual; abstract;
 
     // procedures eventos de tabela
-    function Gerar_eSocial2190(aCompetencia : String; aZerarBase : Boolean;
+    function Gerar_eSocial2190(aCompetencia : TCompetencia; aZerarBase : Boolean;
       aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge;
       var aProtocolo : TProtocoloESocial) : Boolean;                         virtual; abstract;
-    function Gerar_eSocial2200(aCompetencia : String; aZerarBase : Boolean;
+    function Gerar_eSocial2200(aCompetencia : TCompetencia; aZerarBase : Boolean;
+      aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge;
+      var aProtocolo : TProtocoloESocial) : Boolean;
+    function Gerar_eSocial2205(aCompetencia : TCompetencia; aZerarBase : Boolean;
+      aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge;
+      var aProtocolo : TProtocoloESocial) : Boolean;
+    function Gerar_eSocial2206(aCompetencia : TCompetencia; aZerarBase : Boolean;
+      aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge;
+      var aProtocolo : TProtocoloESocial) : Boolean;
+    function Gerar_eSocial2210(aCompetencia : TCompetencia; aZerarBase : Boolean;
+      aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge;
+      var aProtocolo : TProtocoloESocial) : Boolean;                         virtual; abstract;
+    function Gerar_eSocial2220(aCompetencia : TCompetencia; aZerarBase : Boolean;
+      aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge;
+      var aProtocolo : TProtocoloESocial) : Boolean;                         virtual; abstract;
+    function Gerar_eSocial2230(aCompetencia : TCompetencia; aZerarBase : Boolean;
+      aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge;
+      var aProtocolo : TProtocoloESocial) : Boolean;                         virtual; abstract;
+    function Gerar_eSocial2240(aCompetencia : TCompetencia; aZerarBase : Boolean;
       aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge;
       var aProtocolo : TProtocoloESocial) : Boolean;
 
@@ -225,6 +299,22 @@ uses
   VarGlobais, gsLib, UtilsDb;
 
 {$R *.dfm}
+
+{ TCompetencia }
+
+constructor TCompetencia.Criar;
+begin
+  inherited Create;
+  aCodigo      := EmptyStr;
+  aDescricao   := EmptyStr;
+  aDataInicial := StrToDate(EMPTY_DATE);
+  aDataFinal   := StrToDate(EMPTY_DATE);
+end;
+
+function TCompetencia.GetDescricao : String;
+begin
+  Result := AnsiUpperCase(aDescricao);
+end;
 
 procedure ShowInforme(aTitulo, aMensagem : String);
 begin
@@ -418,22 +508,29 @@ function TdmESocial.EventoEnviado_eSocial(aGrupo: TeSocialGrupo;
   aCompetencia: String; aLabel: TLabel; aProcesso: TGauge;
   var aProtocolo : TProtocoloESocial): Boolean;
 var
-  aDataHora1 ,
-  aDataHora2 ,
-  aDataHora3 ,
-  aDataHora4 ,
-  aDataHora5 ,
-  aDataHora6 ,
-  aDataHora7 ,
-  aDataHora8 : TDateTime;
-  aRetorno   : Boolean;
+//  aDataHora1  ,
+//  aDataHora2  ,
+//  aDataHora3  ,
+//  aDataHora4  ,
+//  aDataHora5  ,
+//  aDataHora6  ,
+//  aDataHora7  ,
+//  aDataHora8  ,
+//  aDataHora9  ,
+//  aDataHora10 : TDateTime;
+//
+  aDataHoraTemp   ,
+  aDataHoraInicial,
+  aDataHoraFinal  : TDateTime;
+
+  aRetorno    : Boolean;
   I : Integer;
   sPath    ,
   sArquivo : String;
 begin
   aRetorno := False;
   try
-    aLabel.Caption     := 'Enviando...';
+    aLabel.Caption     := 'Validando dados...';
     aProcesso.Progress := aProcesso.MaxValue - 1;
     Application.ProcessMessages;
 
@@ -451,19 +548,13 @@ begin
       Mensagem('Sem dados para envio!', 'Aviso', MB_ICONINFORMATION)
     else
     begin
+      aLabel.Caption := 'Enviando...';
 
-      aDataHora1 := Now;
-      aDataHora2 := aDataHora1 + StrToTime('00:00:01');
-      aDataHora3 := aDataHora1 + StrToTime('00:00:02');
-      aDataHora4 := aDataHora1 + StrToTime('00:00:03');
-      aDataHora5 := aDataHora1 + StrToTime('00:00:04');
-      aDataHora6 := aDataHora1 + StrToTime('00:00:05');
-      aDataHora7 := aDataHora1 + StrToTime('00:00:06');
-      aDataHora8 := aDataHora1 + StrToTime('00:00:07');
+      aDataHoraInicial := Now - StrToTime('00:00:05');       // Retorceder 5 segundos
 
-      aRetorno   := ACBrESocial.Enviar(aGrupo);
+      aRetorno := ACBrESocial.Enviar(aGrupo);
 
-      Sleep(3000);
+      Sleep(5000);                                           // Aguardar 5 segundos
 
       if aRetorno then
         with ACBrESocial.Eventos, ACBrESocial.WebServices.EnvioLote.RetEnvioLote do
@@ -475,57 +566,27 @@ begin
             aProtocolo.Numero   := dadosRecLote.Protocolo;
             aProtocolo.NumeroInscricao := IdeTransmissor.NrInsc;
 
-            sPath    := PathWithDelim(ACBrESocial.Configuracoes.Arquivos.GetPatheSocial(aProtocolo.DataHora, ACBrESocial.Configuracoes.Geral.IdEmpregador));
-            sArquivo := StringReplace(sPath + '\' + FormatDateTime('yyyymmddhhmmss', aDataHora1), '\\', '\', [rfReplaceAll]);
+            sPath := PathWithDelim(ACBrESocial.Configuracoes.Arquivos.GetPatheSocial(aProtocolo.DataHora, ACBrESocial.Configuracoes.Geral.IdEmpregador));
 
-            // Pegar Arquivo de Envio
-            if FileExists(sArquivo + '-env-lot.xml') then
-              aProtocolo.Arquivos.Add(sArquivo + '-env-lot.xml');
+            aDataHoraFinal   := Now + StrToTime('00:00:59'); // Esperar até 59 segundos
+            aDataHoraTemp    := aDataHoraInicial;
 
-            // Pegar Arquivo de Retorno
-            if FileExists(sArquivo + '-rec.xml') then
-              aProtocolo.Arquivos.Add(sArquivo + '-rec.xml')
-            else
+            while aDataHoraTemp <= aDataHoraFinal do
             begin
-              sArquivo := StringReplace(sPath + '\' + FormatDateTime('yyyymmddhhmmss', aDataHora2), '\\', '\', [rfReplaceAll]);
+              sArquivo := StringReplace(sPath + '\' + FormatDateTime('yyyymmddhhmmss', aDataHoraTemp), '\\', '\', [rfReplaceAll]);
+
+              // Pegar Arquivo de Envio
+              if FileExists(sArquivo + '-env-lot.xml') then
+                aProtocolo.Arquivos.Add(sArquivo + '-env-lot.xml');
+
+              // Pegar Arquivo de Retorno
               if FileExists(sArquivo + '-rec.xml') then
-                aProtocolo.Arquivos.Add(sArquivo + '-rec.xml')
-              else
               begin
-                sArquivo := StringReplace(sPath + '\' + FormatDateTime('yyyymmddhhmmss', aDataHora3), '\\', '\', [rfReplaceAll]);
-                if FileExists(sArquivo + '-rec.xml') then
-                  aProtocolo.Arquivos.Add(sArquivo + '-rec.xml')
-                else
-                begin
-                  sArquivo := StringReplace(sPath + '\' + FormatDateTime('yyyymmddhhmmss', aDataHora4), '\\', '\', [rfReplaceAll]);
-                  if FileExists(sArquivo + '-rec.xml') then
-                    aProtocolo.Arquivos.Add(sArquivo + '-rec.xml')
-                  else
-                  begin
-                    sArquivo := StringReplace(sPath + '\' + FormatDateTime('yyyymmddhhmmss', aDataHora5), '\\', '\', [rfReplaceAll]);
-                    if FileExists(sArquivo + '-rec.xml') then
-                      aProtocolo.Arquivos.Add(sArquivo + '-rec.xml')
-                    else
-                    begin
-                      sArquivo := StringReplace(sPath + '\' + FormatDateTime('yyyymmddhhmmss', aDataHora6), '\\', '\', [rfReplaceAll]);
-                      if FileExists(sArquivo + '-rec.xml') then
-                        aProtocolo.Arquivos.Add(sArquivo + '-rec.xml')
-                      else
-                      begin
-                        sArquivo := StringReplace(sPath + '\' + FormatDateTime('yyyymmddhhmmss', aDataHora7), '\\', '\', [rfReplaceAll]);
-                        if FileExists(sArquivo + '-rec.xml') then
-                          aProtocolo.Arquivos.Add(sArquivo + '-rec.xml')
-                        else
-                        begin
-                          sArquivo := StringReplace(sPath + '\' + FormatDateTime('yyyymmddhhmmss', aDataHora8), '\\', '\', [rfReplaceAll]);
-                          if FileExists(sArquivo + '-rec.xml') then
-                            aProtocolo.Arquivos.Add(sArquivo + '-rec.xml');
-                        end;
-                      end;
-                    end;
-                  end;
-                end;
+                aProtocolo.Arquivos.Add(sArquivo + '-rec.xml');
+                Break;
               end;
+
+              aDataHoraTemp := aDataHoraTemp + StrToTime('00:00:01');
             end;
 
             aLabel.Caption     := 'Envio realizado com sucesso...';
@@ -1792,7 +1853,7 @@ begin
   end;
 end;
 
-function TdmESocial.Gerar_eSocial2200(aCompetencia: String; aZerarBase: Boolean; aModoLancamento: TModoLancamento;
+function TdmESocial.Gerar_eSocial2200(aCompetencia: TCompetencia; aZerarBase: Boolean; aModoLancamento: TModoLancamento;
   aLabel: TLabel; aProcesso: TGauge; var aProtocolo: TProtocoloESocial): Boolean;
 var
   aRetorno : Boolean;
@@ -1800,7 +1861,12 @@ var
   ok   : Boolean;
   aEventoID,
   I    : Integer;
+  aDataInicial,
+  aDataFinal  : TDateTime;
 begin
+  aDataInicial := aCompetencia.DataInicial; // StrToDate('01/' + Copy(aCompetencia, 6, 2) + '/' + Copy(aCompetencia, 1, 4));
+  aDataFinal   := aCompetencia.DataFinal;   // StrToDate(FormatFloat('00', DaysInMonth(aDataInicial)) + FormatDateTime('/mm/yyyy', aDataInicial));
+
   aRetorno := False;
   aSQL := TStringList.Create;
   ok   := True;
@@ -1824,7 +1890,7 @@ begin
     aSQL.Add('  , ''N'' as primeiro_emprego ');
     aSQL.Add('  , ''N'' as serv_aposentado ');
     aSQL.Add('  , u.tipo_previd ');
-    aSQL.Add('  , s.matricula   ');
+    aSQL.Add('  , coalesce(s.matricula, substring(s.id from 1 for char_length(s.id) - 1)) as matricula');
     aSQL.Add('  , s.dt_admissao ');
     aSQL.Add('  , a.cnpj as cnpj_sindicato');
     aSQL.Add('  , s.id_situacao_tcm');
@@ -1861,7 +1927,7 @@ begin
 
     aSQL.Add('  , coalesce(s.id_horario, 0) as id_horario');
     aSQL.Add('  , (cast(coalesce(cast(nullif(trim(h.duracao_jornada), '''') as integer), 0) / 60 as integer) * 5) as jornada_semanal');
-    //aSQL.Add('  , (Select CNPJ from CONFIG_ORGAO c where c.id = 1) as CNPJ ');
+
     aSQL.Add('from SERVIDOR s');
     aSQL.Add('  inner join PESSOA_FISICA p on (p.id = s.id_pessoa_fisica)');
     aSQL.Add('  left join TAB_RACA_COR r on (r.id = p.id_raca_cor)');
@@ -1873,6 +1939,15 @@ begin
     aSQL.Add('  left join ENTID_SINDICAL a on (a.id = s.id_entid_sindical)');
     aSQL.Add('  left join TAB_HORARIO h on (h.id = s.id_horario)');
     aSQL.Add('where (s.id > 0)   ');
+    aSQL.Add('  and (p.dt_nascimento is not null)');                // Sem Data de Nascimento
+    aSQL.Add('  and (coalesce(trim(p.ender_cep), '''') <> '''')');  // Sem Número de CEP
+
+    if ( StrToIntDef(OnlyNumber(aCompetencia.Codigo), 0) < (StrToInt(FormatDateTime('YYYYMM', Date)) - 1) ) then
+      // Carga inicial
+      aSQL.Add('  and (coalesce(s.dt_readmissao, s.dt_admissao) <= ' + QuotedStr(FormatDateTime('yyyy.mm.dd', aDataFinal)) + ')')
+    else
+      // Admissões do mês
+      aSQL.Add('  and (coalesce(s.dt_readmissao, s.dt_admissao) between ' + QuotedStr(FormatDateTime('yyyy.mm.dd', aDataInicial)) + ' and ' + QuotedStr(FormatDateTime('yyyy.mm.dd', aDataFinal)) + ')');
 
     case aModoLancamento of
       mlInclusao  : aSQL.Add('  and s.tipo_operacao = ' + QuotedStr(FLAG_OPERACAO_INSERIR));
@@ -1888,6 +1963,8 @@ begin
     aProcesso.MaxValue := cdsTabela.RecordCount;
     aProcesso.Progress := 0;
     Application.ProcessMessages;
+
+    ACBrESocial.Eventos.NaoPeriodicos.S2200.Clear;
 
     cdsTabela.First;
     while not cdsTabela.Eof do
@@ -1926,7 +2003,7 @@ begin
 
         with Trabalhador do
         begin
-          CpfTrab    := Trim(cdsTabela.FieldByName('cpf').AsString);
+          CpfTrab    := OnlyNumber(Trim(cdsTabela.FieldByName('cpf').AsString));
           NisTrab    := Trim(cdsTabela.FieldByName('nis_trabalhador').AsString);
           NmTrab     := Trim(cdsTabela.FieldByName('nome').AsString);
           Sexo       := Trim(cdsTabela.FieldByName('sexo').AsString);
@@ -1950,9 +2027,12 @@ begin
           with Documentos do
           begin
             // Informações da Carteira de Trabalho e Previdência Social
-            CTPS.NrCtps    := Trim(cdsTabela.FieldByName('ctps_num').AsString);
-            CTPS.SerieCtps := Trim(cdsTabela.FieldByName('ctps_serie').AsString);
-            CTPS.UfCtps    := Trim(cdsTabela.FieldByName('ctps_uf').AsString);
+            if (Trim(cdsTabela.FieldByName('ctps_num').AsString) <> EmptyStr) then
+            begin
+              CTPS.NrCtps    := Trim(cdsTabela.FieldByName('ctps_num').AsString);
+              CTPS.SerieCtps := Trim(cdsTabela.FieldByName('ctps_serie').AsString);
+              CTPS.UfCtps    := Trim(cdsTabela.FieldByName('ctps_uf').AsString);
+            end;
 
 //            // Informações do Documento Nacional de Identidade - DNI (Registro de Identificação Civil - RIC)
 //            RIC.NrRic        := '123123';
@@ -1961,7 +2041,7 @@ begin
 //
             if (Trim(cdsTabela.FieldByName('rg_num').AsString) <> EmptyStr) and (Trim(cdsTabela.FieldByName('rg_orgao_emissor').AsString) <> EmptyStr) then
             begin
-              RG.NrRg         := Trim(cdsTabela.FieldByName('rg_num').AsString);
+              RG.NrRg         := OnlyNumber(Trim(cdsTabela.FieldByName('rg_num').AsString));
               RG.OrgaoEmissor := Trim(cdsTabela.FieldByName('rg_orgao_emissor').AsString) + '/' + Trim(cdsTabela.FieldByName('rg_uf').AsString);
               RG.DtExped      := cdsTabela.FieldByName('rg_dt_emissao').AsDateTime;
             end;
@@ -1969,7 +2049,7 @@ begin
             // Informações do Registro Nacional de Estrangeiro
             if (Nascimento.PaisNac <> ID_NACIONALIDADE_BRASIL) then
             begin
-              RNE.NrRne        := Trim(cdsTabela.FieldByName('rne_num').AsString);
+              RNE.NrRne        := OnlyNumber(Trim(cdsTabela.FieldByName('rne_num').AsString));
               RNE.OrgaoEmissor := Trim(cdsTabela.FieldByName('rne_orgao').AsString) + '/' + Trim(cdsTabela.FieldByName('rne_uf').AsString);
               RNE.DtExped      := cdsTabela.FieldByName('rne_dt_emissao').AsDateTime;
             end;
@@ -1977,7 +2057,7 @@ begin
             // Informações do número de registro em Órgão de Classe (OC)
             if (Trim(cdsTabela.FieldByName('conselho_registro').AsString) <> EmptyStr) and (Trim(cdsTabela.FieldByName('conselho_orgao').AsString) <> EmptyStr) then
             begin
-              OC.NrOc         := Trim(cdsTabela.FieldByName('conselho_registro').AsString);
+              OC.NrOc         := OnlyNumber(Trim(cdsTabela.FieldByName('conselho_registro').AsString));
               OC.OrgaoEmissor := Trim(cdsTabela.FieldByName('conselho_orgao').AsString) + '/' + Trim(cdsTabela.FieldByName('conselho_uf').AsString);
               if not cdsTabela.FieldByName('conselho_dt_emissao').IsNull then
                 OC.DtExped    := cdsTabela.FieldByName('conselho_dt_emissao').AsDateTime;
@@ -1985,12 +2065,16 @@ begin
                 OC.DtValid    := cdsTabela.FieldByName('conselho_dt_validade').AsDateTime;
             end;
 
-            CNH.nrRegCnh     := Trim(cdsTabela.FieldByName('cnh_num').AsString);
-            CNH.DtExped      := cdsTabela.FieldByName('cnh_dt_emissao').AsDateTime;
-            CNH.ufCnh        := tpuf(ufPR);
-            CNH.DtValid      := cdsTabela.FieldByName('cnh_dt_vencto').AsDateTime;
-            CNH.categoriaCnh := eSStrToCnh(ok, Trim(cdsTabela.FieldByName('cnh_categoria').AsString));
-            //CNH.dtPriHab     := date;
+            // Informações da Carteira Nacional de Habilitação (CNH)
+            if (Trim(cdsTabela.FieldByName('cnh_num').AsString) <> EmptyStr) and (not cdsTabela.FieldByName('cnh_dt_vencto').IsNull) and (cdsTabela.FieldByName('cnh_dt_vencto').AsDateTime <> StrToDate(EMPTY_DATE)) then
+            begin
+              CNH.nrRegCnh     := OnlyNumber(Trim(cdsTabela.FieldByName('cnh_num').AsString));
+              CNH.DtExped      := cdsTabela.FieldByName('cnh_dt_emissao').AsDateTime;
+              CNH.ufCnh        := tpuf(ufPR);
+              CNH.DtValid      := cdsTabela.FieldByName('cnh_dt_vencto').AsDateTime;
+              CNH.categoriaCnh := eSStrToCnh(ok, Trim(cdsTabela.FieldByName('cnh_categoria').AsString));
+              //CNH.dtPriHab     := date;
+            end;
           end;
 
           with Endereco do
@@ -2002,7 +2086,7 @@ begin
               NrLograd    := Trim(cdsTabela.FieldByName('ender_numero').AsString);
               Complemento := Trim(cdsTabela.FieldByName('ender_complem').AsString);
               Bairro      := IfThen(Trim(cdsTabela.FieldByName('ender_bairro').AsString) = EmptyStr, 'NAO INFORMADO', Trim(cdsTabela.FieldByName('ender_bairro').AsString));
-              Cep         := Trim(cdsTabela.FieldByName('ender_cep').AsString);
+              Cep         := Copy(Trim(cdsTabela.FieldByName('ender_cep').AsString) + '000', 1, 8);
               codMunic    := cdsTabela.FieldByName('id_ender_cidade').AsInteger;
               uf          := eSStrTouf(ok, Trim(cdsTabela.FieldByName('ender_uf').AsString));
             end;
@@ -2104,7 +2188,7 @@ begin
 
           NrRecInfPrelim := EmptyStr;
 
-          if ( StrToIntDef(OnlyNumber(aCompetencia), 0) < (StrToInt(FormatDateTime('YYYYMM', Date)) - 1) ) then
+          if ( StrToIntDef(OnlyNumber(aCompetencia.Codigo), 0) < (StrToInt(FormatDateTime('YYYYMM', Date)) - 1) ) then
             cadIni := tpSim
           else
             cadIni := tpNao;
@@ -2261,10 +2345,10 @@ begin
               AlvaraJudicial.nrProcJud := EmptyStr;
 
             observacoes.Clear;
-
-            if (Trim(cdsTabela.FieldByName('observacao').AsString) <> EmptyStr) then
-              with observacoes.Add do
-                observacao := cdsTabela.FieldByName('observacao').AsString;
+//
+//            if (Trim(cdsTabela.FieldByName('observacao').AsString) <> EmptyStr) then
+//              with observacoes.Add do
+//                observacao := cdsTabela.FieldByName('observacao').AsString;
           end;
 
 //          // Grupo de informações da sucessão de vínculo trabalhista/estatutário
@@ -2298,6 +2382,1000 @@ begin
 
     aRetorno := True;
     aProtocolo.S2200 := aRetorno;
+  finally
+    aSQL.Free;
+    Result := aRetorno;
+  end;
+end;
+
+function TdmESocial.Gerar_eSocial2205(aCompetencia: TCompetencia; aZerarBase: Boolean; aModoLancamento: TModoLancamento;
+  aLabel: TLabel; aProcesso: TGauge; var aProtocolo: TProtocoloESocial): Boolean;
+var
+  aRetorno : Boolean;
+  aSQL : TStringList;
+  ok   : Boolean;
+  aEventoID,
+  I    : Integer;
+  aDataInicial,
+  aDataFinal  : TDateTime;
+begin
+  aDataInicial := aCompetencia.DataInicial;
+  aDataFinal   := aCompetencia.DataFinal;
+
+  aRetorno := False;
+  aSQL := TStringList.Create;
+  ok   := True;
+  try
+    aSQL.BeginUpdate;
+    aSQL.Clear;
+    aSQL.Add('Select ');
+    aSQL.Add('    p.* ');
+    aSQL.Add('  , s.id as id_servidor ');
+    aSQL.Add('  , coalesce(p.cnh_categ, ''B'') as cnh_categoria');
+
+    aSQL.Add('  , coalesce(nullif(trim(p.apelido), ''''), p.nome) as nome_social ');
+    aSQL.Add('  , left(replace(replace(trim(p.telefone), ''-'', ''''), '' '', ''''), 10) as nr_telefone');
+    aSQL.Add('  , coalesce(nullif(nullif(trim(p.ender_num), ''''), ''0''), ''S/N'') as ender_numero');
+
+    aSQL.Add('  , coalesce(r.id_esocial, 6) as id_raca ');
+    aSQL.Add('  , coalesce(e.id_esocial, 1) as id_estado_civil ');
+    aSQL.Add('  , coalesce(c.id_esocial, ''01'') as id_escola  ');
+    aSQL.Add('  , cast((Select first 1 idade.r_qtd_anos || ''.'' || idade.r_qtd_meses from SP_CALC_IDADE(current_date, p.dt_nascimento) idade) as NUMERIC(15,2)) as nr_idade');
+
+    aSQL.Add('  , ''N'' as primeiro_emprego ');
+    aSQL.Add('  , ''N'' as serv_aposentado ');
+    aSQL.Add('  , u.tipo_previd ');
+    aSQL.Add('  , coalesce(s.matricula, substring(s.id from 1 for char_length(s.id) - 1)) as matricula');
+    aSQL.Add('  , s.dt_admissao ');
+    aSQL.Add('  , a.cnpj as cnpj_sindicato');
+    aSQL.Add('  , s.id_situacao_tcm');
+    aSQL.Add('  , s.id_cargo_origem');
+    aSQL.Add('  , s.id_cargo_atual');
+    aSQL.Add('  , f.id_tipo_cargo_tcm');
+    aSQL.Add('  , coalesce(s.vencto_base, f.vencto_base) as vencto_base');
+    aSQL.Add('  , s.observacao');
+    aSQL.Add('  , coalesce(nullif(trim(s.pis_pasep_pf), ''''), nullif(trim(p.pis_pasep), ''''), ''00000000000'') as nis_trabalhador');
+
+    aSQL.Add('  , coalesce(s.dt_readmissao, s.dt_admissao, current_date) as dt_nomeacao');
+    aSQL.Add('  , coalesce(s.dt_readmissao, s.dt_admissao, current_date) as dt_posse');
+    aSQL.Add('  , coalesce(s.dt_readmissao, s.dt_admissao, current_date) as dt_exercicio');
+
+    aSQL.Add('  , coalesce(n.id_esocial, ''105'') as id_pais_nascimento   ');
+    aSQL.Add('  , coalesce(n.id_esocial, ''105'') as id_pais_naturalidade ');
+    aSQL.Add('  , coalesce(p.ender_tipo, ''IND'') as ender_tipo_lograd');
+
+    aSQL.Add('  , null as ctps_num ');
+    aSQL.Add('  , null as ctps_serie ');
+    aSQL.Add('  , null as ctps_uf ');
+
+    aSQL.Add('  , null as rne_num ');
+    aSQL.Add('  , null as rne_orgao ');
+    aSQL.Add('  , null as rne_uf ');
+    aSQL.Add('  , null as rne_dt_emissao ');
+
+
+    aSQL.Add('  , s.conselho_registro ');
+    aSQL.Add('  , s.conselho_orgao    ');
+    aSQL.Add('  , s.conselho_uf       ');
+    aSQL.Add('  , s.conselho_dt_emissao  ');
+    aSQL.Add('  , s.conselho_dt_validade ');
+
+    aSQL.Add('  , coalesce(s.id_horario, 0) as id_horario');
+    aSQL.Add('  , (cast(coalesce(cast(nullif(trim(h.duracao_jornada), '''') as integer), 0) / 60 as integer) * 5) as jornada_semanal');
+
+    aSQL.Add('from SERVIDOR s');
+    aSQL.Add('  inner join PESSOA_FISICA p on (p.id = s.id_pessoa_fisica)');
+    aSQL.Add('  left join TAB_RACA_COR r on (r.id = p.id_raca_cor)');
+    aSQL.Add('  left join ESTADO_CIVIL e on (e.id = p.id_estado_civil)');
+    aSQL.Add('  left join ESCOLARIDADE c on (c.id = p.id_escolaridade)');
+    aSQL.Add('  left join NACIONALIDADE n on (n.id = p.id_nacionalidade)');
+    aSQL.Add('  left join SUB_UNID_ORCAMENT u on (u.id = s.id_sub_unid_orcament)');
+    aSQL.Add('  left join CARGO_FUNCAO f on (f.id = coalesce(s.id_cargo_origem, s.id_cargo_atual))');
+    aSQL.Add('  left join ENTID_SINDICAL a on (a.id = s.id_entid_sindical)');
+    aSQL.Add('  left join TAB_HORARIO h on (h.id = s.id_horario)');
+    aSQL.Add('where (s.id > 0)   ');
+    aSQL.Add('  and (p.dt_nascimento is not null)');                // Sem Data de Nascimento
+    aSQL.Add('  and (coalesce(trim(p.ender_cep), '''') <> '''')');  // Sem Número de CEP
+
+    if ( StrToIntDef(OnlyNumber(aCompetencia.Codigo), 0) < (StrToInt(FormatDateTime('YYYYMM', Date)) - 1) ) then
+      // Carga inicial
+      aSQL.Add('  and (p.data_operacao <= ' + QuotedStr(FormatDateTime('yyyy.mm.dd', aDataFinal)) + ')')
+    else
+      // Aletrações do mês
+      aSQL.Add('  and (p.data_operacao between ' + QuotedStr(FormatDateTime('yyyy.mm.dd', aDataInicial)) + ' and ' + QuotedStr(FormatDateTime('yyyy.mm.dd', aDataFinal)) + ')');
+
+    case aModoLancamento of
+      mlInclusao  : aSQL.Add('  and p.tipo_operacao = ' + QuotedStr(FLAG_OPERACAO_INSERIR));
+      mlAlteracao : aSQL.Add('  and p.tipo_operacao = ' + QuotedStr(FLAG_OPERACAO_ALTERAR));
+      mlExclusao  : aSQL.Add('  and p.tipo_operacao = ' + QuotedStr(FLAG_OPERACAO_EXCLUIR));
+    end;
+
+    aSQL.EndUpdate;
+    SetSQL(aSQL);
+
+    I := 1;
+
+    aProcesso.MaxValue := cdsTabela.RecordCount;
+    aProcesso.Progress := 0;
+    Application.ProcessMessages;
+
+    ACBrESocial.Eventos.NaoPeriodicos.S2205.Clear;
+
+    cdsTabela.First;
+    while not cdsTabela.Eof do
+    begin
+      with ACBrESocial.Eventos.NaoPeriodicos.S2205.Add, EvtAltCadastral do
+      begin
+        aEventoID   := StrToInt(IncrementGenerator('GEN_ESOCIAL_EVENTO_S2205', 1));
+        Sequencial  := aEventoID;
+        dtAlteracao := Now;
+
+        if AmbienteWebServiceProducao then
+          IdeEvento.TpAmb := TpTpAmb(0) //taProducao
+        else
+          IdeEvento.TpAmb := taProducaoRestrita;
+
+        IdeEvento.indRetif := ireOriginal; // (ireOriginal, ireRetificacao);
+
+        if (IdeEvento.indRetif = ireRetificacao) then
+          IdeEvento.NrRecibo := '65.5454.987798798798' // Preencher com o número do recibo do arquivo a ser retificado.
+        else
+          IdeEvento.NrRecibo := EmptyStr;
+
+        IdeEvento.ProcEmi  := peAplicEmpregador;
+        IdeEvento.VerProc  := Versao_Executavel(ParamStr(0));
+
+        IdeEmpregador.TpInsc := tiCNPJ;
+        IdeEmpregador.NrInsc := Criptografa(Pesquisa('CONFIG_ORGAO', 'ID', '1', 'CNPJ', ''),'2', 14); //Criptografa(cdsTabela.FieldByName('CNPJ').AsString, '2', 14);
+
+        with ACBrESocial.Configuracoes do
+          Geral.IdEmpregador := EvtAltCadastral.IdeEmpregador.NrInsc;
+
+        ideTrabalhador.CpfTrab := OnlyNumber(Trim(cdsTabela.FieldByName('cpf').AsString));
+
+        with Trabalhador do
+        begin
+          NisTrab    := Trim(cdsTabela.FieldByName('nis_trabalhador').AsString);
+          NmTrab     := Trim(cdsTabela.FieldByName('nome').AsString);
+          Sexo       := Trim(cdsTabela.FieldByName('sexo').AsString);
+          RacaCor    := cdsTabela.FieldByName('id_raca').AsInteger;
+          EstCiv     := cdsTabela.FieldByName('id_estado_civil').AsInteger;
+          GrauInstr  := Trim(cdsTabela.FieldByName('id_escola').AsString);
+          IndPriEmpr := eSStrToSimNao(ok, Trim(cdsTabela.FieldByName('primeiro_emprego').AsString));
+          nmSoc      := Trim(cdsTabela.FieldByName('nome_social').AsString);
+
+          with Nascimento do
+          begin
+            DtNascto   := cdsTabela.FieldByName('dt_nascimento').AsDateTime;
+            codMunic   := cdsTabela.FieldByName('id_natural_cidade').AsInteger;
+            uf         := Trim(cdsTabela.FieldByName('natural_uf').AsString);
+            PaisNascto := Trim(cdsTabela.FieldByName('id_pais_nascimento').AsString);
+            PaisNac    := Trim(cdsTabela.FieldByName('id_pais_naturalidade').AsString);
+            NmMae      := Trim(cdsTabela.FieldByName('filiacao_pai').AsString);
+            NmPai      := Trim(cdsTabela.FieldByName('filiacao_mae').AsString);
+          end;
+
+          with Documentos do
+          begin
+            // Informações da Carteira de Trabalho e Previdência Social
+            if (Trim(cdsTabela.FieldByName('ctps_num').AsString) <> EmptyStr) then
+            begin
+              CTPS.NrCtps    := Trim(cdsTabela.FieldByName('ctps_num').AsString);
+              CTPS.SerieCtps := Trim(cdsTabela.FieldByName('ctps_serie').AsString);
+              CTPS.UfCtps    := Trim(cdsTabela.FieldByName('ctps_uf').AsString);
+            end;
+
+//            // Informações do Documento Nacional de Identidade - DNI (Registro de Identificação Civil - RIC)
+//            RIC.NrRic        := '123123';
+//            RIC.OrgaoEmissor := 'SSP';
+//            RIC.DtExped      := date;
+//
+            if (Trim(cdsTabela.FieldByName('rg_num').AsString) <> EmptyStr) and (Trim(cdsTabela.FieldByName('rg_orgao_emissor').AsString) <> EmptyStr) then
+            begin
+              RG.NrRg         := OnlyNumber(Trim(cdsTabela.FieldByName('rg_num').AsString));
+              RG.OrgaoEmissor := Trim(cdsTabela.FieldByName('rg_orgao_emissor').AsString) + '/' + Trim(cdsTabela.FieldByName('rg_uf').AsString);
+              RG.DtExped      := cdsTabela.FieldByName('rg_dt_emissao').AsDateTime;
+            end;
+
+            // Informações do Registro Nacional de Estrangeiro
+            if (Nascimento.PaisNac <> ID_NACIONALIDADE_BRASIL) then
+            begin
+              RNE.NrRne        := OnlyNumber(Trim(cdsTabela.FieldByName('rne_num').AsString));
+              RNE.OrgaoEmissor := Trim(cdsTabela.FieldByName('rne_orgao').AsString) + '/' + Trim(cdsTabela.FieldByName('rne_uf').AsString);
+              RNE.DtExped      := cdsTabela.FieldByName('rne_dt_emissao').AsDateTime;
+            end;
+
+            // Informações do número de registro em Órgão de Classe (OC)
+            if (Trim(cdsTabela.FieldByName('conselho_registro').AsString) <> EmptyStr) and (Trim(cdsTabela.FieldByName('conselho_orgao').AsString) <> EmptyStr) then
+            begin
+              OC.NrOc         := OnlyNumber(Trim(cdsTabela.FieldByName('conselho_registro').AsString));
+              OC.OrgaoEmissor := Trim(cdsTabela.FieldByName('conselho_orgao').AsString) + '/' + Trim(cdsTabela.FieldByName('conselho_uf').AsString);
+              if not cdsTabela.FieldByName('conselho_dt_emissao').IsNull then
+                OC.DtExped    := cdsTabela.FieldByName('conselho_dt_emissao').AsDateTime;
+              if not cdsTabela.FieldByName('conselho_dt_validade').IsNull then
+                OC.DtValid    := cdsTabela.FieldByName('conselho_dt_validade').AsDateTime;
+            end;
+
+            // Informações da Carteira Nacional de Habilitação (CNH)
+            if (Trim(cdsTabela.FieldByName('cnh_num').AsString) <> EmptyStr) and (not cdsTabela.FieldByName('cnh_dt_vencto').IsNull) and (cdsTabela.FieldByName('cnh_dt_vencto').AsDateTime <> StrToDate(EMPTY_DATE)) then
+            begin
+              CNH.nrRegCnh     := OnlyNumber(Trim(cdsTabela.FieldByName('cnh_num').AsString));
+              CNH.DtExped      := cdsTabela.FieldByName('cnh_dt_emissao').AsDateTime;
+              CNH.ufCnh        := tpuf(ufPR);
+              CNH.DtValid      := cdsTabela.FieldByName('cnh_dt_vencto').AsDateTime;
+              CNH.categoriaCnh := eSStrToCnh(ok, Trim(cdsTabela.FieldByName('cnh_categoria').AsString));
+              //CNH.dtPriHab     := date;
+            end;
+          end;
+
+          with Endereco do
+          begin
+            with Brasil do
+            begin
+              TpLograd    := IfThen(Trim(cdsTabela.FieldByName('ender_tipo_lograd').AsString) = EmptyStr, 'IND', Trim(cdsTabela.FieldByName('ender_tipo_lograd').AsString));
+              DscLograd   := IfThen(Trim(cdsTabela.FieldByName('ender_lograd').AsString) = EmptyStr, 'NAO INFORMADO', Trim(cdsTabela.FieldByName('ender_lograd').AsString));
+              NrLograd    := Trim(cdsTabela.FieldByName('ender_numero').AsString);
+              Complemento := Trim(cdsTabela.FieldByName('ender_complem').AsString);
+              Bairro      := IfThen(Trim(cdsTabela.FieldByName('ender_bairro').AsString) = EmptyStr, 'NAO INFORMADO', Trim(cdsTabela.FieldByName('ender_bairro').AsString));
+              Cep         := Copy(Trim(cdsTabela.FieldByName('ender_cep').AsString) + '000', 1, 8);
+              codMunic    := cdsTabela.FieldByName('id_ender_cidade').AsInteger;
+              uf          := eSStrTouf(ok, Trim(cdsTabela.FieldByName('ender_uf').AsString));
+            end;
+//
+//            with Exterior do
+//            begin
+//              PaisResid   := '545';
+//              DscLograd   := 'TESTE';
+//              NrLograd    := '777';
+//              Complemento := 'AP 101';
+//              Bairro      := 'CENTRO';
+//              NmCid       := 'CIDADE EXTERIOR';
+//              CodPostal   := '50000';
+//            end;
+          end;
+
+//          with TrabEstrangeiro do
+//          begin
+//            DtChegada        := date;
+//            ClassTrabEstrang := tpClassTrabEstrang(ctVistoPermanente);
+//            CasadoBr := 'N';
+//            FilhosBr := 'N';
+//          end;
+
+          with InfoDeficiencia do
+          begin
+            DefFisica      := eSStrToSimNao(ok, Trim(cdsTabela.FieldByName('deficiente_fisico').AsString));
+            DefVisual      := eSStrToSimNao(ok, Trim(cdsTabela.FieldByName('deficiente_visual').AsString));
+            DefAuditiva    := eSStrToSimNao(ok, Trim(cdsTabela.FieldByName('deficiente_auditivo').AsString));
+            DefMental      := eSStrToSimNao(ok, Trim(cdsTabela.FieldByName('deficiente_mental').AsString));
+            DefIntelectual := eSStrToSimNao(ok, Trim(cdsTabela.FieldByName('deficiente_intelectual').AsString));
+            ReabReadap     := eSStrToSimNao(ok, Trim(cdsTabela.FieldByName('deficiente_readaptado').AsString));
+            infoCota       := eSStrToSimNao(ok, Trim(cdsTabela.FieldByName('deficiente_cota').AsString));
+            observacao     := Trim(cdsTabela.FieldByName('deficiente_obs').AsString);
+          end;
+
+          Dependente.Clear;
+
+          aSQL.BeginUpdate;
+          aSQL.Clear;
+          aSQL.Add('Select');
+          aSQL.Add('    coalesce(p.id_tipo_dependente, d.id_tipo_dependente, ''99'') as tipo_dependente');
+          aSQL.Add('  , d.nome');
+          aSQL.Add('  , d.dt_nascimento');
+          aSQL.Add('  , p.cpf');
+          aSQL.Add('  , d.ativo_irrf');
+          aSQL.Add('  , d.ativo_sal_familia');
+          aSQL.Add('  , d.deficiente');
+          aSQL.Add('from SERVIDOR_DEPENDENTE d');
+          aSQL.Add('  inner join PESSOA_FISICA_DEPENDENTE p on (p.id = d.id)');
+          aSQL.Add('where (d.id_servidor   = ' + Trim(cdsTabela.FieldByName('id_servidor').AsString) + ') ');
+          aSQL.Add('  and (d.dt_nascimento < current_date)');
+          aSQL.Add('order by');
+          aSQL.Add('    d.nome');
+          aSQL.EndUpdate;
+          SetSQL_Detalhe(aSQL);
+
+          cdsDetalhe.First;
+          if (cdsDetalhe.RecordCount > 0) then
+          begin
+            while not cdsDetalhe.Eof do
+            begin
+              with Dependente.Add do
+              begin
+                tpDep    := eSStrToTpDep(ok, Trim(cdsDetalhe.FieldByName('tipo_dependente').AsString));
+                nmDep    := Trim(cdsDetalhe.FieldByName('nome').AsString);
+                DtNascto := cdsDetalhe.FieldByName('dt_nascimento').AsDateTime;
+                cpfDep   := Trim(cdsDetalhe.FieldByName('cpf').AsString);
+                depIRRF  := eSStrToSimNao(ok, Trim(cdsDetalhe.FieldByName('ativo_irrf').AsString));
+                depSF    := eSStrToSimNao(ok, Trim(cdsDetalhe.FieldByName('ativo_sal_familia').AsString));
+                incTrab  := eSStrToSimNao(ok, Trim(cdsDetalhe.FieldByName('deficiente').AsString));
+              end;
+
+              cdsDetalhe.Next;
+            end;
+          end;
+          cdsDetalhe.Close;
+
+          Aposentadoria.TrabAposent := eSStrToSimNao(ok, Trim(cdsTabela.FieldByName('serv_aposentado').AsString));
+
+          with Contato do
+          begin
+            FonePrinc     := OnlyNumber(Trim(cdsTabela.FieldByName('nr_telefone').AsString));
+            FoneAlternat  := EmptyStr;
+            EmailPrinc    := AnsiLowerCase(Trim(cdsTabela.FieldByName('e_mail').AsString));
+            EmailAlternat := EmptyStr
+          end;
+        end;
+      end;
+
+      aLabel.Caption     := Trim(cdsTabela.FieldByName('nome').AsString);
+      aProcesso.Progress := I;
+      Application.ProcessMessages;
+      Inc(I);
+
+      cdsTabela.Next;
+    end;
+
+    aRetorno := True;
+    aProtocolo.S2205 := aRetorno;
+  finally
+    aSQL.Free;
+    Result := aRetorno;
+  end;
+end;
+
+function TdmESocial.Gerar_eSocial2206(aCompetencia: TCompetencia; aZerarBase: Boolean; aModoLancamento: TModoLancamento;
+  aLabel: TLabel; aProcesso: TGauge; var aProtocolo: TProtocoloESocial): Boolean;
+var
+  aRetorno : Boolean;
+  aSQL : TStringList;
+  ok   : Boolean;
+  aEventoID,
+  I    : Integer;
+  aDataInicial,
+  aDataFinal  : TDateTime;
+begin
+  aDataInicial := aCompetencia.DataInicial;
+  aDataFinal   := aCompetencia.DataFinal;
+
+  aRetorno := False;
+  aSQL := TStringList.Create;
+  ok   := True;
+  try
+    aSQL.BeginUpdate;
+    aSQL.Clear;
+    aSQL.Add('Select ');
+    aSQL.Add('    p.* ');
+    aSQL.Add('  , s.id as id_servidor ');
+    aSQL.Add('  , coalesce(p.cnh_categ, ''B'') as cnh_categoria');
+
+    aSQL.Add('  , coalesce(nullif(trim(p.apelido), ''''), p.nome) as nome_social ');
+    aSQL.Add('  , left(replace(replace(trim(p.telefone), ''-'', ''''), '' '', ''''), 10) as nr_telefone');
+    aSQL.Add('  , coalesce(nullif(nullif(trim(p.ender_num), ''''), ''0''), ''S/N'') as ender_numero');
+
+    aSQL.Add('  , coalesce(r.id_esocial, 6) as id_raca ');
+    aSQL.Add('  , coalesce(e.id_esocial, 1) as id_estado_civil ');
+    aSQL.Add('  , coalesce(c.id_esocial, ''01'') as id_escola  ');
+    aSQL.Add('  , cast((Select first 1 idade.r_qtd_anos || ''.'' || idade.r_qtd_meses from SP_CALC_IDADE(current_date, p.dt_nascimento) idade) as NUMERIC(15,2)) as nr_idade');
+
+    aSQL.Add('  , ''N'' as primeiro_emprego ');
+    aSQL.Add('  , ''N'' as serv_aposentado ');
+    aSQL.Add('  , u.tipo_previd ');
+    aSQL.Add('  , coalesce(s.matricula, substring(s.id from 1 for char_length(s.id) - 1)) as matricula');
+    aSQL.Add('  , s.dt_admissao ');
+    aSQL.Add('  , a.cnpj as cnpj_sindicato');
+    aSQL.Add('  , s.id_situacao_tcm');
+    aSQL.Add('  , s.id_cargo_origem');
+    aSQL.Add('  , s.id_cargo_atual');
+    aSQL.Add('  , f.id_tipo_cargo_tcm');
+    aSQL.Add('  , coalesce(s.vencto_base, f.vencto_base) as vencto_base');
+    aSQL.Add('  , s.observacao');
+    aSQL.Add('  , coalesce(nullif(trim(s.pis_pasep_pf), ''''), nullif(trim(p.pis_pasep), ''''), ''00000000000'') as nis_trabalhador');
+
+    aSQL.Add('  , coalesce(s.dt_readmissao, s.dt_admissao, current_date) as dt_nomeacao');
+    aSQL.Add('  , coalesce(s.dt_readmissao, s.dt_admissao, current_date) as dt_posse');
+    aSQL.Add('  , coalesce(s.dt_readmissao, s.dt_admissao, current_date) as dt_exercicio');
+
+    aSQL.Add('  , coalesce(n.id_esocial, ''105'') as id_pais_nascimento   ');
+    aSQL.Add('  , coalesce(n.id_esocial, ''105'') as id_pais_naturalidade ');
+    aSQL.Add('  , coalesce(p.ender_tipo, ''IND'') as ender_tipo_lograd');
+
+    aSQL.Add('  , null as ctps_num ');
+    aSQL.Add('  , null as ctps_serie ');
+    aSQL.Add('  , null as ctps_uf ');
+
+    aSQL.Add('  , null as rne_num ');
+    aSQL.Add('  , null as rne_orgao ');
+    aSQL.Add('  , null as rne_uf ');
+    aSQL.Add('  , null as rne_dt_emissao ');
+
+    aSQL.Add('  , s.conselho_registro ');
+    aSQL.Add('  , s.conselho_orgao    ');
+    aSQL.Add('  , s.conselho_uf       ');
+    aSQL.Add('  , s.conselho_dt_emissao  ');
+    aSQL.Add('  , s.conselho_dt_validade ');
+
+    aSQL.Add('  , coalesce(s.id_horario, 0) as id_horario');
+    aSQL.Add('  , (cast(coalesce(cast(nullif(trim(h.duracao_jornada), '''') as integer), 0) / 60 as integer) * 5) as jornada_semanal');
+    aSQL.Add('from SERVIDOR s');
+    aSQL.Add('  inner join PESSOA_FISICA p on (p.id = s.id_pessoa_fisica)');
+    aSQL.Add('  left join TAB_RACA_COR r on (r.id = p.id_raca_cor)');
+    aSQL.Add('  left join ESTADO_CIVIL e on (e.id = p.id_estado_civil)');
+    aSQL.Add('  left join ESCOLARIDADE c on (c.id = p.id_escolaridade)');
+    aSQL.Add('  left join NACIONALIDADE n on (n.id = p.id_nacionalidade)');
+    aSQL.Add('  left join SUB_UNID_ORCAMENT u on (u.id = s.id_sub_unid_orcament)');
+    aSQL.Add('  left join CARGO_FUNCAO f on (f.id = coalesce(s.id_cargo_origem, s.id_cargo_atual))');
+    aSQL.Add('  left join ENTID_SINDICAL a on (a.id = s.id_entid_sindical)');
+    aSQL.Add('  left join TAB_HORARIO h on (h.id = s.id_horario)');
+    aSQL.Add('where (s.id > 0)   ');
+    aSQL.Add('  and (p.dt_nascimento is not null)');                // Sem Data de Nascimento
+    aSQL.Add('  and (coalesce(trim(p.ender_cep), '''') <> '''')');  // Sem Número de CEP
+
+    if ( StrToIntDef(OnlyNumber(aCompetencia.Codigo), 0) < (StrToInt(FormatDateTime('YYYYMM', Date)) - 1) ) then
+      // Carga inicial
+      aSQL.Add('  and (s.data_operacao <= ' + QuotedStr(FormatDateTime('yyyy.mm.dd', aDataFinal)) + ')')
+    else
+      // Aletrações do mês
+      aSQL.Add('  and (s.data_operacao between ' + QuotedStr(FormatDateTime('yyyy.mm.dd', aDataInicial)) + ' and ' + QuotedStr(FormatDateTime('yyyy.mm.dd', aDataFinal)) + ')');
+
+    case aModoLancamento of
+      mlInclusao  : aSQL.Add('  and s.tipo_operacao = ' + QuotedStr(FLAG_OPERACAO_INSERIR));
+      mlAlteracao : aSQL.Add('  and s.tipo_operacao = ' + QuotedStr(FLAG_OPERACAO_ALTERAR));
+      mlExclusao  : aSQL.Add('  and s.tipo_operacao = ' + QuotedStr(FLAG_OPERACAO_EXCLUIR));
+    end;
+
+    aSQL.EndUpdate;
+    SetSQL(aSQL);
+
+    I := 1;
+
+    aProcesso.MaxValue := cdsTabela.RecordCount;
+    aProcesso.Progress := 0;
+    Application.ProcessMessages;
+
+    ACBrESocial.Eventos.NaoPeriodicos.S2206.Clear;
+
+    cdsTabela.First;
+    while not cdsTabela.Eof do
+    begin
+      with ACBrESocial.Eventos.NaoPeriodicos.S2206.Add, EvtAltContratual, AltContratual do
+      begin
+        aEventoID := StrToInt(IncrementGenerator('GEN_ESOCIAL_EVENTO_S2206', 1));
+        Sequencial:= aEventoID;
+
+        AltContratual.dtAlteracao := Date;
+        AltContratual.dtEf        := Now;
+        AltContratual.dscAlt      := 'ALTERAÇÕES CONTRATUAIS DE ' + aCompetencia.Descricao;
+
+        if AmbienteWebServiceProducao then
+          IdeEvento.TpAmb := TpTpAmb(0) //taProducao
+        else
+          IdeEvento.TpAmb := taProducaoRestrita;
+
+        IdeEvento.indRetif := ireOriginal; // (ireOriginal, ireRetificacao);
+
+        if (IdeEvento.indRetif = ireRetificacao) then
+          IdeEvento.NrRecibo := '65.5454.987798798798' // Preencher com o número do recibo do arquivo a ser retificado.
+        else
+          IdeEvento.NrRecibo := EmptyStr;
+
+        IdeEvento.ProcEmi  := peAplicEmpregador;
+        IdeEvento.VerProc  := Versao_Executavel(ParamStr(0));
+
+        IdeEmpregador.TpInsc := tiCNPJ;
+        IdeEmpregador.NrInsc := Criptografa(Pesquisa('CONFIG_ORGAO', 'ID', '1', 'CNPJ', ''),'2', 14); //Criptografa(cdsTabela.FieldByName('CNPJ').AsString, '2', 14);
+
+        IdeVinculo.cpfTrab   := OnlyNumber(Trim(cdsTabela.FieldByName('cpf').AsString));
+        IdeVinculo.Matricula := Trim(cdsTabela.FieldByName('matricula').AsString);
+        IdeVinculo.NisTrab   := Trim(cdsTabela.FieldByName('nis_trabalhador').AsString);
+
+        with ACBrESocial.Configuracoes do
+          Geral.IdEmpregador := EvtAltContratual.IdeEmpregador.NrInsc;
+
+        with Vinculo do
+        begin
+          Matricula   := Trim(cdsTabela.FieldByName('matricula').AsString);
+          TpRegTrab   := trEstatutario; // Servidor Público
+
+          if (StrToIntDef(Trim(cdsTabela.FieldByName('tipo_previd').AsString), 0) < 2) then
+            TpRegPrev := rpRGPS  // Regime Geral da Previdência Social - RGPS
+          else
+            TpRegPrev := rpRPPS; // Regime Próprio de Previdência Social - RPPS
+        end;
+
+        with InfoRegimeTrab do
+        begin
+          with InfoCeletista do
+          begin
+            DtAdm             := cdsTabela.FieldByName('dt_admissao').AsDateTime;
+            TpAdmissao        := taAdmissao;
+            IndAdmissao       := iaNormal;
+            TpRegJor          := rjSubmetidosHorarioTrabalho;
+            NatAtividade      := navNaoInformar;
+            dtBase            := 01;               // JANEIRO
+            cnpjSindCategProf := Trim(cdsTabela.FieldByName('cnpj_sindicato').AsString);
+
+            FGTS.OpcFGTS   := ofNaoOptante;
+            FGTS.DtOpcFGTS := StrToDate(EMPTY_DATE);
+
+//              with TrabTemporario do
+//              begin
+//                hipLeg      := 1;
+//                justContr   := 'teste';
+//                tpinclContr := icLocaisSemFiliais;
+//
+//                with IdeTomadorServ do
+//                begin
+//                  TpInsc := tiCNPJ;
+//                  NrInsc := '12345678901234';
+//                  ideEstabVinc.TpInsc := tiCNPJ;
+//                  ideEstabVinc.NrInsc := '12345678901234';
+//                end;
+//
+//                IdeTrabSubstituido.Clear;
+//
+//                with IdeTrabSubstituido.Add do
+//                  CpfTrabSubst := '12345678912';
+//              end;
+//
+//              aprend.TpInsc := tpTpInsc(1);
+//              aprend.NrInsc := '98765432109';
+          end;
+
+          // Enviar apenas um tipo de admissao, que no caso de órgãos públicos é esta abaixo
+          with InfoEstatutario do
+          begin
+            IndProvim := ipNormal;
+
+            Case cdsTabela.FieldByName('id_situacao_tcm').AsInteger of
+              10:
+                TpProv := tpNomeacaoCargoComissao;
+              20..35:
+                TpProv := tpNomeacaoCargoEfetivo;
+              else
+                TpProv := tpTpProv(6); //tpOutros;
+            end;
+
+            DtNomeacao  := cdsTabela.FieldByName('dt_nomeacao').AsDateTime;  // StrToDate(EMPTY_DATE);
+            DtPosse     := cdsTabela.FieldByName('dt_posse').AsDateTime;     // StrToDate(EMPTY_DATE);
+            DtExercicio := cdsTabela.FieldByName('dt_exercicio').AsDateTime; // StrToDate(EMPTY_DATE);
+          end;
+        end;
+
+        with InfoContrato do
+        begin
+          CodCargo    := cdsTabela.FieldByName('id_cargo_origem').AsString;
+          CodFuncao   := IfThen(cdsTabela.FieldByName('id_tipo_cargo_tcm').AsInteger = 10, cdsTabela.FieldByName('id_cargo_origem').AsString, EmptyStr);
+          CodCateg    := 309; // Agente Público - Outros
+          codCarreira := EmptyStr;
+          dtIngrCarr  := StrToDate(EMPTY_DATE);
+
+          Remuneracao.VrSalFx    := cdsTabela.FieldByName('vencto_base').AsCurrency;
+          Remuneracao.UndSalFixo := sfPorMes;
+          Remuneracao.DscSalVar  := 'NADA A DECLARAR';
+
+          Duracao.TpContr := PrazoIndeterminado;
+          Duracao.dtTerm  := StrToDate(EMPTY_DATE);
+
+          with LocalTrabalho do
+          begin
+            LocalTrabGeral.TpInsc   := tiCNPJ;
+            LocalTrabGeral.NrInsc   := Criptografa(Pesquisa('CONFIG_ORGAO', 'ID', '1', 'CNPJ', ''),'2', 14);
+            LocalTrabGeral.DescComp := Criptografa(Pesquisa('CONFIG_ORGAO', 'ID', '1', 'RAZAO_SOCIAL', ''),'2', 60);
+          end;
+
+          if (cdsTabela.FieldByName('jornada_semanal').AsInteger > 0) and (cdsTabela.FieldByName('id_horario').AsInteger > 0) then
+            with HorContratual do
+            begin
+              QtdHrsSem := cdsTabela.FieldByName('jornada_semanal').AsInteger;
+              TpJornada := tjJornadaComHorarioDiarioFolgaFixos;
+              DscTpJorn := EmptyStr;
+              tmpParc   := tpNaoeTempoParcial;
+
+              horario.Clear;
+
+              with horario.Add do
+              begin
+                Dia := tpTpDia(diSegundaFeira);
+                codHorContrat := cdsTabela.FieldByName('id_horario').AsString;
+              end;
+
+              with horario.Add do
+              begin
+                Dia := tpTpDia(diTercaFeira);
+                codHorContrat := cdsTabela.FieldByName('id_horario').AsString;
+              end;
+
+              with horario.Add do
+              begin
+                Dia := tpTpDia(diQuartaFeira);
+                codHorContrat := cdsTabela.FieldByName('id_horario').AsString;
+              end;
+
+              with horario.Add do
+              begin
+                Dia := tpTpDia(diQuintaFeira);
+                codHorContrat := cdsTabela.FieldByName('id_horario').AsString;
+              end;
+
+              with horario.Add do
+              begin
+                Dia := tpTpDia(diSextaFeira);
+                codHorContrat := cdsTabela.FieldByName('id_horario').AsString;
+              end;
+            end;
+
+          FiliacaoSindical.Clear;
+
+          if (Trim(cdsTabela.FieldByName('cnpj_sindicato').AsString) <> EmptyStr) then
+            with FiliacaoSindical.Add do
+              CnpjSindTrab := cdsTabela.FieldByName('cnpj_sindicato').AsString;
+
+          // Informações do alvará judicial em caso de contratação de menores de 14 anos,
+          // em qualquer categoria, e de maiores de 14 e menores de 16, em categoria diferente de "Aprendiz".
+
+          if (cdsTabela.FieldByName('nr_idade').AsCurrency > 0) and (cdsTabela.FieldByName('nr_idade').AsCurrency < 14) then
+            AlvaraJudicial.nrProcJud := EmptyStr
+          else
+          if (cdsTabela.FieldByName('nr_idade').AsCurrency > 14) and (cdsTabela.FieldByName('nr_idade').AsCurrency < 16) then
+            AlvaraJudicial.nrProcJud := EmptyStr
+          else
+            AlvaraJudicial.nrProcJud := EmptyStr;
+
+          servPubl.mtvAlter := maOutros;
+        end;
+
+      end;
+
+      aLabel.Caption     := Trim(cdsTabela.FieldByName('nome').AsString);
+      aProcesso.Progress := I;
+      Application.ProcessMessages;
+      Inc(I);
+
+      cdsTabela.Next;
+    end;
+
+    aRetorno := True;
+    aProtocolo.S2206 := aRetorno;
+  finally
+    aSQL.Free;
+    Result := aRetorno;
+  end;
+end;
+
+function TdmESocial.Gerar_eSocial2240(aCompetencia: TCompetencia; aZerarBase: Boolean; aModoLancamento: TModoLancamento;
+  aLabel: TLabel; aProcesso: TGauge; var aProtocolo: TProtocoloESocial): Boolean;
+var
+  aRetorno : Boolean;
+  aSQL : TStringList;
+  ok   : Boolean;
+  aEventoID,
+  I : Integer;
+  aDataInicial ,
+  aDataFinal   : TDateTime;
+  aResponsavel : TResponsavel;
+begin
+  aDataInicial := aCompetencia.DataInicial;
+  aDataFinal   := aCompetencia.DataFinal;
+
+  aRetorno := False;
+  aSQL := TStringList.Create;
+  ok   := True;
+  try
+    aSQL.BeginUpdate;
+    aSQL.Clear;
+    aSQL.Add('Select');
+    aSQL.Add('    c.id_servid_fiscal as id_servidor');
+    aSQL.Add('  , s.nome_servidor');
+    aSQL.Add('  , coalesce(nullif(trim(s.pis_pasep_pf), ''''), nullif(trim(p.pis_pasep), ''''), ''00000000000'') as nis_trabalhador');
+    aSQL.Add('  , s.conselho_registro');
+    aSQL.Add('  , s.conselho_orgao');
+    aSQL.Add('  , s.conselho_uf');
+    aSQL.Add('  , s.conselho_dt_emissao');
+    aSQL.Add('  , s.conselho_dt_validade');
+    aSQL.Add('from CONFIG_ORGAO c');
+    aSQL.Add('  inner join SERVIDOR s on (s.id = c.id_servid_fiscal)');
+    aSQL.Add('  inner join PESSOA_FISICA p on (p.id = s.id_pessoa_fisica)');
+    aSQL.Add('where c.id = 1');
+    aSQL.EndUpdate;
+    SetSQL_Geral(aSQL);
+
+    with aResponsavel, Conselho do
+    begin
+      ID       := cdsGeral.FieldByName('id_servidor').AsInteger;
+      Nome     := Trim(cdsGeral.FieldByName('nome_servidor').AsString);
+      NIS      := Trim(cdsGeral.FieldByName('nis_trabalhador').AsString);
+      Numero   := Trim(cdsGeral.FieldByName('conselho_registro').AsString);
+      Orgao    := Trim(cdsGeral.FieldByName('conselho_orgao').AsString);
+      UF       := Trim(cdsGeral.FieldByName('conselho_uf').AsString);
+      Emissao  := cdsGeral.FieldByName('conselho_dt_emissao').AsDateTime;
+      Validade := cdsGeral.FieldByName('conselho_dt_validade').AsDateTime;
+    end;
+
+    cdsGeral.Close;
+
+    aSQL.BeginUpdate;
+    aSQL.Clear;
+    aSQL.Add('Select ');
+    aSQL.Add('    s.* ');
+    aSQL.Add('  , p.cpf');
+    aSQL.Add('  , coalesce(nullif(trim(s.pis_pasep_pf), ''''), nullif(trim(p.pis_pasep), ''''), ''00000000000'') as nis_trabalhador');
+    aSQL.Add('  , d.descricao as dep_descricao');
+    aSQL.Add('  , c.descricao as fun_descricao');
+    aSQL.Add('from SERVIDOR s');
+    aSQL.Add('  inner join PESSOA_FISICA p on (p.id = s.id_pessoa_fisica)');
+    aSQL.Add('  inner join DEPTO d on (d.id = s.id_depto)');
+    aSQL.Add('  inner join CARGO_FUNCAO c on (c.id = coalesce(s.id_cargo_atual, s.id_cargo_origem))');
+    aSQL.Add('where (s.id > 0)   ');
+
+    if ( StrToIntDef(OnlyNumber(aCompetencia.Codigo), 0) < (StrToInt(FormatDateTime('YYYYMM', Date)) - 1) ) then
+      // Carga inicial
+      aSQL.Add('  and (s.data_operacao <= ' + QuotedStr(FormatDateTime('yyyy.mm.dd', aDataFinal)) + ')')
+    else
+      // Aletrações do mês
+      aSQL.Add('  and (s.data_operacao between ' + QuotedStr(FormatDateTime('yyyy.mm.dd', aDataInicial)) + ' and ' + QuotedStr(FormatDateTime('yyyy.mm.dd', aDataFinal)) + ')');
+
+    case aModoLancamento of
+      mlInclusao  : aSQL.Add('  and (s.tipo_operacao = ' + QuotedStr(FLAG_OPERACAO_INSERIR) + ')');
+      mlAlteracao : aSQL.Add('  and (s.tipo_operacao = ' + QuotedStr(FLAG_OPERACAO_ALTERAR) + ')');
+      mlExclusao  : aSQL.Add('  and (s.tipo_operacao = ' + QuotedStr(FLAG_OPERACAO_EXCLUIR) + ')');
+    end;
+
+    aSQL.EndUpdate;
+    SetSQL(aSQL);
+
+    I := 1;
+
+    aProcesso.MaxValue := cdsTabela.RecordCount;
+    aProcesso.Progress := 0;
+    Application.ProcessMessages;
+
+    ACBrESocial.Eventos.NaoPeriodicos.S2240.Clear;
+
+    cdsTabela.First;
+    while not cdsTabela.Eof do
+    begin
+      with ACBrESocial.Eventos.NaoPeriodicos.S2240.Add, EvtExpRisco do
+      begin
+        aEventoID := StrToInt(IncrementGenerator('GEN_ESOCIAL_EVENTO_S2240', 1));
+        Sequencial:= aEventoID;
+
+        if AmbienteWebServiceProducao then
+          IdeEvento.TpAmb := TpTpAmb(0) //taProducao
+        else
+          IdeEvento.TpAmb := taProducaoRestrita;
+
+        IdeEvento.indRetif := ireOriginal; // (ireOriginal, ireRetificacao);
+
+        if (IdeEvento.indRetif = ireRetificacao) then
+          IdeEvento.NrRecibo := '65.5454.987798798798' // Preencher com o número do recibo do arquivo a ser retificado.
+        else
+          IdeEvento.NrRecibo := EmptyStr;
+
+        IdeEvento.ProcEmi  := peAplicEmpregador;
+        IdeEvento.VerProc  := Versao_Executavel(ParamStr(0));
+
+        IdeEmpregador.TpInsc := tiCNPJ;
+        IdeEmpregador.NrInsc := Criptografa(Pesquisa('CONFIG_ORGAO', 'ID', '1', 'CNPJ', ''),'2', 14); //Criptografa(cdsTabela.FieldByName('CNPJ').AsString, '2', 14);
+
+        IdeVinculo.cpfTrab   := OnlyNumber(Trim(cdsTabela.FieldByName('cpf').AsString));
+        IdeVinculo.Matricula := Trim(cdsTabela.FieldByName('matricula').AsString);
+        IdeVinculo.NisTrab   := Trim(cdsTabela.FieldByName('nis_trabalhador').AsString);
+
+        with ACBrESocial.Configuracoes do
+          Geral.IdEmpregador := EvtExpRisco.IdeEmpregador.NrInsc;
+
+        with infoExpRisco do
+        begin
+          if (aModoLancamento in [mlInclusao, mlAlteracao]) then
+            with iniExpRisco do
+            begin
+              dtCondicao := Date;
+
+              InfoAmb.Clear;
+
+              with InfoAmb.Add do
+              begin
+                codAmb              := Trim(cdsTabela.FieldByName('id_depto').AsString);
+                InfoAtiv.dscAtivDes := Trim(cdsTabela.FieldByName('fun_descricao').AsString);
+
+                FatRisco.Clear;
+
+                aSQL.BeginUpdate;
+                aSQL.Clear;
+                aSQL.Add('Select ');
+                aSQL.Add('    f.id_fator_risco as codigo ');
+                aSQL.Add('from DEPTO_FATOR_RISCO f ');
+                aSQL.Add('where (f.id_depto = ' + Trim(cdsTabela.FieldByName('id').AsString) + ') ');
+
+                aSQL.EndUpdate;
+                SetSQL_Detalhe(aSQL);
+
+                cdsDetalhe.First;
+                if (cdsDetalhe.RecordCount > 0) then
+                begin
+
+                  while not cdsDetalhe.Eof do
+                  begin
+                    with FatRisco.Add do
+                    begin
+                      codFatRis  := Trim(cdsDetalhe.FieldByName('codigo').AsString);
+                      intConc    := 'N/A';
+                      tecMedicao := EmptyStr;
+
+                      with epcEpi do
+                      begin
+                        utilizEPC := uEPCNaoAplica;
+                        utilizEPI := uEPINaoAplica;
+
+                        epc.Clear;
+      //
+      //                  with epc.Add do
+      //                  begin
+      //                    dscEpc  := 'Descrição do EPC 1';
+      //                    eficEpc := tpSim;
+      //                  end;
+
+                        epi.Clear;
+      //
+      //                  with epi.Add do
+      //                  begin
+      //                    caEPI         := '321654';
+      //                    eficEpi       := tpSim;
+      //                    medProtecao   := tpSim;
+      //                    condFuncto    := tpSim;
+      //                    przValid      := tpSim;
+      //                    periodicTroca := tpSim;
+      //                    higienizacao  := tpSim;
+      //                  end;
+                      end;
+                    end;
+
+                    cdsDetalhe.Next;
+                  end;
+
+                end
+                else
+                  with FatRisco.Add do
+                  begin
+                    codFatRis := '0901001'; // Ausência de Fator de Risco
+                    with epcEpi do
+                    begin
+                      utilizEPC := uEPCNaoAplica;
+                      utilizEPI := uEPINaoAplica;
+
+                      epc.Clear;
+                      epi.Clear;
+                    end;
+                  end;
+
+                cdsDetalhe.Close;
+              end;
+            end;
+
+          // Alteração das informações de condições de ambiente de trabalho, opcional
+          if (aModoLancamento = mlAlteracao) then
+            with altExpRisco do
+            begin
+              dtCondicao := Date;
+
+              InfoAmb.Clear;
+
+              with InfoAmb.Add do
+              begin
+                codAmb              := Trim(cdsTabela.FieldByName('id_depto').AsString);
+                InfoAtiv.dscAtivDes := Trim(cdsTabela.FieldByName('fun_descricao').AsString);
+
+                FatRisco.Clear;
+
+                aSQL.BeginUpdate;
+                aSQL.Clear;
+                aSQL.Add('Select ');
+                aSQL.Add('    f.id_fator_risco as codigo ');
+                aSQL.Add('from DEPTO_FATOR_RISCO f ');
+                aSQL.Add('where (f.id_depto = ' + Trim(cdsTabela.FieldByName('id').AsString) + ') ');
+
+                aSQL.EndUpdate;
+                SetSQL_Detalhe(aSQL);
+
+                cdsDetalhe.First;
+                if (cdsDetalhe.RecordCount > 0) then
+                begin
+
+                  while not cdsDetalhe.Eof do
+                  begin
+                    with FatRisco.Add do
+                    begin
+                      codFatRis  := Trim(cdsDetalhe.FieldByName('codigo').AsString);
+                      intConc    := 'N/A';
+                      tecMedicao := EmptyStr;
+
+                      with epcEpi do
+                      begin
+                        utilizEPC := uEPCNaoAplica;
+                        utilizEPI := uEPINaoAplica;
+
+                        epc.Clear;
+      //
+      //                  with epc.Add do
+      //                  begin
+      //                    dscEpc  := 'Descrição do EPC 1';
+      //                    eficEpc := tpSim;
+      //                  end;
+
+                        epi.Clear;
+      //
+      //                  with epi.Add do
+      //                  begin
+      //                    caEPI         := '321654';
+      //                    eficEpi       := tpSim;
+      //                    medProtecao   := tpSim;
+      //                    condFuncto    := tpSim;
+      //                    przValid      := tpSim;
+      //                    periodicTroca := tpSim;
+      //                    higienizacao  := tpSim;
+      //                  end;
+                      end;
+                    end;
+
+                    cdsDetalhe.Next;
+                  end;
+
+                end
+                else
+                  with FatRisco.Add do
+                  begin
+                    codFatRis := '0901001'; // Ausência de Fator de Risco
+                    with epcEpi do
+                    begin
+                      utilizEPC := uEPCNaoAplica;
+                      utilizEPI := uEPINaoAplica;
+
+                      epc.Clear;
+                      epi.Clear;
+                    end;
+                  end;
+
+                cdsDetalhe.Close;
+              end;
+            end;
+
+          // FimExpRisco - opcional, informar quando o trabalhador não se sujeitar mais as condições de ambiente informadas anteriormente
+          if (aModoLancamento = mlExclusao) then
+            with fimExpRisco do
+            begin
+              dtFimCondicao := Date;
+
+              infoAmb.Clear;
+
+              with InfoAmb.Add do
+                codAmb := Trim(cdsTabela.FieldByName('id_depto').AsString);
+            end;
+
+          respReg.Clear;
+
+          // Informações relativas ao responsável pelos registros ambientais
+          with respReg.Add, aResponsavel do
+          begin
+            dtIni   := Conselho.Emissao;
+            dtFim   := Conselho.Validade;
+            NisResp := NIS;
+            NrOc    := Conselho.Numero;
+            ufOC    := eSStrTouf(ok, Conselho.UF);
+          end;
+        end;
+      end;
+
+      aLabel.Caption     := Trim(cdsTabela.FieldByName('nome_servidor').AsString);
+      aProcesso.Progress := I;
+      Application.ProcessMessages;
+      Inc(I);
+
+      cdsTabela.Next;
+    end;
+
+    aRetorno := True;
+    aProtocolo.S2240 := aRetorno;
   finally
     aSQL.Free;
     Result := aRetorno;
@@ -2554,6 +3632,7 @@ var
   x ,
   i : Integer;
   s : String;
+  c : TCompetencia;
 begin
   x := 0;
   s := FormatDateTime('YYYY', Date);
@@ -2562,13 +3641,86 @@ begin
   try
     for I := 1 to 12 do
     begin
-      aLista.Items.Add(s + '-' + FormatFloat('00', I));
+      c := TCompetencia.Criar;
+      c.DataInicial := StrToDate('01/' + FormatFloat('00', I) + '/' + s);
+      c.DataFinal   := StrToDate(FormatFloat('00', DaysInMonth(c.DataInicial)) + FormatDateTime('/mm/yyyy', c.DataInicial));
+      c.Codigo      := s + '-' + FormatFloat('00', I);
+      c.Descricao   := FormatDateTime('mmmm"/"yyyy', c.DataInicial);
+
+      aLista.Items.AddObject(c.Codigo, c);
+      //aLista.Items.Add(s + '-' + FormatFloat('00', I));
       if (I = StrToInt(FormatDateTime('mm', Date)) ) then
         x := aLista.Items.Count - 1;
     end;
   finally
     aLista.Items.EndUpdate;
     aLista.ItemIndex := x;
+  end;
+end;
+
+procedure TdmESocial.ListarCompetenciasAdmissao(aLista: TComboBox);
+var
+  aSQL : TStringList;
+  x ,
+  i : Integer;
+  s : String;
+  c : TCompetencia;
+begin
+  aLista.Items.BeginUpdate;
+  aLista.Items.Clear;
+
+  aSQL := TStringList.Create;
+  try
+    aSQL.BeginUpdate;
+    aSQL.Clear;
+    aSQL.Add('Select distinct');
+    aSQL.Add('    extract(year from coalesce(s.dt_readmissao, s.dt_admissao)) || ''-'' ||');
+    aSQL.Add('    right(''00'' || extract(month from coalesce(s.dt_readmissao, s.dt_admissao)), 2) as cmp_admissao');
+    aSQL.Add('  , extract(year from coalesce(s.dt_readmissao, s.dt_admissao))                      as ano_admissao');
+    aSQL.Add('  , right(''00'' || extract(month from coalesce(s.dt_readmissao, s.dt_admissao)), 2) as mes_admissao');
+    aSQL.Add('from SERVIDOR s');
+    aSQL.Add('where extract(year from coalesce(s.dt_readmissao, s.dt_admissao)) <>  extract(year from current_date)');
+    aSQL.Add('order by');
+    aSQL.Add('1');
+    aSQL.EndUpdate;
+
+    SetSQL_Geral(aSQL);
+
+    cdsGeral.First;
+    while not cdsGeral.Eof do
+    begin
+      c := TCompetencia.Criar;
+      c.DataInicial := StrToDate('01/' + cdsGeral.FieldByName('mes_admissao').AsString + '/' + cdsGeral.FieldByName('ano_admissao').AsString);
+      c.DataFinal   := StrToDate(FormatFloat('00', DaysInMonth(c.DataInicial)) + FormatDateTime('/mm/yyyy', c.DataInicial));
+      c.Codigo      := cdsGeral.FieldByName('ano_admissao').AsString + '-' + cdsGeral.FieldByName('mes_admissao').AsString;
+      c.Descricao   := FormatDateTime('mmmm"/"yyyy', c.DataInicial);
+
+      aLista.Items.AddObject(c.Codigo, c);
+      cdsGeral.Next;
+    end;
+    cdsGeral.Close;
+
+    x := 0;
+    s := FormatDateTime('YYYY', Date);
+    I := 1;
+
+    for I := 1 to 12 do
+    begin
+      c := TCompetencia.Criar;
+      c.DataInicial := StrToDate('01/' + FormatFloat('00', I) + '/' + s);
+      c.DataFinal   := StrToDate(FormatFloat('00', DaysInMonth(c.DataInicial)) + FormatDateTime('/mm/yyyy', c.DataInicial));
+      c.Codigo      := s + '-' + FormatFloat('00', I);
+      c.Descricao   := FormatDateTime('mmmm"/"yyyy', c.DataInicial);
+
+      aLista.Items.AddObject(c.Codigo, c);
+      if (I = StrToInt(FormatDateTime('mm', Date)) ) then
+        x := aLista.Items.Count - 1;
+    end;
+  finally
+    aLista.Items.EndUpdate;
+    aLista.ItemIndex := x;
+
+    aSQL.Free;
   end;
 end;
 
@@ -2621,6 +3773,22 @@ begin
   end;
 end;
 
+procedure TdmESocial.SetSQL_Geral(aSQL: TStringList);
+begin
+  if cdsGeral.Active then
+    cdsGeral.Close;
+
+  qryGeral.SQL.BeginUpdate;
+  qryGeral.SQL.Clear;
+  try
+    qryGeral.SQL.AddStrings(aSQL);
+  finally
+    qryGeral.SQL.EndUpdate;
+    cdsGeral.FetchParams;
+    cdsGeral.Open;
+  end;
+end;
+
 { TProtocoloESocial }
 
 constructor TProtocoloESocial.Create(Value : String);
@@ -2644,7 +3812,16 @@ begin
   aS1060 := False;
   aS1070 := False;
   aS1080 := False;
-  S2200  := False;
+  aS2200 := False;
+  aS2205 := False;
+  aS2206 := False;
+  aS2210 := False;
+  aS2220 := False;
+  aS2230 := False;
+  aS2240 := False;
+  aS2241 := False;
+  aS2250 := False;
+  aS2260 := False;
 end;
 
 procedure TProtocoloESocial.SetNumeroInscricao(Value: String);

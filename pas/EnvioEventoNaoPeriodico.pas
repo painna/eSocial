@@ -44,6 +44,7 @@ type
     procedure btnOkClick(Sender: TObject);
 
     function GetESocial : TACBreSocial;
+    procedure gpbOperacaoClick(Sender: TObject);
   private
     { Private declarations }
     property eSocial : TACBreSocial read GetESocial;
@@ -112,7 +113,7 @@ end;
 procedure TfrmEnvioEventoNaoPeriodico.FormCreate(Sender: TObject);
 begin
   inherited;
-  dmESocial.ListarCompetencias(cmbAnoMes);
+  dmESocial.ListarCompetenciasAdmissao(cmbAnoMes);
   LimparPainelProcesso(False);
 //  cbS1035.Enabled := (Pesquisa('CONFIG_ESOCIAL', 'ID_CONFIG_ORGAO', '1', 'POSSUI_TABELA_CARREIRA', '') = FLAG_SIM);
 end;
@@ -154,9 +155,21 @@ begin
         aProtocolo := TProtocoloESocial.Create(EmptyStr);
 
         if aRetorno and cbS2190.Checked then
-          aRetorno := dmESocial.Gerar_eSocial2190(cmbAnoMes.Text, Checb_ZeraBase.Checked, mlInclusao, lblProcesso, gagProcesso, aProtocolo);
+          aRetorno := dmESocial.Gerar_eSocial2190(TCompetencia(cmbAnoMes.Items.Objects[cmbAnoMes.ItemIndex]), Checb_ZeraBase.Checked, mlInclusao, lblProcesso, gagProcesso, aProtocolo);
         if aRetorno and cbS2200.Checked  then
-          aRetorno := dmESocial.Gerar_eSocial2200(cmbAnoMes.Text, Checb_ZeraBase.Checked, mlInclusao, lblProcesso, gagProcesso, aProtocolo);
+          aRetorno := dmESocial.Gerar_eSocial2200(TCompetencia(cmbAnoMes.Items.Objects[cmbAnoMes.ItemIndex]), Checb_ZeraBase.Checked, mlInclusao, lblProcesso, gagProcesso, aProtocolo);
+        if aRetorno and cbS2205.Checked  then
+          aRetorno := dmESocial.Gerar_eSocial2205(TCompetencia(cmbAnoMes.Items.Objects[cmbAnoMes.ItemIndex]), Checb_ZeraBase.Checked, mlAlteracao, lblProcesso, gagProcesso, aProtocolo);
+        if aRetorno and cbS2206.Checked  then
+          aRetorno := dmESocial.Gerar_eSocial2206(TCompetencia(cmbAnoMes.Items.Objects[cmbAnoMes.ItemIndex]), Checb_ZeraBase.Checked, mlAlteracao, lblProcesso, gagProcesso, aProtocolo);
+        if aRetorno and cbS2210.Checked  then
+          aRetorno := dmESocial.Gerar_eSocial2210(TCompetencia(cmbAnoMes.Items.Objects[cmbAnoMes.ItemIndex]), Checb_ZeraBase.Checked, mlInclusao, lblProcesso, gagProcesso, aProtocolo);
+        if aRetorno and cbS2220.Checked  then
+          aRetorno := dmESocial.Gerar_eSocial2220(TCompetencia(cmbAnoMes.Items.Objects[cmbAnoMes.ItemIndex]), Checb_ZeraBase.Checked, mlInclusao, lblProcesso, gagProcesso, aProtocolo);
+        if aRetorno and cbS2230.Checked  then
+          aRetorno := dmESocial.Gerar_eSocial2230(TCompetencia(cmbAnoMes.Items.Objects[cmbAnoMes.ItemIndex]), Checb_ZeraBase.Checked, mlInclusao, lblProcesso, gagProcesso, aProtocolo);
+        if aRetorno and cbS2240.Checked  then
+          aRetorno := dmESocial.Gerar_eSocial2240(TCompetencia(cmbAnoMes.Items.Objects[cmbAnoMes.ItemIndex]), Checb_ZeraBase.Checked, aModoLancamento, lblProcesso, gagProcesso, aProtocolo);
 //        if aRetorno and cbS1010.Checked  then
 //          aRetorno := dmESocial.Gerar_eSocial1010(cmbAnoMes.Text, Checb_ZeraBase.Checked, aModoLancamento, lblProcesso, gagProcesso, aProtocolo);
 //        if aRetorno and cbS1020.Checked  then
@@ -208,6 +221,25 @@ end;
 function TfrmEnvioEventoNaoPeriodico.GetESocial: TACBreSocial;
 begin
   Result := dmESocial.ACBrESocial;
+end;
+
+procedure TfrmEnvioEventoNaoPeriodico.gpbOperacaoClick(Sender: TObject);
+begin
+  cbS2200.Enabled := (gpbOperacao.ItemIndex = 0);
+  cbS2205.Enabled := (gpbOperacao.ItemIndex = 1);
+  cbS2206.Enabled := (gpbOperacao.ItemIndex = 1);
+  cbS2210.Enabled := (gpbOperacao.ItemIndex = 0);
+  cbS2220.Enabled := (gpbOperacao.ItemIndex = 0);
+  cbS2230.Enabled := (gpbOperacao.ItemIndex = 0);
+  cbS2240.Enabled := (gpbOperacao.ItemIndex = 0) or (gpbOperacao.ItemIndex = 1);
+
+  if not cbS2200.Enabled then cbS2200.Checked := False;
+  if not cbS2205.Enabled then cbS2205.Checked := False;
+  if not cbS2206.Enabled then cbS2206.Checked := False;
+  if not cbS2210.Enabled then cbS2210.Checked := False;
+  if not cbS2220.Enabled then cbS2220.Checked := False;
+  if not cbS2230.Enabled then cbS2230.Checked := False;
+  if not cbS2240.Enabled then cbS2240.Checked := False;
 end;
 
 procedure TfrmEnvioEventoNaoPeriodico.LimparPainelProcesso(aVisualizar: Boolean);

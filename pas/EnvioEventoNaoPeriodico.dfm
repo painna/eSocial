@@ -97,6 +97,7 @@ inherited frmEnvioEventoNaoPeriodico: TfrmEnvioEventoNaoPeriodico
         'Altera'#231#227'o'
         'Exclus'#227'o')
       TabOrder = 1
+      OnClick = gpbOperacaoClick
     end
     object cmbAnoMes: TComboBox
       Left = 12
@@ -153,6 +154,7 @@ inherited frmEnvioEventoNaoPeriodico: TfrmEnvioEventoNaoPeriodico
       Height = 17
       Caption = 'S-2200 -  Evento Admiss'#227'o'
       Ctl3D = False
+      Enabled = False
       ParentCtl3D = False
       TabOrder = 2
     end
@@ -182,9 +184,19 @@ inherited frmEnvioEventoNaoPeriodico: TfrmEnvioEventoNaoPeriodico
       Width = 243
       Height = 17
       Caption = 'S-2210 - Comunica'#231#227'o de Acidente de Trabalho'
+      Color = 14938356
       Ctl3D = False
+      DoubleBuffered = False
       Enabled = False
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clBlack
+      Font.Height = -11
+      Font.Name = 'Tahoma'
+      Font.Style = []
+      ParentColor = False
       ParentCtl3D = False
+      ParentDoubleBuffered = False
+      ParentFont = False
       TabOrder = 5
     end
     object cbS2220: TCheckBox
@@ -193,9 +205,17 @@ inherited frmEnvioEventoNaoPeriodico: TfrmEnvioEventoNaoPeriodico
       Width = 270
       Height = 17
       Caption = 'S-2220 -  Monitoramento da Sa'#250'de do Trabalhador'
+      Color = 14938356
       Ctl3D = False
       Enabled = False
+      Font.Charset = DEFAULT_CHARSET
+      Font.Color = clBlack
+      Font.Height = -11
+      Font.Name = 'Tahoma'
+      Font.Style = []
+      ParentColor = False
       ParentCtl3D = False
+      ParentFont = False
       TabOrder = 6
     end
     object cbS2240: TCheckBox
@@ -257,7 +277,7 @@ inherited frmEnvioEventoNaoPeriodico: TfrmEnvioEventoNaoPeriodico
       Top = 24
       Width = 300
       Height = 17
-      Caption = 'S-2260 Convoca'#231#227'o para Trabalho Intermitente'
+      Caption = 'S-2260 - Convoca'#231#227'o para Trabalho Intermitente'
       Enabled = False
       TabOrder = 12
     end

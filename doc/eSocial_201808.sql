@@ -786,3 +786,231 @@ SET TIPO_OPERACAO = 'I';
 
 ALTER TABLE PESSOA_FISICA ALTER DEFIFIENTE_COTA TO DEFICIENTE_COTA;
 
+
+
+/*------ GERASYS.TI 09/09/2018 09:49:25 --------*/
+
+/*!!! Error occured !!!
+Invalid token.
+Dynamic SQL Error.
+SQL error code = -104.
+Token unknown - line 68, column 34.
+).
+
+*/
+
+/*------ GERASYS.TI 09/09/2018 10:00:17 --------*/
+
+/*!!! Error occured !!!
+Invalid token.
+Dynamic SQL Error.
+SQL error code = -104.
+Token unknown - line 69, column 53.
+=.
+
+*/
+
+/*------ GERASYS.TI 09/09/2018 11:26:59 --------*/
+
+/*!!! Error occured !!!
+Overflow occurred during data type conversion.
+conversion error from string "28/02/1980".
+
+*/
+
+/*------ GERASYS.TI 09/09/2018 12:52:02 --------*/
+
+/*!!! Error occured !!!
+Invalid token.
+Dynamic SQL Error.
+SQL error code = -104.
+Token unknown - line 3, column 3.
+right.
+
+*/
+
+/*------ GERASYS.TI 09/09/2018 12:53:20 --------*/
+
+/*!!! Error occured !!!
+Invalid token.
+Dynamic SQL Error.
+SQL error code = -104.
+Token unknown - line 4, column 81.
+||.
+
+*/
+
+
+/*------ GERASYS.TI 09/09/2018 13:53:21 --------*/
+
+ALTER TABLE PESSOA_FISICA
+    ADD TIPO_OPERACAO ESOCIAL_OPERACAO;
+
+COMMENT ON COLUMN PESSOA_FISICA.TIPO_OPERACAO IS
+'eSocial - Operacao do registro:
+I - Inclusao
+A - Alteracao
+E - Exclusao
+P - Processado/Enviado';
+
+
+
+
+/*------ GERASYS.TI 09/09/2018 13:53:33 --------*/
+
+UPDATE PESSOA_FISICA
+SET TIPO_OPERACAO = 'A';
+
+
+
+
+/*------ GERASYS.TI 09/09/2018 14:09:40 --------*/
+
+CREATE DOMAIN ESOCIAL_DATA AS
+DATE;COMMENT ON DOMAIN ESOCIAL_DATA IS 'eSocial - Data da operacao de insercao ou edicao do registro:';
+
+
+
+
+/*------ GERASYS.TI 09/09/2018 14:10:08 --------*/
+
+ALTER TABLE PESSOA_FISICA
+    ADD DATA_OPERACAO ESOCIAL_DATA;
+
+COMMENT ON COLUMN PESSOA_FISICA.DATA_OPERACAO IS
+'eSocial - Data da operacao de insercao ou edicao do registro:';
+
+
+
+
+/*------ GERASYS.TI 09/09/2018 15:01:23 --------*/
+
+ALTER TABLE SERVIDOR
+    ADD DATA_OPERACAO ESOCIAL_DATA;
+
+COMMENT ON COLUMN SERVIDOR.DATA_OPERACAO IS
+'eSocial - Data da operacao de insercao ou edicao do registro:';
+
+
+
+
+/*------ GERASYS.TI 09/09/2018 18:26:25 --------*/
+
+ALTER TABLE CONFIG_ORGAO
+    ADD ID_SERVID_FICAL "INTEGER";
+
+COMMENT ON COLUMN CONFIG_ORGAO.ID_SERVID_FICAL IS
+'eSocial - Servidor responsavel pela fiscalizacao do ambiente de trabalho/risco.';
+
+alter table CONFIG_ORGAO
+alter ID position 1;
+
+alter table CONFIG_ORGAO
+alter RAZAO_SOCIAL position 2;
+
+alter table CONFIG_ORGAO
+alter SIGLA position 3;
+
+alter table CONFIG_ORGAO
+alter CNPJ position 4;
+
+alter table CONFIG_ORGAO
+alter TIPO_ORGAO position 5;
+
+alter table CONFIG_ORGAO
+alter ENDER_LOGRAD position 6;
+
+alter table CONFIG_ORGAO
+alter ENDER_NUM position 7;
+
+alter table CONFIG_ORGAO
+alter ENDER_BAIRRO position 8;
+
+alter table CONFIG_ORGAO
+alter ENDER_CIDADE position 9;
+
+alter table CONFIG_ORGAO
+alter ENDER_CEP position 10;
+
+alter table CONFIG_ORGAO
+alter ENDER_UF position 11;
+
+alter table CONFIG_ORGAO
+alter TELEFONE position 12;
+
+alter table CONFIG_ORGAO
+alter NOME_DIR_DRH position 13;
+
+alter table CONFIG_ORGAO
+alter COD_CNAE position 14;
+
+alter table CONFIG_ORGAO
+alter COD_FPAS position 15;
+
+alter table CONFIG_ORGAO
+alter COD_NATUREZA_JURIDICA position 16;
+
+alter table CONFIG_ORGAO
+alter COD_MUNICIPIO_RAIS position 17;
+
+alter table CONFIG_ORGAO
+alter COD_MUNICIPIO_TCM position 18;
+
+alter table CONFIG_ORGAO
+alter BRASAO position 19;
+
+alter table CONFIG_ORGAO
+alter LOGO_ADMIN position 20;
+
+alter table CONFIG_ORGAO
+alter VER_EXE position 21;
+
+alter table CONFIG_ORGAO
+alter DT_VER_EXE position 22;
+
+alter table CONFIG_ORGAO
+alter NOME_PASTA_ATUALIZA_EXE position 23;
+
+alter table CONFIG_ORGAO
+alter TIPO_CONTRA_CHEQUE position 24;
+
+alter table CONFIG_ORGAO
+alter ID_SERVID_GESTOR position 25;
+
+alter table CONFIG_ORGAO
+alter NOME_SERVID_GESTOR position 26;
+
+alter table CONFIG_ORGAO
+alter DESCR_TIPO_ORGAO position 27;
+
+alter table CONFIG_ORGAO
+alter ID_SERVID_FICAL position 28;
+
+alter table CONFIG_ORGAO
+alter ANO_MES_TRAVA position 29;
+
+alter table CONFIG_ORGAO
+alter COD_CLI_RH_TRANSP position 30;
+
+alter table CONFIG_ORGAO
+alter COD_ORGAO_TCM position 31;
+
+alter table CONFIG_ORGAO
+alter COD_HASH_DRH_TRANSP position 32;
+
+alter table CONFIG_ORGAO
+alter E_MAIL position 33;
+
+alter table CONFIG_ORGAO
+alter PRAZO_LICENCA position 34;
+
+alter table CONFIG_ORGAO
+alter TIPO_OPERACAO position 35;
+
+
+
+
+/*------ GERASYS.TI 09/09/2018 18:26:34 --------*/
+
+ALTER TABLE CONFIG_ORGAO ALTER ID_SERVID_FICAL TO ID_SERVID_FISCAL;
+
