@@ -66,8 +66,10 @@ type
       aDescricao  : String;
       aDataInicial,
       aDataFinal  : TDateTime;
+      function GetId : Integer;
       function GetDescricao : String;
     public
+      property ID : Integer read GetId;
       property Codigo      : String read aCodigo write aCodigo;
       property Descricao   : String read GetDescricao write aDescricao;
       property DataInicial : TDateTime read aDataInicial write aDataInicial;
@@ -192,6 +194,16 @@ type
     function ProximaCompetencia(aCompetencia : String) : String;
   public
     { Public declarations }
+    flOperacao_eS1000 ,
+    flOperacao_eS1005 ,
+    flOperacao_eS1010 ,
+    flOperacao_eS1020 ,
+    flOperacao_eS1030 ,
+    flOperacao_eS1035 ,
+    flOperacao_eS1040 ,
+    flOperacao_eS1050 ,
+    flOperacao_eS1060 : TextFile;
+
     property MensagemRetorno : TStringList read GetMensagemRetorno;
 
     procedure ListarCompetencias(aLista : TComboBox);
@@ -265,6 +277,15 @@ type
     function Gerar_eSocial2240(aCompetencia : TCompetencia; aZerarBase : Boolean;
       aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge;
       var aProtocolo : TProtocoloESocial) : Boolean;
+    function Gerar_eSocial2241(aCompetencia : TCompetencia; aZerarBase : Boolean;
+      aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge;
+      var aProtocolo : TProtocoloESocial) : Boolean;
+    function Gerar_eSocial2250(aCompetencia : TCompetencia; aZerarBase : Boolean;
+      aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge;
+      var aProtocolo : TProtocoloESocial) : Boolean;                         virtual; abstract;
+    function Gerar_eSocial2260(aCompetencia : TCompetencia; aZerarBase : Boolean;
+      aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge;
+      var aProtocolo : TProtocoloESocial) : Boolean;                         virtual; abstract;
 
     function ConfigurarCertificado(const AOwner : TComponent) : Boolean;
     function EventoEnviado_eSocial(aGrupo : TeSocialGrupo; aCompetencia : String;
@@ -289,7 +310,9 @@ const
 
   EMPTY_DATE = '30/12/1899';
 
-  ID_NACIONALIDADE_BRASIL = '105';
+  ID_NACIONALIDADE_BRASIL        = '105';
+  ID_ESTADO_FUNCIONAL_DEMITIDO   = 6;
+  ID_ESTADO_FUNCIONAL_APOSENTADO = 10;
 
 implementation
 
@@ -309,6 +332,11 @@ begin
   aDescricao   := EmptyStr;
   aDataInicial := StrToDate(EMPTY_DATE);
   aDataFinal   := StrToDate(EMPTY_DATE);
+end;
+
+function TCompetencia.GetId : Integer;
+begin
+  Result := StrToIntDef(StringReplace(aCodigo, '-', '', [rfReplaceAll]) , 0);
 end;
 
 function TCompetencia.GetDescricao : String;
@@ -484,6 +512,8 @@ end
 end;
 
 procedure TdmESocial.DataModuleCreate(Sender: TObject);
+var
+  aLog : String;
 begin
   aForm := TfrmConfigurarCertificado.Create(Self);
   aForm.btnSalvarConfig.OnClick := btnSalvar;
@@ -496,6 +526,9 @@ begin
 //    ForceDirectories(ACBrIntegrador.PastaInput);
 //  if not DirectoryExists(ACBrIntegrador.PastaOutput) then
 //    ForceDirectories(ACBrIntegrador.PastaOutput);
+  aLog := ExtractFilePath(ParamStr(0)) + '\log\';
+  if not DirectoryExists(aLog) then
+    ForceDirectories(aLog);
 end;
 
 procedure TdmESocial.DataModuleDestroy(Sender: TObject);
@@ -634,7 +667,12 @@ var
   ok   : Boolean;
   aEventoID,
   I    : Integer;
+  aFileProcesso : String;
 begin
+  aFileProcesso := '.\log\eS1000.txt';
+  AssignFile(flOperacao_eS1000, aFileProcesso);
+  Rewrite(flOperacao_eS1000);
+
   aRetorno := False;
   aSQL := TStringList.Create;
   ok   := True;
@@ -727,12 +765,15 @@ begin
       raise Exception.Create('Dados de configuração de eSocial ainda não foram informado!');
 
     aSQL.BeginUpdate;
+
     case aModoLancamento of
       mlInclusao  : aSQL.Add('  and e.tipo_operacao = ' + QuotedStr(FLAG_OPERACAO_INSERIR));
       mlAlteracao : aSQL.Add('  and e.tipo_operacao = ' + QuotedStr(FLAG_OPERACAO_ALTERAR));
       mlExclusao  : aSQL.Add('  and e.tipo_operacao = ' + QuotedStr(FLAG_OPERACAO_EXCLUIR));
     end;
+
     aSQL.EndUpdate;
+    aSQL.SaveToFile('.\log\eS1000.sql');
     SetSQL(aSQL);
 
     I := 1;
@@ -844,12 +885,15 @@ begin
       Application.ProcessMessages;
       Inc(I);
 
+      Writeln(flOperacao_eS1000, 'S1000|' + FormatFloat('0000000000', cdsTabela.FieldByName('ID').AsInteger));
       cdsTabela.Next;
     end;
 
     aRetorno := True;
     aProtocolo.s1000 := aRetorno;
   finally
+    CloseFile(flOperacao_eS1000);
+
     aSQL.Free;
     Result := aRetorno;
   end;
@@ -863,7 +907,12 @@ var
   ok   : Boolean;
   I    : Integer;
   aDataImplantacao : TDateTime;
+  aFileProcesso : String;
 begin
+  aFileProcesso := '.\log\eS1005.txt';
+  AssignFile(flOperacao_eS1005, aFileProcesso);
+  Rewrite(flOperacao_eS1005);
+
   aRetorno := False;
   aSQL := TStringList.Create;
   ok   := True;
@@ -899,12 +948,15 @@ begin
       raise Exception.Create('Dados das Unidades Gestoras para o eSocial ainda não foram disponíveis!');
 
     aSQL.BeginUpdate;
+
     case aModoLancamento of
       mlInclusao  : aSQL.Add('  and ug.tipo_operacao = ' + QuotedStr(FLAG_OPERACAO_INSERIR));
       mlAlteracao : aSQL.Add('  and ug.tipo_operacao = ' + QuotedStr(FLAG_OPERACAO_ALTERAR));
       mlExclusao  : aSQL.Add('  and ug.tipo_operacao = ' + QuotedStr(FLAG_OPERACAO_EXCLUIR));
     end;
+
     aSQL.EndUpdate;
+    aSQL.SaveToFile('.\log\eS1005.sql');
     SetSQL(aSQL);
 
     I := 1;
@@ -1002,12 +1054,15 @@ begin
       Application.ProcessMessages;
       Inc(I);
 
+      Writeln(flOperacao_eS1005, 'S1005|' + FormatFloat('0000000000', cdsTabela.FieldByName('ID').AsInteger));
       cdsTabela.Next;
     end;
 
     aRetorno := True;
     aProtocolo.S1005  := aRetorno;
   finally
+    CloseFile(flOperacao_eS1005);
+
     aSQL.Free;
     Result := aRetorno;
   end;
@@ -1023,7 +1078,12 @@ var
   I    : Integer;
   aInicio,
   aFim   : String;
+  aFileProcesso : String;
 begin
+  aFileProcesso := '.\log\eS1010.txt';
+  AssignFile(flOperacao_eS1010, aFileProcesso);
+  Rewrite(flOperacao_eS1010);
+
   aRetorno := False;
   aSQL := TStringList.Create;
   ok   := True;
@@ -1056,6 +1116,7 @@ begin
     end;
 
     aSQL.EndUpdate;
+    aSQL.SaveToFile('.\log\eS1010.sql');
     SetSQL(aSQL);
 
     I := 1;
@@ -1184,12 +1245,15 @@ begin
       Application.ProcessMessages;
       Inc(I);
 
+      Writeln(flOperacao_eS1010, 'S1010|' + FormatFloat('0000000000', cdsTabela.FieldByName('ID').AsInteger));
       cdsTabela.Next;
     end;
 
     aRetorno := True;
     aProtocolo.S1010 := aRetorno;
   finally
+    CloseFile(flOperacao_eS1010);
+
     aSQL.Free;
     Result := aRetorno;
   end;
@@ -1203,7 +1267,12 @@ var
   ok   : Boolean;
   aEventoID,
   I    : Integer;
+  aFileProcesso : String;
 begin
+  aFileProcesso := '.\log\eS1020.txt';
+  AssignFile(flOperacao_eS1020, aFileProcesso);
+  Rewrite(flOperacao_eS1020);
+
   aRetorno := False;
   aSQL := TStringList.Create;
   ok   := True;
@@ -1225,6 +1294,7 @@ begin
     end;
 
     aSQL.EndUpdate;
+    aSQL.SaveToFile('.\log\eS1020.sql');
     SetSQL(aSQL);
 
     I := 1;
@@ -1314,6 +1384,7 @@ begin
       Application.ProcessMessages;
       Inc(I);
 
+      Writeln(flOperacao_eS1020, 'S1020|' + FormatFloat('0000000000', cdsTabela.FieldByName('ID').AsInteger));
       cdsTabela.Next;
     end;
 (*
@@ -1380,6 +1451,8 @@ begin
     aRetorno := True;
     aProtocolo.S1020 := aRetorno;
   finally
+    CloseFile(flOperacao_eS1020);
+
     aSQL.Free;
     Result := aRetorno;
   end;
@@ -1393,7 +1466,12 @@ var
   ok   : Boolean;
   aEventoID,
   I    : Integer;
+  aFileProcesso : String;
 begin
+  aFileProcesso := '.\log\eS1030.txt';
+  AssignFile(flOperacao_eS1030, aFileProcesso);
+  Rewrite(flOperacao_eS1030);
+
   aRetorno := False;
   aSQL := TStringList.Create;
   ok   := True;
@@ -1418,6 +1496,7 @@ begin
     end;
 
     aSQL.EndUpdate;
+    aSQL.SaveToFile('.\log\eS1030.sql');
     SetSQL(aSQL);
 
     I := 1;
@@ -1489,12 +1568,15 @@ begin
       Application.ProcessMessages;
       Inc(I);
 
+      Writeln(flOperacao_eS1030, 'S1030|' + FormatFloat('0000000000', cdsTabela.FieldByName('ID').AsInteger));
       cdsTabela.Next;
     end;
 
     aRetorno := True;
     aProtocolo.S1030 := aRetorno;
   finally
+    CloseFile(flOperacao_eS1030);
+
     aSQL.Free;
     Result := aRetorno;
   end;
@@ -1555,6 +1637,7 @@ begin
     end;
 
     aSQL.EndUpdate;
+    aSQL.SaveToFile('.\log\eS1040.sql');
     SetSQL(aSQL);
 
     I := 1;
@@ -1651,6 +1734,7 @@ begin
     end;
 
     aSQL.EndUpdate;
+    aSQL.SaveToFile('.\log\eS1050.sql');
     SetSQL(aSQL);
 
     I := 1;
@@ -1756,6 +1840,7 @@ begin
     end;
 
     aSQL.EndUpdate;
+    aSQL.SaveToFile('.\log\eS1060.sql');
     SetSQL(aSQL);
 
     I := 1;
@@ -1956,6 +2041,7 @@ begin
     end;
 
     aSQL.EndUpdate;
+    aSQL.SaveToFile('.\log\eS2200.sql');
     SetSQL(aSQL);
 
     I := 1;
@@ -2491,6 +2577,7 @@ begin
     end;
 
     aSQL.EndUpdate;
+    aSQL.SaveToFile('.\log\eS2205.sql');
     SetSQL(aSQL);
 
     I := 1;
@@ -2825,6 +2912,7 @@ begin
     end;
 
     aSQL.EndUpdate;
+    aSQL.SaveToFile('.\log\eS2206.sql');
     SetSQL(aSQL);
 
     I := 1;
@@ -3122,6 +3210,7 @@ begin
     end;
 
     aSQL.EndUpdate;
+    aSQL.SaveToFile('.\log\eS2240.sql');
     SetSQL(aSQL);
 
     I := 1;
@@ -3273,7 +3362,7 @@ begin
                 aSQL.Add('Select ');
                 aSQL.Add('    f.id_fator_risco as codigo ');
                 aSQL.Add('from DEPTO_FATOR_RISCO f ');
-                aSQL.Add('where (f.id_depto = ' + Trim(cdsTabela.FieldByName('id').AsString) + ') ');
+                aSQL.Add('where (f.id_depto = ' + Trim(cdsTabela.FieldByName('id_depto').AsString) + ') ');
 
                 aSQL.EndUpdate;
                 SetSQL_Detalhe(aSQL);
@@ -3376,6 +3465,320 @@ begin
 
     aRetorno := True;
     aProtocolo.S2240 := aRetorno;
+  finally
+    aSQL.Free;
+    Result := aRetorno;
+  end;
+end;
+
+function TdmESocial.Gerar_eSocial2241(aCompetencia: TCompetencia; aZerarBase: Boolean; aModoLancamento: TModoLancamento;
+  aLabel: TLabel; aProcesso: TGauge; var aProtocolo: TProtocoloESocial): Boolean;
+var
+  aRetorno : Boolean;
+  aSQL : TStringList;
+  ok   : Boolean;
+  aEventoID,
+  I : Integer;
+  aDataInicial ,
+  aDataFinal   : TDateTime;
+  aResponsavel : TResponsavel;
+begin
+  aDataInicial := aCompetencia.DataInicial;
+  aDataFinal   := aCompetencia.DataFinal;
+
+  aRetorno := False;
+  aSQL := TStringList.Create;
+  ok   := True;
+  try
+    aSQL.BeginUpdate;
+    aSQL.Clear;
+    aSQL.Add('Select ');
+    aSQL.Add('    s.* ');
+    aSQL.Add('  , coalesce(s.matricula, substring(s.id from 1 for char_length(s.id) - 1)) as matricula_servidor');
+    aSQL.Add('  , p.cpf');
+    aSQL.Add('  , coalesce(nullif(trim(s.pis_pasep_pf), ''''), nullif(trim(p.pis_pasep), ''''), ''00000000000'') as nis_trabalhador');
+    aSQL.Add('  , d.descricao as dep_descricao');
+    aSQL.Add('  , c.descricao as fun_descricao');
+    aSQL.Add('  , coalesce(s.dt_readmissao, s.dt_admissao) as dt_inicio_condicao');
+    aSQL.Add('  , x.ini_validade');
+    aSQL.Add('  , x.fim_validade');
+    aSQL.Add('from SERVIDOR s');
+    aSQL.Add('  inner join PESSOA_FISICA p on (p.id = s.id_pessoa_fisica)');
+    aSQL.Add('  inner join DEPTO d on (d.id = s.id_depto)');
+    aSQL.Add('  inner join CARGO_FUNCAO c on (c.id = coalesce(s.id_cargo_atual, s.id_cargo_origem))');
+    aSQL.Add('  inner join (');
+    aSQL.Add('    Select');
+    aSQL.Add('        se.id_servidor');
+    aSQL.Add('      , cast(coalesce(nullif(nullif(trim(se.ini_validade), ''''), ''/''), extract(year from current_date) || right(''0'' || extract(month from current_date), 2)) as Integer) as ini_validade');
+    aSQL.Add('      , cast(coalesce(nullif(nullif(trim(se.fim_validade), ''''), ''/''), ''209912'') as Integer) as fim_validade');
+    aSQL.Add('    from SERVIDOR_EVENTO_FIXO se');
+    aSQL.Add('    where se.id_evento in (');
+    aSQL.Add('      Select');
+    aSQL.Add('        e.id');
+    aSQL.Add('      from EVENTO e');
+    aSQL.Add('      where e.id_categ_tcm = 4'); // Remunetação por Insalubridade (TIPO_REMUN_TCM)
+    aSQL.Add('    )');
+    aSQL.Add('  ) x on (x.id_servidor = s.id)');
+    aSQL.Add('where (s.id > 0)');
+
+    if ( StrToIntDef(OnlyNumber(aCompetencia.Codigo), 0) < (StrToInt(FormatDateTime('YYYYMM', Date)) - 1) ) then
+      // Carga inicial
+      aSQL.Add('  and (s.data_operacao <= ' + QuotedStr(FormatDateTime('yyyy.mm.dd', aDataFinal)) + ')')
+    else
+      // Aletrações do mês
+      aSQL.Add('  and (s.data_operacao between ' + QuotedStr(FormatDateTime('yyyy.mm.dd', aDataInicial)) + ' and ' + QuotedStr(FormatDateTime('yyyy.mm.dd', aDataFinal)) + ')');
+
+    case aModoLancamento of
+      mlInclusao  : aSQL.Add('  and (s.tipo_operacao = ' + QuotedStr(FLAG_OPERACAO_INSERIR) + ')');
+      mlAlteracao : aSQL.Add('  and (s.tipo_operacao = ' + QuotedStr(FLAG_OPERACAO_ALTERAR) + ')');
+      mlExclusao  : aSQL.Add('  and (s.tipo_operacao = ' + QuotedStr(FLAG_OPERACAO_EXCLUIR) + ')');
+    end;
+
+    if (aModoLancamento = mlAlteracao) then
+      aSQL.Add('  and (x.ini_validade >= ' + IntToStr(aCompetencia.ID - 1) + ')');
+
+    aSQL.EndUpdate;
+    aSQL.SaveToFile('.\log\eS2241.sql');
+    SetSQL(aSQL);
+
+    I := 1;
+
+    aProcesso.MaxValue := cdsTabela.RecordCount;
+    aProcesso.Progress := 0;
+    Application.ProcessMessages;
+
+    ACBrESocial.Eventos.NaoPeriodicos.S2241.Clear;
+
+    cdsTabela.First;
+    while not cdsTabela.Eof do
+    begin
+      with ACBrESocial.Eventos.NaoPeriodicos.S2241.Add, EvtInsApo do
+      begin
+        aEventoID := StrToInt(IncrementGenerator('GEN_ESOCIAL_EVENTO_S2241', 1));
+        Sequencial:= aEventoID;
+
+        if AmbienteWebServiceProducao then
+          IdeEvento.TpAmb := TpTpAmb(0) //taProducao
+        else
+          IdeEvento.TpAmb := taProducaoRestrita;
+
+        IdeEvento.indRetif := ireOriginal; // (ireOriginal, ireRetificacao);
+
+        if (IdeEvento.indRetif = ireRetificacao) then
+          IdeEvento.NrRecibo := '65.5454.987798798798' // Preencher com o número do recibo do arquivo a ser retificado.
+        else
+          IdeEvento.NrRecibo := EmptyStr;
+
+        IdeEvento.ProcEmi  := peAplicEmpregador;
+        IdeEvento.VerProc  := Versao_Executavel(ParamStr(0));
+
+        IdeEmpregador.TpInsc := tiCNPJ;
+        IdeEmpregador.NrInsc := Criptografa(Pesquisa('CONFIG_ORGAO', 'ID', '1', 'CNPJ', ''),'2', 14); //Criptografa(cdsTabela.FieldByName('CNPJ').AsString, '2', 14);
+
+        IdeVinculo.cpfTrab   := OnlyNumber(Trim(cdsTabela.FieldByName('cpf').AsString));
+        IdeVinculo.Matricula := Trim(cdsTabela.FieldByName('matricula_servidor').AsString);
+        IdeVinculo.NisTrab   := Trim(cdsTabela.FieldByName('nis_trabalhador').AsString);
+
+        with ACBrESocial.Configuracoes do
+          Geral.IdEmpregador := EvtInsApo.IdeEmpregador.NrInsc;
+
+        // InsalPeric - Informações de insalubridade e periculosidade
+        with InsalPeric do
+        begin
+          if (aModoLancamento = mlInclusao) then
+            with iniInsalPeric do
+            begin
+              DtiniCondicao := cdsTabela.FieldByName('dt_inicio_condicao').AsDateTime;
+
+              InfoAmb.Clear;
+
+              with InfoAmb.Add do
+              begin
+                codAmb              := Trim(cdsTabela.FieldByName('id_depto').AsString);
+                InfoAtiv.dscAtivDes := Trim(cdsTabela.FieldByName('fun_descricao').AsString);
+
+                FatRisco.Clear;
+
+                aSQL.BeginUpdate;
+                aSQL.Clear;
+                aSQL.Add('Select ');
+                aSQL.Add('    f.id_fator_risco as codigo ');
+                aSQL.Add('from DEPTO_FATOR_RISCO f ');
+                aSQL.Add('where (f.id_depto = ' + Trim(cdsTabela.FieldByName('id_depto').AsString) + ') ');
+
+                aSQL.EndUpdate;
+                SetSQL_Detalhe(aSQL);
+
+                cdsDetalhe.First;
+                if (cdsDetalhe.RecordCount > 0) then
+                begin
+
+                  while not cdsDetalhe.Eof do
+                  begin
+                    with FatRisco.Add do
+                    begin
+                      codFatRis  := Trim(cdsDetalhe.FieldByName('codigo').AsString);
+  //                    intConc    := 'N/A';
+  //                    tecMedicao := EmptyStr;
+                    end;
+
+                    cdsDetalhe.Next;
+                  end;
+
+                end
+                else
+                  with FatRisco.Add do
+                  begin
+                    codFatRis := '0901001'; // Ausência de Fator de Risco
+                  end;
+
+                cdsDetalhe.Close;
+              end;
+            end;
+
+          // Opcional - usado para alterações nas condições de trabalho previamente informadas
+          // so sera enviado posteriormente quando for alterar um registro
+          if (aModoLancamento = mlAlteracao) then
+            with altInsalPeric do
+            begin
+              DtaltCondicao := Date;
+
+              InfoAmb.Clear;
+
+              with InfoAmb.Add do
+              begin
+                codAmb              := Trim(cdsTabela.FieldByName('id_depto').AsString);
+                InfoAtiv.dscAtivDes := Trim(cdsTabela.FieldByName('fun_descricao').AsString);
+
+                FatRisco.Clear;
+
+                aSQL.BeginUpdate;
+                aSQL.Clear;
+                aSQL.Add('Select ');
+                aSQL.Add('    f.id_fator_risco as codigo ');
+                aSQL.Add('from DEPTO_FATOR_RISCO f ');
+                aSQL.Add('where (f.id_depto = ' + Trim(cdsTabela.FieldByName('id_depto').AsString) + ') ');
+
+                aSQL.EndUpdate;
+                SetSQL_Detalhe(aSQL);
+
+                cdsDetalhe.First;
+                if (cdsDetalhe.RecordCount > 0) then
+                begin
+
+                  while not cdsDetalhe.Eof do
+                  begin
+                    with FatRisco.Add do
+                    begin
+                      codFatRis  := Trim(cdsDetalhe.FieldByName('codigo').AsString);
+                      intConc    := 'N/A';
+                      tecMedicao := EmptyStr;
+                    end;
+
+                    cdsDetalhe.Next;
+                  end;
+
+                end
+                else
+                  with FatRisco.Add do
+                  begin
+                    codFatRis  := '0901001'; // Ausência de Fator de Risco
+                    intConc    := 'N/A';
+                    tecMedicao := EmptyStr;
+                  end;
+
+                cdsDetalhe.Close;
+              end;
+            end;
+
+          // Opcional - usado quando cessarem as condições de trabalho previamente informadas
+          if (aModoLancamento = mlExclusao)
+            or (cdsTabela.FieldByName('fim_validade').AsInteger <= aCompetencia.ID)
+            //or ((cdsTabela.FieldByName('id_est_funcional').AsInteger = ID_ESTADO_FUNCIONAL_DEMITIDO))
+            or (Trim(cdsTabela.FieldByName('efetivo').AsString) = FLAG_NAO) then
+            with fimInsalPeric do
+            begin
+              DtfimCondicao := Date;
+
+              InfoAmb.Clear;
+              with InfoAmb.Add do
+                codAmb := Trim(cdsTabela.FieldByName('id_depto').AsString);
+            end;
+        end;
+
+        // Estado Funcional "APOSENTADO" (ESTADO_FUNCIONAL)
+        if (cdsTabela.FieldByName('id_est_funcional').AsInteger = ID_ESTADO_FUNCIONAL_APOSENTADO) then
+          ;
+//        // AposentEsp - Infomações de condições que ensejam aposentadoria especial
+//        with AposentEsp do
+//        begin
+//          with iniAposentEsp do
+//          begin
+//            DtiniCondicao := date - 60;
+//
+//            InfoAmb.Clear;
+//
+//            with InfoAmb.Add do
+//            begin
+//              codAmb := '654';
+//
+//              InfoAtiv.dscAtivDes := 'dscAtivDes';
+//
+//              FatRisco.Clear;
+//
+//              with FatRisco.Add do
+//                codFatRis := '1234567890';
+//            end;
+//          end;
+//
+//          // Opcional - usado para alterações nas condições de trabalho previamente informadas
+//          // so sera enviado posteriormente quando for alterar um registro
+//          with altAposentEsp do
+//          begin
+//            DtaltCondicao := Date;
+//
+//            InfoAmb.Clear;
+//
+//            with InfoAmb.Add do
+//            begin
+//              codAmb := '456';
+//
+//              InfoAtiv.dscAtivDes := 'dscAtivDes';
+//
+//              FatRisco.Clear;
+//
+//              with FatRisco.Add do
+//              begin
+//                codFatRis  := '321';
+//                intConc    := 'N/A';
+//                tecMedicao := 'Técnica de medição';
+//              end;
+//            end;
+//          end;
+//
+//          // Opcional - usado quando cessarem as condições de trabalho previamente informadas
+//          with fimAposentEsp do
+//          begin
+//            DtfimCondicao := Date;
+//
+//            InfoAmb.Clear;
+//
+//            with InfoAmb.Add do
+//              codAmb := '654321';
+//          end;
+//        end;
+      end;
+
+      aLabel.Caption     := Trim(cdsTabela.FieldByName('nome_servidor').AsString);
+      aProcesso.Progress := I;
+      Application.ProcessMessages;
+      Inc(I);
+
+      cdsTabela.Next;
+    end;
+
+    aRetorno := True;
+    aProtocolo.S2241 := aRetorno;
   finally
     aSQL.Free;
     Result := aRetorno;

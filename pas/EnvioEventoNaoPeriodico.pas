@@ -170,10 +170,12 @@ begin
           aRetorno := dmESocial.Gerar_eSocial2230(TCompetencia(cmbAnoMes.Items.Objects[cmbAnoMes.ItemIndex]), Checb_ZeraBase.Checked, mlInclusao, lblProcesso, gagProcesso, aProtocolo);
         if aRetorno and cbS2240.Checked  then
           aRetorno := dmESocial.Gerar_eSocial2240(TCompetencia(cmbAnoMes.Items.Objects[cmbAnoMes.ItemIndex]), Checb_ZeraBase.Checked, aModoLancamento, lblProcesso, gagProcesso, aProtocolo);
-//        if aRetorno and cbS1010.Checked  then
-//          aRetorno := dmESocial.Gerar_eSocial1010(cmbAnoMes.Text, Checb_ZeraBase.Checked, aModoLancamento, lblProcesso, gagProcesso, aProtocolo);
-//        if aRetorno and cbS1020.Checked  then
-//          aRetorno := dmESocial.Gerar_eSocial1020(cmbAnoMes.Text, Checb_ZeraBase.Checked, aModoLancamento, lblProcesso, gagProcesso, aProtocolo);
+        if aRetorno and cbS2241.Checked  then
+          aRetorno := dmESocial.Gerar_eSocial2241(TCompetencia(cmbAnoMes.Items.Objects[cmbAnoMes.ItemIndex]), Checb_ZeraBase.Checked, aModoLancamento, lblProcesso, gagProcesso, aProtocolo);
+        if aRetorno and cbS2250.Checked  then
+          aRetorno := dmESocial.Gerar_eSocial2250(TCompetencia(cmbAnoMes.Items.Objects[cmbAnoMes.ItemIndex]), Checb_ZeraBase.Checked, aModoLancamento, lblProcesso, gagProcesso, aProtocolo);
+        if aRetorno and cbS2260.Checked  then
+          aRetorno := dmESocial.Gerar_eSocial2260(TCompetencia(cmbAnoMes.Items.Objects[cmbAnoMes.ItemIndex]), Checb_ZeraBase.Checked, aModoLancamento, lblProcesso, gagProcesso, aProtocolo);
 //        if aRetorno and cbS1030.Checked  then
 //          aRetorno := dmESocial.Gerar_eSocial1030(cmbAnoMes.Text, Checb_ZeraBase.Checked, aModoLancamento, lblProcesso, gagProcesso, aProtocolo);
 //        if aRetorno and cbS1035.Checked  then
@@ -232,6 +234,9 @@ begin
   cbS2220.Enabled := (gpbOperacao.ItemIndex = 0);
   cbS2230.Enabled := (gpbOperacao.ItemIndex = 0);
   cbS2240.Enabled := (gpbOperacao.ItemIndex = 0) or (gpbOperacao.ItemIndex = 1);
+  cbS2241.Enabled := (gpbOperacao.ItemIndex = 0) or (gpbOperacao.ItemIndex = 1);
+//  cbS2298.Enabled := (gpbOperacao.ItemIndex = 1);
+//  cbS2299.Enabled := (gpbOperacao.ItemIndex = 1);
 
   if not cbS2200.Enabled then cbS2200.Checked := False;
   if not cbS2205.Enabled then cbS2205.Checked := False;
@@ -240,6 +245,9 @@ begin
   if not cbS2220.Enabled then cbS2220.Checked := False;
   if not cbS2230.Enabled then cbS2230.Checked := False;
   if not cbS2240.Enabled then cbS2240.Checked := False;
+  if not cbS2241.Enabled then cbS2241.Checked := False;
+//  if not cbS2298.Enabled then cbS2299.Checked := False;
+//  if not cbS2299.Enabled then cbS2299.Checked := False;
 end;
 
 procedure TfrmEnvioEventoNaoPeriodico.LimparPainelProcesso(aVisualizar: Boolean);
