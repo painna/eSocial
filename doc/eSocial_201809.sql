@@ -431,3 +431,4 @@ Stored procedure responsavel por processar os LOGs de envio dos eventos, evitand
 assim que determinados dados enviados/processados pelo eSocial sejam novamente
 enviados.';
 
+GRANT EXECUTE ON PROCEDURE SP_ESOCIAL_LOG_EVENTO TO "PUBLIC";
