@@ -314,6 +314,8 @@ const
   ID_ESTADO_FUNCIONAL_DEMITIDO   = 6;
   ID_ESTADO_FUNCIONAL_APOSENTADO = 10;
 
+  MODO_OPERACAO : array[0..3] of String = (FLAG_OPERACAO_INSERIR, FLAG_OPERACAO_ALTERAR, FLAG_OPERACAO_EXCLUIR, FLAG_OPERACAO_ENVIADO);
+
 implementation
 
 {%CLASSGROUP 'Vcl.Controls.TControl'}
@@ -885,7 +887,7 @@ begin
       Application.ProcessMessages;
       Inc(I);
 
-      Writeln(flOperacao_eS1000, 'S1000|' + FormatFloat('0000000000', cdsTabela.FieldByName('ID').AsInteger));
+      Writeln(flOperacao_eS1000, 'S1000|' + MODO_OPERACAO[Ord(aModoLancamento)] + '|' + FormatFloat('0000000000', cdsTabela.FieldByName('ID').AsInteger));
       cdsTabela.Next;
     end;
 
@@ -893,6 +895,8 @@ begin
     aProtocolo.s1000 := aRetorno;
   finally
     CloseFile(flOperacao_eS1000);
+    if not aRetorno then
+      DeleteFile(aFileProcesso);
 
     aSQL.Free;
     Result := aRetorno;
@@ -1054,7 +1058,7 @@ begin
       Application.ProcessMessages;
       Inc(I);
 
-      Writeln(flOperacao_eS1005, 'S1005|' + FormatFloat('0000000000', cdsTabela.FieldByName('ID').AsInteger));
+      Writeln(flOperacao_eS1005, 'S1005|' + MODO_OPERACAO[Ord(aModoLancamento)] + '|' + FormatFloat('0000000000', cdsTabela.FieldByName('ID').AsInteger));
       cdsTabela.Next;
     end;
 
@@ -1062,6 +1066,8 @@ begin
     aProtocolo.S1005  := aRetorno;
   finally
     CloseFile(flOperacao_eS1005);
+    if not aRetorno then
+      DeleteFile(aFileProcesso);
 
     aSQL.Free;
     Result := aRetorno;
@@ -1245,7 +1251,7 @@ begin
       Application.ProcessMessages;
       Inc(I);
 
-      Writeln(flOperacao_eS1010, 'S1010|' + FormatFloat('0000000000', cdsTabela.FieldByName('ID').AsInteger));
+      Writeln(flOperacao_eS1010, 'S1010|' + MODO_OPERACAO[Ord(aModoLancamento)] + '|' + FormatFloat('0000000000', cdsTabela.FieldByName('ID').AsInteger));
       cdsTabela.Next;
     end;
 
@@ -1253,6 +1259,8 @@ begin
     aProtocolo.S1010 := aRetorno;
   finally
     CloseFile(flOperacao_eS1010);
+    if not aRetorno then
+      DeleteFile(aFileProcesso);
 
     aSQL.Free;
     Result := aRetorno;
@@ -1384,7 +1392,7 @@ begin
       Application.ProcessMessages;
       Inc(I);
 
-      Writeln(flOperacao_eS1020, 'S1020|' + FormatFloat('0000000000', cdsTabela.FieldByName('ID').AsInteger));
+      Writeln(flOperacao_eS1020, 'S1020|' + MODO_OPERACAO[Ord(aModoLancamento)] + '|' + FormatFloat('0000000000', cdsTabela.FieldByName('ID').AsInteger));
       cdsTabela.Next;
     end;
 (*
@@ -1452,6 +1460,8 @@ begin
     aProtocolo.S1020 := aRetorno;
   finally
     CloseFile(flOperacao_eS1020);
+    if not aRetorno then
+      DeleteFile(aFileProcesso);
 
     aSQL.Free;
     Result := aRetorno;
@@ -1568,7 +1578,7 @@ begin
       Application.ProcessMessages;
       Inc(I);
 
-      Writeln(flOperacao_eS1030, 'S1030|' + FormatFloat('0000000000', cdsTabela.FieldByName('ID').AsInteger));
+      Writeln(flOperacao_eS1030, 'S1030|' + MODO_OPERACAO[Ord(aModoLancamento)] + '|' + FormatFloat('0000000000', cdsTabela.FieldByName('ID').AsInteger));
       cdsTabela.Next;
     end;
 
@@ -1576,6 +1586,8 @@ begin
     aProtocolo.S1030 := aRetorno;
   finally
     CloseFile(flOperacao_eS1030);
+    if not aRetorno then
+      DeleteFile(aFileProcesso);
 
     aSQL.Free;
     Result := aRetorno;
