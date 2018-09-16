@@ -35,7 +35,7 @@ object dmESocial: TdmESocial
     Options = [poAllowCommandText, poUseQuoteChar]
     UpdateMode = upWhereKeyOnly
     Left = 272
-    Top = 135
+    Top = 136
   end
   object cdsTabela: TClientDataSet
     Aggregates = <>
@@ -142,19 +142,19 @@ object dmESocial: TdmESocial
     ProviderName = 'dspTabela'
     StoreDefs = True
     Left = 272
-    Top = 183
+    Top = 184
   end
   object qryTabela: TSQLQuery
     MaxBlobSize = -1
     Params = <>
     SQLConnection = dmPrincipal.SConPrincipal
     Left = 272
-    Top = 96
+    Top = 88
   end
   object ACBrValidador: TACBrValidador
     IgnorarChar = './-'
-    Left = 104
-    Top = 160
+    Left = 32
+    Top = 120
   end
   object dspDetalhe: TDataSetProvider
     DataSet = qryDetalhe
@@ -162,7 +162,7 @@ object dmESocial: TdmESocial
     Options = [poAllowCommandText, poUseQuoteChar]
     UpdateMode = upWhereKeyOnly
     Left = 408
-    Top = 175
+    Top = 176
   end
   object cdsDetalhe: TClientDataSet
     Aggregates = <>
@@ -269,14 +269,14 @@ object dmESocial: TdmESocial
     ProviderName = 'dspDetalhe'
     StoreDefs = True
     Left = 408
-    Top = 223
+    Top = 224
   end
   object qryDetalhe: TSQLQuery
     MaxBlobSize = -1
     Params = <>
     SQLConnection = dmPrincipal.SConPrincipal
     Left = 408
-    Top = 136
+    Top = 128
   end
   object dspProtocolo: TDataSetProvider
     DataSet = qryProtocolo
@@ -284,7 +284,7 @@ object dmESocial: TdmESocial
     Options = [poAllowCommandText, poUseQuoteChar]
     UpdateMode = upWhereKeyOnly
     Left = 552
-    Top = 287
+    Top = 288
   end
   object cdsProtocolo: TClientDataSet
     Aggregates = <>
@@ -335,7 +335,7 @@ object dmESocial: TdmESocial
     ProviderName = 'dspProtocolo'
     StoreDefs = True
     Left = 552
-    Top = 335
+    Top = 336
     object cdsProtocoloID: TLargeintField
       FieldName = 'ID'
       ProviderFlags = [pfInUpdate]
@@ -376,6 +376,7 @@ object dmESocial: TdmESocial
         DataType = ftString
         Name = 'numero'
         ParamType = ptInput
+        Size = 30
         Value = ''
       end>
     SQL.Strings = (
@@ -391,7 +392,7 @@ object dmESocial: TdmESocial
       'where p.numero = :numero')
     SQLConnection = dmPrincipal.SConPrincipal
     Left = 552
-    Top = 248
+    Top = 240
     object qryProtocoloID: TLargeintField
       FieldName = 'ID'
     end
@@ -425,7 +426,7 @@ object dmESocial: TdmESocial
     Options = [poAllowCommandText, poUseQuoteChar]
     UpdateMode = upWhereKeyOnly
     Left = 168
-    Top = 303
+    Top = 304
   end
   object cdsGeral: TClientDataSet
     Aggregates = <>
@@ -532,13 +533,197 @@ object dmESocial: TdmESocial
     ProviderName = 'dspGeral'
     StoreDefs = True
     Left = 168
-    Top = 351
+    Top = 352
   end
   object qryGeral: TSQLQuery
     MaxBlobSize = -1
     Params = <>
     SQLConnection = dmPrincipal.SConPrincipal
     Left = 168
-    Top = 264
+    Top = 256
+  end
+  object dspLogEvento: TDataSetProvider
+    DataSet = qryLogEvento
+    Exported = False
+    Options = [poAllowCommandText, poUseQuoteChar]
+    UpdateMode = upWhereKeyOnly
+    Left = 464
+    Top = 376
+  end
+  object cdsLogEvento: TClientDataSet
+    Aggregates = <>
+    FieldDefs = <
+      item
+        Name = 'EVENTO'
+        Attributes = [faRequired]
+        DataType = ftString
+        Size = 10
+      end
+      item
+        Name = 'OPERACAO'
+        Attributes = [faRequired, faFixed]
+        DataType = ftString
+        Size = 1
+      end
+      item
+        Name = 'ID'
+        Attributes = [faRequired]
+        DataType = ftLargeint
+      end
+      item
+        Name = 'TABELA'
+        DataType = ftString
+        Size = 40
+      end
+      item
+        Name = 'PROTOCOLO_ENVIO'
+        Attributes = [faRequired]
+        DataType = ftString
+        Size = 30
+      end>
+    IndexDefs = <>
+    Params = <
+      item
+        DataType = ftString
+        Name = 'protocolo'
+        ParamType = ptInput
+        Value = ''
+      end>
+    ProviderName = 'dspLogEvento'
+    StoreDefs = True
+    Left = 464
+    Top = 424
+    object cdsLogEventoEVENTO: TStringField
+      FieldName = 'EVENTO'
+      ProviderFlags = [pfInUpdate, pfInWhere, pfInKey]
+      Required = True
+      Size = 10
+    end
+    object cdsLogEventoOPERACAO: TStringField
+      FieldName = 'OPERACAO'
+      ProviderFlags = [pfInUpdate, pfInWhere, pfInKey]
+      Required = True
+      FixedChar = True
+      Size = 1
+    end
+    object cdsLogEventoID: TLargeintField
+      FieldName = 'ID'
+      ProviderFlags = [pfInUpdate, pfInWhere, pfInKey]
+      Required = True
+    end
+    object cdsLogEventoTABELA: TStringField
+      FieldName = 'TABELA'
+      ProviderFlags = [pfInUpdate]
+      Size = 40
+    end
+    object cdsLogEventoPROTOCOLO_ENVIO: TStringField
+      FieldName = 'PROTOCOLO_ENVIO'
+      ProviderFlags = [pfInUpdate]
+      Required = True
+      Size = 30
+    end
+  end
+  object qryLogEvento: TSQLQuery
+    MaxBlobSize = 1
+    Params = <
+      item
+        DataType = ftString
+        Name = 'protocolo'
+        ParamType = ptInput
+        Value = ''
+      end>
+    SQL.Strings = (
+      'Select'
+      '    lg.evento'
+      '  , lg.operacao'
+      '  , lg.id'
+      '  , lg.tabela'
+      '  , lg.protocolo_envio'
+      'from ESOCIAL_LOG_EVENTO lg'
+      'where lg.protocolo_envio = :protocolo')
+    SQLConnection = dmPrincipal.SConPrincipal
+    Left = 464
+    Top = 328
+    object qryLogEventoEVENTO: TStringField
+      FieldName = 'EVENTO'
+      ProviderFlags = [pfInUpdate, pfInWhere, pfInKey]
+      Required = True
+      Size = 10
+    end
+    object qryLogEventoOPERACAO: TStringField
+      FieldName = 'OPERACAO'
+      ProviderFlags = [pfInUpdate, pfInWhere, pfInKey]
+      Required = True
+      FixedChar = True
+      Size = 1
+    end
+    object qryLogEventoID: TLargeintField
+      FieldName = 'ID'
+      ProviderFlags = [pfInUpdate, pfInWhere, pfInKey]
+      Required = True
+    end
+    object qryLogEventoTABELA: TStringField
+      FieldName = 'TABELA'
+      ProviderFlags = [pfInUpdate]
+      Size = 40
+    end
+    object qryLogEventoPROTOCOLO_ENVIO: TStringField
+      FieldName = 'PROTOCOLO_ENVIO'
+      ProviderFlags = [pfInUpdate]
+      Required = True
+      Size = 30
+    end
+  end
+  object setLogEvento: TSQLStoredProc
+    MaxBlobSize = -1
+    Params = <
+      item
+        DataType = ftString
+        Precision = 10
+        Name = 'EVENTO'
+        ParamType = ptInput
+      end
+      item
+        DataType = ftString
+        Precision = 30
+        Name = 'TABELA'
+        ParamType = ptInput
+      end
+      item
+        DataType = ftFixedChar
+        Precision = 1
+        Name = 'OPERACAO'
+        ParamType = ptInput
+      end
+      item
+        DataType = ftLargeint
+        Precision = 8
+        Name = 'ID'
+        ParamType = ptInput
+      end
+      item
+        DataType = ftString
+        Precision = 30
+        Name = 'PROTOCOLO'
+        ParamType = ptInput
+      end>
+    SQLConnection = dmPrincipal.SConPrincipal
+    StoredProcName = 'SET_ESOCIAL_LOG_EVENTO'
+    Left = 648
+    Top = 328
+  end
+  object spLogEvento: TSQLStoredProc
+    MaxBlobSize = -1
+    Params = <
+      item
+        DataType = ftString
+        Precision = 30
+        Name = 'PROTOCOLO'
+        ParamType = ptInput
+      end>
+    SQLConnection = dmPrincipal.SConPrincipal
+    StoredProcName = 'SP_ESOCIAL_LOG_EVENTO'
+    Left = 648
+    Top = 376
   end
 end

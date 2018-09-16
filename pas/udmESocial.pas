@@ -31,6 +31,9 @@ uses
   Dialogs,
   DateUtils,
 
+  System.Types,
+  System.Variants,
+
   System.SysUtils, System.Classes, Controls, Vcl.StdCtrls, Vcl.Samples.Gauges,
   Data.FMTBcd, Data.SqlExpr, Data.DB, Datasnap.DBClient, Datasnap.Provider, ACBrValidador;
 
@@ -98,6 +101,7 @@ type
       aS1060 ,
       aS1070 ,
       aS1080 ,
+      aS2190 ,
       aS2200 ,
       aS2205 ,
       aS2206 ,
@@ -130,6 +134,7 @@ type
       property S1060 : Boolean read aS1060 write aS1060;
       property S1070 : Boolean read aS1070 write aS1070;
       property S1080 : Boolean read aS1080 write aS1080;
+      property S2190 : Boolean read aS2190 write aS2190;
       property S2200 : Boolean read aS2200 write aS2200;
       property S2205 : Boolean read aS2205 write aS2205;
       property S2206 : Boolean read aS2206 write aS2206;
@@ -175,6 +180,21 @@ type
     dspGeral: TDataSetProvider;
     cdsGeral: TClientDataSet;
     qryGeral: TSQLQuery;
+    dspLogEvento: TDataSetProvider;
+    cdsLogEvento: TClientDataSet;
+    qryLogEvento: TSQLQuery;
+    qryLogEventoEVENTO: TStringField;
+    qryLogEventoOPERACAO: TStringField;
+    qryLogEventoID: TLargeintField;
+    qryLogEventoTABELA: TStringField;
+    qryLogEventoPROTOCOLO_ENVIO: TStringField;
+    cdsLogEventoEVENTO: TStringField;
+    cdsLogEventoOPERACAO: TStringField;
+    cdsLogEventoID: TLargeintField;
+    cdsLogEventoTABELA: TStringField;
+    cdsLogEventoPROTOCOLO_ENVIO: TStringField;
+    setLogEvento: TSQLStoredProc;
+    spLogEvento: TSQLStoredProc;
     procedure DataModuleCreate(Sender: TObject);
     procedure DataModuleDestroy(Sender: TObject);
     procedure btnSalvar(Sender: TObject);
@@ -194,6 +214,8 @@ type
     function ProximaCompetencia(aCompetencia : String) : String;
   public
     { Public declarations }
+
+    // LOGs para Eventos de Tabelas
     flOperacao_eS1000 ,
     flOperacao_eS1005 ,
     flOperacao_eS1010 ,
@@ -202,7 +224,22 @@ type
     flOperacao_eS1035 ,
     flOperacao_eS1040 ,
     flOperacao_eS1050 ,
-    flOperacao_eS1060 : TextFile;
+    flOperacao_eS1060 ,
+    flOperacao_eS1070 ,
+    flOperacao_eS1080 : TextFile;
+
+    // LOGs para Eventos Não Periódicos
+    flOperacao_eS2190 ,
+    flOperacao_eS2200 ,
+    flOperacao_eS2205 ,
+    flOperacao_eS2206 ,
+    flOperacao_eS2210 ,
+    flOperacao_eS2220 ,
+    flOperacao_eS2230 ,
+    flOperacao_eS2240 ,
+    flOperacao_eS2241 ,
+    flOperacao_eS2250 ,
+    flOperacao_eS2260 : TextFile;
 
     property MensagemRetorno : TStringList read GetMensagemRetorno;
 
@@ -210,7 +247,7 @@ type
     procedure ListarCompetenciasAdmissao(aLista : TComboBox);
     procedure LerConfiguracao;
     procedure GravarProtocoloRetorno(aProtocolo : TProtocoloESocial);
-    procedure AtualizarOperacoes(aModoLancamento: TModoLancamento; aProtocolo: TProtocoloESocial); virtual; abstract;
+    procedure AtualizarOperacoes(aModoLancamento: TModoLancamento; aProtocolo: TProtocoloESocial);
 
     function CertificadoInstalado : Boolean;
     function CertificadoValido : Boolean;
@@ -252,7 +289,7 @@ type
       aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge;
       var aProtocolo : TProtocoloESocial) : Boolean;                         virtual; abstract;
 
-    // procedures eventos de tabela
+    // procedures eventos não periódicos
     function Gerar_eSocial2190(aCompetencia : TCompetencia; aZerarBase : Boolean;
       aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge;
       var aProtocolo : TProtocoloESocial) : Boolean;                         virtual; abstract;
@@ -357,6 +394,92 @@ begin
     Result := aTrue
   else
     Result := aFalse;
+end;
+
+procedure TdmESocial.AtualizarOperacoes(aModoLancamento: TModoLancamento; aProtocolo: TProtocoloESocial);
+
+  procedure ProcessarFileLOG(aFileName : String; const aTextFile : TextFile);
+  var
+    aLinha    : String;
+    aRegistro : TStringDynArray;
+  begin
+    if FileExists(aFileName) then
+    begin
+      AssignFile(aTextFile, aFileName);
+      Reset(aTextFile);
+      while not Eof(aTextFile) do
+      begin
+        Readln(aTextFile, aLinha);
+        aRegistro := SplitString(aLinha, '|');
+
+        // Gravar LOGs
+        with setLogEvento do
+        begin
+          Close;
+          ParamByName('EVENTO').AsString    := aRegistro[0];
+          ParamByName('TABELA').AsString    := aRegistro[1];
+          ParamByName('OPERACAO').AsString  := aRegistro[2];
+          ParamByName('ID').AsString        := aRegistro[3];
+          ParamByName('PROTOCOLO').AsString := aProtocolo.Numero;
+          ExecProc;
+        end;
+      end;
+      CloseFile(aTextFile);
+      DeleteFile(aFileName);
+    end;
+  end;
+
+begin
+  try
+    if aProtocolo.S1000 then
+      ProcessarFileLOG('.\log\eS1000.txt', flOperacao_eS1000);
+    if aProtocolo.S1005 then
+      ProcessarFileLOG('.\log\eS1005.txt', flOperacao_eS1005);
+    if aProtocolo.S1010 then
+      ProcessarFileLOG('.\log\eS1010.txt', flOperacao_eS1010);
+    if aProtocolo.S1020 then
+      ProcessarFileLOG('.\log\eS1020.txt', flOperacao_eS1020);
+    if aProtocolo.S1030 then
+      ProcessarFileLOG('.\log\eS1030.txt', flOperacao_eS1030);
+    if aProtocolo.S1040 then
+      ProcessarFileLOG('.\log\eS1040.txt', flOperacao_eS1040);
+    if aProtocolo.S1050 then
+      ProcessarFileLOG('.\log\eS1050.txt', flOperacao_eS1050);
+    if aProtocolo.S1060 then
+      ProcessarFileLOG('.\log\eS1060.txt', flOperacao_eS1060);
+    if aProtocolo.S1070 then
+      ProcessarFileLOG('.\log\eS1070.txt', flOperacao_eS1070);
+    if aProtocolo.S1080 then
+      ProcessarFileLOG('.\log\eS1080.txt', flOperacao_eS1080);
+
+    if aProtocolo.S2190 then
+      ProcessarFileLOG('.\log\eS2190.txt', flOperacao_eS2190);
+    if aProtocolo.S2200 then
+      ProcessarFileLOG('.\log\eS2200.txt', flOperacao_eS2200);
+    if aProtocolo.S2205 then
+      ProcessarFileLOG('.\log\eS2205.txt', flOperacao_eS2205);
+    if aProtocolo.S2206 then
+      ProcessarFileLOG('.\log\eS2206.txt', flOperacao_eS2206);
+    if aProtocolo.S2210 then
+      ProcessarFileLOG('.\log\eS2210.txt', flOperacao_eS2210);
+    if aProtocolo.S2220 then
+      ProcessarFileLOG('.\log\eS2220.txt', flOperacao_eS2220);
+    if aProtocolo.S2230 then
+      ProcessarFileLOG('.\log\eS2230.txt', flOperacao_eS2230);
+    if aProtocolo.S2240 then
+      ProcessarFileLOG('.\log\eS2240.txt', flOperacao_eS2240);
+    if aProtocolo.S2241 then
+      ProcessarFileLOG('.\log\eS2241.txt', flOperacao_eS2241);
+    if aProtocolo.S2250 then
+      ProcessarFileLOG('.\log\eS2250.txt', flOperacao_eS2250);
+    if aProtocolo.S2260 then
+      ProcessarFileLOG('.\log\eS2260.txt', flOperacao_eS2260);
+  finally
+    // Processar LOGs
+    spLogEvento.Close;
+    spLogEvento.ParamByName('PROTOCOLO').AsString := aProtocolo.Numero;
+    spLogEvento.ExecProc;
+  end;
 end;
 
 procedure TdmESocial.AtualizaSSLLibsCombo;
@@ -596,9 +719,9 @@ begin
         begin
           if Status.cdResposta in [201, 202] then
           begin
-            aProtocolo.Versao   := dadosRecLote.versaoAplicRecepcao;
-            aProtocolo.DataHora := dadosRecLote.dhRecepcao;
-            aProtocolo.Numero   := dadosRecLote.Protocolo;
+            aProtocolo.Versao          := dadosRecLote.versaoAplicRecepcao;
+            aProtocolo.DataHora        := dadosRecLote.dhRecepcao;
+            aProtocolo.Numero          := dadosRecLote.Protocolo;
             aProtocolo.NumeroInscricao := IdeTransmissor.NrInsc;
 
             sPath := PathWithDelim(ACBrESocial.Configuracoes.Arquivos.GetPatheSocial(aProtocolo.DataHora, ACBrESocial.Configuracoes.Geral.IdEmpregador));
@@ -669,8 +792,10 @@ var
   ok   : Boolean;
   aEventoID,
   I    : Integer;
+  aMainTable    ,
   aFileProcesso : String;
 begin
+  aMainTable    := 'CONFIG_ESOCIAL';
   aFileProcesso := '.\log\eS1000.txt';
   AssignFile(flOperacao_eS1000, aFileProcesso);
   Rewrite(flOperacao_eS1000);
@@ -887,15 +1012,15 @@ begin
       Application.ProcessMessages;
       Inc(I);
 
-      Writeln(flOperacao_eS1000, 'S1000|' + MODO_OPERACAO[Ord(aModoLancamento)] + '|' + FormatFloat('0000000000', cdsTabela.FieldByName('ID').AsInteger));
+      Writeln(flOperacao_eS1000, 'S1000|' + aMainTable + '|' + MODO_OPERACAO[Ord(aModoLancamento)] + '|' + FormatFloat('0000000000', cdsTabela.FieldByName('ID').AsInteger));
       cdsTabela.Next;
     end;
 
     aRetorno := True;
-    aProtocolo.s1000 := aRetorno;
+    aProtocolo.s1000 := (cdsTabela.RecordCount > 0);
   finally
     CloseFile(flOperacao_eS1000);
-    if not aRetorno then
+    if not aProtocolo.s1000 then
       DeleteFile(aFileProcesso);
 
     aSQL.Free;
@@ -911,8 +1036,10 @@ var
   ok   : Boolean;
   I    : Integer;
   aDataImplantacao : TDateTime;
+  aMainTable    ,
   aFileProcesso : String;
 begin
+  aMainTable    := 'UNID_GESTORA';
   aFileProcesso := '.\log\eS1005.txt';
   AssignFile(flOperacao_eS1005, aFileProcesso);
   Rewrite(flOperacao_eS1005);
@@ -1058,15 +1185,15 @@ begin
       Application.ProcessMessages;
       Inc(I);
 
-      Writeln(flOperacao_eS1005, 'S1005|' + MODO_OPERACAO[Ord(aModoLancamento)] + '|' + FormatFloat('0000000000', cdsTabela.FieldByName('ID').AsInteger));
+      Writeln(flOperacao_eS1005, 'S1005|' + aMainTable + '|' + MODO_OPERACAO[Ord(aModoLancamento)] + '|' + FormatFloat('0000000000', cdsTabela.FieldByName('ID').AsInteger));
       cdsTabela.Next;
     end;
 
     aRetorno := True;
-    aProtocolo.S1005  := aRetorno;
+    aProtocolo.S1005  := (cdsTabela.RecordCount > 0);
   finally
     CloseFile(flOperacao_eS1005);
-    if not aRetorno then
+    if not aProtocolo.s1005 then
       DeleteFile(aFileProcesso);
 
     aSQL.Free;
@@ -1084,8 +1211,10 @@ var
   I    : Integer;
   aInicio,
   aFim   : String;
+  aMainTable    ,
   aFileProcesso : String;
 begin
+  aMainTable    := 'EVENTO';
   aFileProcesso := '.\log\eS1010.txt';
   AssignFile(flOperacao_eS1010, aFileProcesso);
   Rewrite(flOperacao_eS1010);
@@ -1251,15 +1380,15 @@ begin
       Application.ProcessMessages;
       Inc(I);
 
-      Writeln(flOperacao_eS1010, 'S1010|' + MODO_OPERACAO[Ord(aModoLancamento)] + '|' + FormatFloat('0000000000', cdsTabela.FieldByName('ID').AsInteger));
+      Writeln(flOperacao_eS1010, 'S1010|' + aMainTable + '|' + MODO_OPERACAO[Ord(aModoLancamento)] + '|' + FormatFloat('0000000000', cdsTabela.FieldByName('ID').AsInteger));
       cdsTabela.Next;
     end;
 
     aRetorno := True;
-    aProtocolo.S1010 := aRetorno;
+    aProtocolo.S1010 := (cdsTabela.RecordCount > 0);
   finally
     CloseFile(flOperacao_eS1010);
-    if not aRetorno then
+    if not aProtocolo.S1010 then
       DeleteFile(aFileProcesso);
 
     aSQL.Free;
@@ -1275,8 +1404,10 @@ var
   ok   : Boolean;
   aEventoID,
   I    : Integer;
+  aMainTable    ,
   aFileProcesso : String;
 begin
+  aMainTable    := 'CONFIG_ORGAO';
   aFileProcesso := '.\log\eS1020.txt';
   AssignFile(flOperacao_eS1020, aFileProcesso);
   Rewrite(flOperacao_eS1020);
@@ -1392,7 +1523,7 @@ begin
       Application.ProcessMessages;
       Inc(I);
 
-      Writeln(flOperacao_eS1020, 'S1020|' + MODO_OPERACAO[Ord(aModoLancamento)] + '|' + FormatFloat('0000000000', cdsTabela.FieldByName('ID').AsInteger));
+      Writeln(flOperacao_eS1020, 'S1020|' + aMainTable + '|' + MODO_OPERACAO[Ord(aModoLancamento)] + '|' + FormatFloat('0000000000', cdsTabela.FieldByName('ID').AsInteger));
       cdsTabela.Next;
     end;
 (*
@@ -1457,10 +1588,10 @@ begin
   end;
 *)
     aRetorno := True;
-    aProtocolo.S1020 := aRetorno;
+    aProtocolo.S1020 := (cdsTabela.RecordCount > 0);
   finally
     CloseFile(flOperacao_eS1020);
-    if not aRetorno then
+    if not aProtocolo.S1020 then
       DeleteFile(aFileProcesso);
 
     aSQL.Free;
@@ -1476,8 +1607,10 @@ var
   ok   : Boolean;
   aEventoID,
   I    : Integer;
+  aMainTable    ,
   aFileProcesso : String;
 begin
+  aMainTable    := 'CARGO_FUNCAO';
   aFileProcesso := '.\log\eS1030.txt';
   AssignFile(flOperacao_eS1030, aFileProcesso);
   Rewrite(flOperacao_eS1030);
@@ -1578,15 +1711,15 @@ begin
       Application.ProcessMessages;
       Inc(I);
 
-      Writeln(flOperacao_eS1030, 'S1030|' + MODO_OPERACAO[Ord(aModoLancamento)] + '|' + FormatFloat('0000000000', cdsTabela.FieldByName('ID').AsInteger));
+      Writeln(flOperacao_eS1030, 'S1030|' + aMainTable + '|' + MODO_OPERACAO[Ord(aModoLancamento)] + '|' + FormatFloat('0000000000', cdsTabela.FieldByName('ID').AsInteger));
       cdsTabela.Next;
     end;
 
     aRetorno := True;
-    aProtocolo.S1030 := aRetorno;
+    aProtocolo.S1030 := (cdsTabela.RecordCount > 0);
   finally
     CloseFile(flOperacao_eS1030);
-    if not aRetorno then
+    if not aProtocolo.S1030 then
       DeleteFile(aFileProcesso);
 
     aSQL.Free;
@@ -1625,7 +1758,14 @@ var
   ok   : Boolean;
   aEventoID,
   I    : Integer;
+  aMainTable    ,
+  aFileProcesso : String;
 begin
+  aMainTable    := 'CARGO_FUNCAO';
+  aFileProcesso := '.\log\eS1040.txt';
+  AssignFile(flOperacao_eS1040, aFileProcesso);
+  Rewrite(flOperacao_eS1040);
+
   aRetorno := False;
   aSQL := TStringList.Create;
   ok   := True;
@@ -1698,12 +1838,17 @@ begin
       Application.ProcessMessages;
       Inc(I);
 
+      Writeln(flOperacao_eS1040, 'S1040|' + aMainTable + '|' + MODO_OPERACAO[Ord(aModoLancamento)] + '|' + FormatFloat('0000000000', cdsTabela.FieldByName('ID').AsInteger));
       cdsTabela.Next;
     end;
 
     aRetorno := True;
-    aProtocolo.S1040 := aRetorno;
+    aProtocolo.S1040 := (cdsTabela.RecordCount > 0);
   finally
+    CloseFile(flOperacao_eS1040);
+    if not aProtocolo.S1040 then
+      DeleteFile(aFileProcesso);
+
     aSQL.Free;
     Result := aRetorno;
   end;
@@ -1717,7 +1862,14 @@ var
   ok   : Boolean;
   aEventoID,
   I    : Integer;
+  aMainTable    ,
+  aFileProcesso : String;
 begin
+  aMainTable    := 'TAB_HORARIO';
+  aFileProcesso := '.\log\eS1050.txt';
+  AssignFile(flOperacao_eS1050, aFileProcesso);
+  Rewrite(flOperacao_eS1050);
+
   aRetorno := False;
   aSQL := TStringList.Create;
   ok   := True;
@@ -1811,12 +1963,17 @@ begin
       Application.ProcessMessages;
       Inc(I);
 
+      Writeln(flOperacao_eS1050, 'S1050|' + aMainTable + '|' + MODO_OPERACAO[Ord(aModoLancamento)] + '|' + FormatFloat('0000000000', cdsTabela.FieldByName('ID').AsInteger));
       cdsTabela.Next;
     end;
 
     aRetorno := True;
-    aProtocolo.S1050 := aRetorno;
+    aProtocolo.S1050 := (cdsTabela.RecordCount > 0);
   finally
+    CloseFile(flOperacao_eS1050);
+    if not aProtocolo.S1050 then
+      DeleteFile(aFileProcesso);
+
     aSQL.Free;
     Result := aRetorno;
   end;
@@ -1830,7 +1987,14 @@ var
   ok   : Boolean;
   aEventoID,
   I    : Integer;
+  aMainTable    ,
+  aFileProcesso : String;
 begin
+  aMainTable    := 'DEPTO';
+  aFileProcesso := '.\log\eS1060.txt';
+  AssignFile(flOperacao_eS1060, aFileProcesso);
+  Rewrite(flOperacao_eS1060);
+
   aRetorno := False;
   aSQL := TStringList.Create;
   ok   := True;
@@ -1939,12 +2103,17 @@ begin
       Application.ProcessMessages;
       Inc(I);
 
+      Writeln(flOperacao_eS1060, 'S1060|' + aMainTable + '|' + MODO_OPERACAO[Ord(aModoLancamento)] + '|' + FormatFloat('0000000000', cdsTabela.FieldByName('ID').AsInteger));
       cdsTabela.Next;
     end;
 
     aRetorno := True;
-    aProtocolo.S1060 := aRetorno;
+    aProtocolo.S1060 := (cdsTabela.RecordCount > 0);
   finally
+    CloseFile(flOperacao_eS1060);
+    if not aProtocolo.S1060 then
+      DeleteFile(aFileProcesso);
+
     aSQL.Free;
     Result := aRetorno;
   end;
@@ -1960,7 +2129,14 @@ var
   I    : Integer;
   aDataInicial,
   aDataFinal  : TDateTime;
+  aMainTable    ,
+  aFileProcesso : String;
 begin
+  aMainTable    := 'SERVIDOR';
+  aFileProcesso := '.\log\eS2200.txt';
+  AssignFile(flOperacao_eS2200, aFileProcesso);
+  Rewrite(flOperacao_eS2200);
+
   aDataInicial := aCompetencia.DataInicial; // StrToDate('01/' + Copy(aCompetencia, 6, 2) + '/' + Copy(aCompetencia, 1, 4));
   aDataFinal   := aCompetencia.DataFinal;   // StrToDate(FormatFloat('00', DaysInMonth(aDataInicial)) + FormatDateTime('/mm/yyyy', aDataInicial));
 
@@ -2475,12 +2651,17 @@ begin
       Application.ProcessMessages;
       Inc(I);
 
+      Writeln(flOperacao_eS2200, 'S2200|' + aMainTable + '|' + MODO_OPERACAO[Ord(aModoLancamento)] + '|' + FormatFloat('0000000000', cdsTabela.FieldByName('ID_SERVIDOR').AsInteger));
       cdsTabela.Next;
     end;
 
     aRetorno := True;
-    aProtocolo.S2200 := aRetorno;
+    aProtocolo.S2200 := (cdsTabela.RecordCount > 0);
   finally
+    CloseFile(flOperacao_eS2200);
+    if not aProtocolo.S2200 then
+      DeleteFile(aFileProcesso);
+
     aSQL.Free;
     Result := aRetorno;
   end;
@@ -2496,7 +2677,14 @@ var
   I    : Integer;
   aDataInicial,
   aDataFinal  : TDateTime;
+  aMainTable    ,
+  aFileProcesso : String;
 begin
+  aMainTable    := 'PESSOA_FISICA';
+  aFileProcesso := '.\log\eS2205.txt';
+  AssignFile(flOperacao_eS2205, aFileProcesso);
+  Rewrite(flOperacao_eS2205);
+
   aDataInicial := aCompetencia.DataInicial;
   aDataFinal   := aCompetencia.DataFinal;
 
@@ -2812,12 +3000,17 @@ begin
       Application.ProcessMessages;
       Inc(I);
 
+      Writeln(flOperacao_eS2205, 'S2205|' + aMainTable + '|' + MODO_OPERACAO[Ord(aModoLancamento)] + '|' + FormatFloat('0000000000', cdsTabela.FieldByName('ID').AsInteger));
       cdsTabela.Next;
     end;
 
     aRetorno := True;
-    aProtocolo.S2205 := aRetorno;
+    aProtocolo.S2205 := (cdsTabela.RecordCount > 0);
   finally
+    CloseFile(flOperacao_eS2205);
+    if not aProtocolo.S2205 then
+      DeleteFile(aFileProcesso);
+
     aSQL.Free;
     Result := aRetorno;
   end;
@@ -2833,7 +3026,14 @@ var
   I    : Integer;
   aDataInicial,
   aDataFinal  : TDateTime;
+  aMainTable    ,
+  aFileProcesso : String;
 begin
+  aMainTable    := 'SERVIDOR';
+  aFileProcesso := '.\log\eS2206.txt';
+  AssignFile(flOperacao_eS2206, aFileProcesso);
+  Rewrite(flOperacao_eS2206);
+
   aDataInicial := aCompetencia.DataInicial;
   aDataFinal   := aCompetencia.DataFinal;
 
@@ -3132,12 +3332,17 @@ begin
       Application.ProcessMessages;
       Inc(I);
 
+      Writeln(flOperacao_eS2206, 'S2206|' + aMainTable + '|' + MODO_OPERACAO[Ord(aModoLancamento)] + '|' + FormatFloat('0000000000', cdsTabela.FieldByName('ID_SERVIDOR').AsInteger));
       cdsTabela.Next;
     end;
 
     aRetorno := True;
-    aProtocolo.S2206 := aRetorno;
+    aProtocolo.S2206 := (cdsTabela.RecordCount > 0);
   finally
+    CloseFile(flOperacao_eS2206);
+    if not aProtocolo.S2206 then
+      DeleteFile(aFileProcesso);
+
     aSQL.Free;
     Result := aRetorno;
   end;
@@ -3154,7 +3359,14 @@ var
   aDataInicial ,
   aDataFinal   : TDateTime;
   aResponsavel : TResponsavel;
+  aMainTable    ,
+  aFileProcesso : String;
 begin
+  aMainTable    := 'SERVIDOR';
+  aFileProcesso := '.\log\eS2240.txt';
+  AssignFile(flOperacao_eS2240, aFileProcesso);
+  Rewrite(flOperacao_eS2240);
+
   aDataInicial := aCompetencia.DataInicial;
   aDataFinal   := aCompetencia.DataFinal;
 
@@ -3198,6 +3410,7 @@ begin
     aSQL.Clear;
     aSQL.Add('Select ');
     aSQL.Add('    s.* ');
+    aSQL.Add('  , s.id as id_servidor ');
     aSQL.Add('  , p.cpf');
     aSQL.Add('  , coalesce(nullif(trim(s.pis_pasep_pf), ''''), nullif(trim(p.pis_pasep), ''''), ''00000000000'') as nis_trabalhador');
     aSQL.Add('  , d.descricao as dep_descricao');
@@ -3472,12 +3685,17 @@ begin
       Application.ProcessMessages;
       Inc(I);
 
+      Writeln(flOperacao_eS2240, 'S2240|' + aMainTable + '|' + MODO_OPERACAO[Ord(aModoLancamento)] + '|' + FormatFloat('0000000000', cdsTabela.FieldByName('ID_SERVIDOR').AsInteger));
       cdsTabela.Next;
     end;
 
     aRetorno := True;
-    aProtocolo.S2240 := aRetorno;
+    aProtocolo.S2240 := (cdsTabela.RecordCount > 0);
   finally
+    CloseFile(flOperacao_eS2240);
+    if not aProtocolo.S2240 then
+      DeleteFile(aFileProcesso);
+
     aSQL.Free;
     Result := aRetorno;
   end;
@@ -3494,7 +3712,14 @@ var
   aDataInicial ,
   aDataFinal   : TDateTime;
   aResponsavel : TResponsavel;
+  aMainTable    ,
+  aFileProcesso : String;
 begin
+  aMainTable    := 'SERVIDOR';
+  aFileProcesso := '.\log\eS2241.txt';
+  AssignFile(flOperacao_eS2241, aFileProcesso);
+  Rewrite(flOperacao_eS2241);
+
   aDataInicial := aCompetencia.DataInicial;
   aDataFinal   := aCompetencia.DataFinal;
 
@@ -3506,6 +3731,7 @@ begin
     aSQL.Clear;
     aSQL.Add('Select ');
     aSQL.Add('    s.* ');
+    aSQL.Add('  , s.id as id_servidor ');
     aSQL.Add('  , coalesce(s.matricula, substring(s.id from 1 for char_length(s.id) - 1)) as matricula_servidor');
     aSQL.Add('  , p.cpf');
     aSQL.Add('  , coalesce(nullif(trim(s.pis_pasep_pf), ''''), nullif(trim(p.pis_pasep), ''''), ''00000000000'') as nis_trabalhador');
@@ -3786,12 +4012,17 @@ begin
       Application.ProcessMessages;
       Inc(I);
 
+      Writeln(flOperacao_eS2241, 'S2241|' + aMainTable + '|' + MODO_OPERACAO[Ord(aModoLancamento)] + '|' + FormatFloat('0000000000', cdsTabela.FieldByName('ID_SERVIDOR').AsInteger));
       cdsTabela.Next;
     end;
 
     aRetorno := True;
-    aProtocolo.S2241 := aRetorno;
+    aProtocolo.S2241 := (cdsTabela.RecordCount > 0);
   finally
+    CloseFile(flOperacao_eS2241);
+    if not aProtocolo.S2241 then
+      DeleteFile(aFileProcesso);
+
     aSQL.Free;
     Result := aRetorno;
   end;
@@ -4227,6 +4458,7 @@ begin
   aS1060 := False;
   aS1070 := False;
   aS1080 := False;
+  aS2190 := False;
   aS2200 := False;
   aS2205 := False;
   aS2206 := False;
