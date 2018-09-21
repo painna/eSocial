@@ -432,3 +432,34 @@ assim que determinados dados enviados/processados pelo eSocial sejam novamente
 enviados.';
 
 GRANT EXECUTE ON PROCEDURE SP_ESOCIAL_LOG_EVENTO TO "PUBLIC";
+
+
+
+/*------ GERASYS.TI 21/09/2018 15:20:08 --------*/
+
+ALTER TABLE SITUACAO_TCM
+    ADD CATEG_ESOCIAL ESOCIAL_SMALLINT;
+
+COMMENT ON COLUMN SITUACAO_TCM.CATEG_ESOCIAL IS
+'eSocial - Categoria:
+Anexo I dos Leiautes do eSocial versao 2.4 - Tabela 01';
+
+
+
+
+/*------ GERASYS.TI 21/09/2018 15:54:15 --------*/
+
+COMMENT ON COLUMN ESTADO_FUNCIONAL.TIPO_MOVIM IS
+'1 - Normal
+A - Afastamento';
+
+
+
+
+/*------ GERASYS.TI 21/09/2018 15:54:54 --------*/
+
+COMMENT ON COLUMN ESTADO_FUNCIONAL.MOVIM_DEFINITIVA IS
+'Movimentacao Definitiva:
+N - Nao
+S - Sim (Para afastamentos definitivos este campo e muito importante)';
+

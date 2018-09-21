@@ -348,8 +348,11 @@ const
   EMPTY_DATE = '30/12/1899';
 
   ID_NACIONALIDADE_BRASIL        = '105';
-  ID_ESTADO_FUNCIONAL_DEMITIDO   = 6;
-  ID_ESTADO_FUNCIONAL_APOSENTADO = 10;
+//  ID_ESTADO_FUNCIONAL_DEMITIDO   = 6;  (Esses dados variam por cliente)
+//  ID_ESTADO_FUNCIONAL_APOSENTADO = 10;
+  ID_SITUACAO_TCM_INATIVO        = 40;
+  ID_SITUACAO_TCM_PENSIONISTA_1  = 51;
+  ID_SITUACAO_TCM_PENSIONISTA_2  = 52;
 
   MODO_OPERACAO : array[0..3] of String = (FLAG_OPERACAO_INSERIR, FLAG_OPERACAO_ALTERAR, FLAG_OPERACAO_EXCLUIR, FLAG_OPERACAO_ENVIADO);
 
@@ -1688,7 +1691,7 @@ begin
 
         if (not cdsTabela.FieldByName('data_ato_criacao').IsNull) then
         begin
-          evtTabCargo.infoCargo.DadosCargo.cargoPublico.leiCargo.nrLei := FormatFloat('#######00000', StrToCurrDef(Trim(cdsTabela.FieldByName('num_ato_criacao').AsString), 0));
+          evtTabCargo.infoCargo.DadosCargo.cargoPublico.leiCargo.nrLei := FormatFloat('#######00000', StrToCurrDef(OnlyNumber(Trim(cdsTabela.FieldByName('num_ato_criacao').AsString)), 0));
           evtTabCargo.infoCargo.DadosCargo.cargoPublico.leiCargo.dtLei := cdsTabela.FieldByName('data_ato_criacao').AsDateTime;
         end
         else
@@ -2190,7 +2193,6 @@ begin
     aSQL.Add('  , null as rne_orgao ');
     aSQL.Add('  , null as rne_uf ');
     aSQL.Add('  , null as rne_dt_emissao ');
-
 
     aSQL.Add('  , s.conselho_registro ');
     aSQL.Add('  , s.conselho_orgao    ');
