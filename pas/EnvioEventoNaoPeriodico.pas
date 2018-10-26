@@ -42,19 +42,17 @@ type
     cbS3000: TCheckBox;
     procedure FormCreate(Sender: TObject);
     procedure btnOkClick(Sender: TObject);
-
-    function GetESocial : TACBreSocial;
     procedure gpbOperacaoClick(Sender: TObject);
   private
     { Private declarations }
-    property eSocial : TACBreSocial read GetESocial;
-
     procedure LimparPainelProcesso(aVisualizar : Boolean);
 
+    function GetESocial : TACBreSocial;
     function EventoSelecionado : Boolean;
     function GeradoEnviado : Boolean;
   public
     { Public declarations }
+    property eSocial : TACBreSocial read GetESocial;
   end;
 
 var

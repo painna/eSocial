@@ -3947,7 +3947,7 @@ begin
         end;
 
         // Estado Funcional "APOSENTADO" (ESTADO_FUNCIONAL)
-        if (cdsTabela.FieldByName('id_est_funcional').AsInteger = ID_ESTADO_FUNCIONAL_APOSENTADO) then
+        if (cdsTabela.FieldByName('id_est_funcional').AsInteger = 0) then // ID_ESTADO_FUNCIONAL_APOSENTADO) then
           ;
 //        // AposentEsp - Infomações de condições que ensejam aposentadoria especial
 //        with AposentEsp do

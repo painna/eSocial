@@ -25,7 +25,8 @@ uses
   DialogoPadrao in '..\pas\DialogoPadrao.pas' {frmDialogoPadrao},
   EnvioEventoTabela in '..\pas\EnvioEventoTabela.pas' {frmEnvioEventoTabela},
   ConfigurarESocial in '..\pas\ConfigurarESocial.pas' {frmConfigurarESocial},
-  EnvioEventoNaoPeriodico in '..\pas\EnvioEventoNaoPeriodico.pas' {frmEnvioEventoNaoPeriodico};
+  EnvioEventoNaoPeriodico in '..\pas\EnvioEventoNaoPeriodico.pas' {frmEnvioEventoNaoPeriodico},
+  EnvioEventoPeriodico in '..\pas\EnvioEventoPeriodico.pas' {frmEnvioEventoPeriodico};
 
 {$R *.res}
 
