@@ -111,7 +111,8 @@ type
       aS2240 ,
       aS2241 ,
       aS2250 ,
-      aS2260 : Boolean;
+      aS2260 ,
+      aS1200 : Boolean;
 
       procedure SetNumeroInscricao(Value : String);
       procedure SetVersao(Value : String);
@@ -145,6 +146,7 @@ type
       property S2241 : Boolean read aS2241 write aS2241;
       property S2250 : Boolean read aS2250 write aS2250;
       property S2260 : Boolean read aS2260 write aS2260;
+      property S1200 : Boolean read aS1200 write aS1200;
 
       constructor Create(Value : String); overload;
       destructor Destroy; override;
@@ -240,6 +242,9 @@ type
     flOperacao_eS2241 ,
     flOperacao_eS2250 ,
     flOperacao_eS2260 : TextFile;
+
+    // LOGs para Eventos Periódicos
+    flOperacao_eS1200 : TextFile;
 
     property MensagemRetorno : TStringList read GetMensagemRetorno;
 
@@ -477,6 +482,9 @@ begin
       ProcessarFileLOG('.\log\eS2250.txt', flOperacao_eS2250);
     if aProtocolo.S2260 then
       ProcessarFileLOG('.\log\eS2260.txt', flOperacao_eS2260);
+
+    if aProtocolo.S1200 then
+      ProcessarFileLOG('.\log\eS1200.txt', flOperacao_eS1200);
   finally
     // Processar LOGs
     spLogEvento.Close;
@@ -4460,6 +4468,7 @@ begin
   aS1060 := False;
   aS1070 := False;
   aS1080 := False;
+
   aS2190 := False;
   aS2200 := False;
   aS2205 := False;
@@ -4471,6 +4480,8 @@ begin
   aS2241 := False;
   aS2250 := False;
   aS2260 := False;
+
+  aS1200 := False;
 end;
 
 procedure TProtocoloESocial.SetNumeroInscricao(Value: String);
