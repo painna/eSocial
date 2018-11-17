@@ -122,21 +122,31 @@ end;
 
 procedure TfrmLogin.FormShow(Sender: TObject);
 begin
-  if glb_iIdOperLogado = 0 then
+  if IsDebuggerPresent then
   begin
-     if DelphiCarregado then
-     begin
-        edUsuario.Text := 'GERASYS.TI';
-        edSenha.Text   := 'gsti2010'; //'gstinew1';
-     end else
-        edUsuario.Text := '';
-     edUsuario.SetFocus
-  end else
+    edUsuario.Text := 'GERASYS.TI';
+    edSenha.Text   := 'gsti2010'; //'gstinew1';
+  end
+  else
   begin
-     edUsuario.Text := Criptografa(Pesquisa('USUARIO','NOME_CURTO',
-        edUsuario.Text,'ID',''),'2',20);
-     edSenha.Text:= '';
-     edSenha.SetFocus;
+    if glb_iIdOperLogado = 0 then
+    begin
+       if DelphiCarregado then
+       begin
+          edUsuario.Text := 'GERASYS.TI';
+          edSenha.Text   := 'gsti2010'; //'gstinew1';
+       end
+       else
+          edUsuario.Text := EmptyStr;
+
+       edUsuario.SetFocus
+    end
+    else
+    begin
+       edUsuario.Text := Criptografa(Pesquisa('USUARIO','NOME_CURTO', edUsuario.Text, 'ID',''), '2', 20);
+       edSenha.Text:= '';
+       edSenha.SetFocus;
+    end;
   end;
 end;
 

@@ -6176,7 +6176,7 @@ inherited frmLogin: TfrmLogin
     Style.Font.Style = [fsBold]
     Style.StyleController = dmPrincipal.cxEditStyleNormal
     Style.IsFontAssigned = True
-    TabOrder = 1
+    TabOrder = 0
     OnExit = edUsuarioExit
     Width = 146
   end
@@ -6193,7 +6193,7 @@ inherited frmLogin: TfrmLogin
     Style.Font.Style = [fsBold]
     Style.StyleController = dmPrincipal.cxEditStyleNormal
     Style.IsFontAssigned = True
-    TabOrder = 3
+    TabOrder = 1
     OnExit = edSenhaExit
     Width = 146
   end
@@ -6227,7 +6227,7 @@ inherited frmLogin: TfrmLogin
       0000}
     NumGlyphs = 2
     ParentFont = False
-    TabOrder = 4
+    TabOrder = 3
     OnClick = btnOkClick
   end
   object btnCancelar: TBitBtn

@@ -329,6 +329,11 @@ type
       aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge;
       var aProtocolo : TProtocoloESocial) : Boolean;                         virtual; abstract;
 
+    // procedures eventos periódicos
+    function Gerar_eSocial1200(aCompetencia : TCompetencia; aZerarBase : Boolean;
+      aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge;
+      var aProtocolo : TProtocoloESocial) : Boolean;
+
     function ConfigurarCertificado(const AOwner : TComponent) : Boolean;
     function EventoEnviado_eSocial(aGrupo : TeSocialGrupo; aCompetencia : String;
       aLabel : TLabel; aProcesso : TGauge; var aProtocolo : TProtocoloESocial) : Boolean;
@@ -358,6 +363,9 @@ const
   ID_SITUACAO_TCM_INATIVO        = 40;
   ID_SITUACAO_TCM_PENSIONISTA_1  = 51;
   ID_SITUACAO_TCM_PENSIONISTA_2  = 52;
+
+  COD_CATEGORIA_AGENTE_PUBLICO   = 309;    // Agente Público - Outros
+  NAT_RUBRICA_DESC_ASSIST_MEDICA = '9219'; // DESCONTO DE ASSISTÊNCIA MÉDICA OU ODONTOLÓGICA
 
   MODO_OPERACAO : array[0..3] of String = (FLAG_OPERACAO_INSERIR, FLAG_OPERACAO_ALTERAR, FLAG_OPERACAO_EXCLUIR, FLAG_OPERACAO_ENVIADO);
 
@@ -428,6 +436,7 @@ procedure TdmESocial.AtualizarOperacoes(aModoLancamento: TModoLancamento; aProto
           ParamByName('TABELA').AsString    := aRegistro[1];
           ParamByName('OPERACAO').AsString  := aRegistro[2];
           ParamByName('ID').AsString        := aRegistro[3];
+          ParamByName('CAMPO').AsString     := aRegistro[4];
           ParamByName('PROTOCOLO').AsString := aProtocolo.Numero;
           ExecProc;
         end;
@@ -1023,7 +1032,7 @@ begin
       Application.ProcessMessages;
       Inc(I);
 
-      Writeln(flOperacao_eS1000, 'S1000|' + aMainTable + '|' + MODO_OPERACAO[Ord(aModoLancamento)] + '|' + FormatFloat('0000000000', cdsTabela.FieldByName('ID').AsInteger));
+      Writeln(flOperacao_eS1000, 'S1000|' + aMainTable + '|' + MODO_OPERACAO[Ord(aModoLancamento)] + '|' + FormatFloat('0000000000', cdsTabela.FieldByName('ID').AsInteger) + '|ID');
       cdsTabela.Next;
     end;
 
@@ -1196,7 +1205,7 @@ begin
       Application.ProcessMessages;
       Inc(I);
 
-      Writeln(flOperacao_eS1005, 'S1005|' + aMainTable + '|' + MODO_OPERACAO[Ord(aModoLancamento)] + '|' + FormatFloat('0000000000', cdsTabela.FieldByName('ID').AsInteger));
+      Writeln(flOperacao_eS1005, 'S1005|' + aMainTable + '|' + MODO_OPERACAO[Ord(aModoLancamento)] + '|' + FormatFloat('0000000000', cdsTabela.FieldByName('ID').AsInteger) + '|ID');
       cdsTabela.Next;
     end;
 
@@ -1391,7 +1400,7 @@ begin
       Application.ProcessMessages;
       Inc(I);
 
-      Writeln(flOperacao_eS1010, 'S1010|' + aMainTable + '|' + MODO_OPERACAO[Ord(aModoLancamento)] + '|' + FormatFloat('0000000000', cdsTabela.FieldByName('ID').AsInteger));
+      Writeln(flOperacao_eS1010, 'S1010|' + aMainTable + '|' + MODO_OPERACAO[Ord(aModoLancamento)] + '|' + FormatFloat('0000000000', cdsTabela.FieldByName('ID').AsInteger) + '|ID');
       cdsTabela.Next;
     end;
 
@@ -1534,7 +1543,7 @@ begin
       Application.ProcessMessages;
       Inc(I);
 
-      Writeln(flOperacao_eS1020, 'S1020|' + aMainTable + '|' + MODO_OPERACAO[Ord(aModoLancamento)] + '|' + FormatFloat('0000000000', cdsTabela.FieldByName('ID').AsInteger));
+      Writeln(flOperacao_eS1020, 'S1020|' + aMainTable + '|' + MODO_OPERACAO[Ord(aModoLancamento)] + '|' + FormatFloat('0000000000', cdsTabela.FieldByName('ID').AsInteger) + '|ID');
       cdsTabela.Next;
     end;
 (*
@@ -1722,7 +1731,7 @@ begin
       Application.ProcessMessages;
       Inc(I);
 
-      Writeln(flOperacao_eS1030, 'S1030|' + aMainTable + '|' + MODO_OPERACAO[Ord(aModoLancamento)] + '|' + FormatFloat('0000000000', cdsTabela.FieldByName('ID').AsInteger));
+      Writeln(flOperacao_eS1030, 'S1030|' + aMainTable + '|' + MODO_OPERACAO[Ord(aModoLancamento)] + '|' + FormatFloat('0000000000', cdsTabela.FieldByName('ID').AsInteger) + '|ID');
       cdsTabela.Next;
     end;
 
@@ -1849,7 +1858,7 @@ begin
       Application.ProcessMessages;
       Inc(I);
 
-      Writeln(flOperacao_eS1040, 'S1040|' + aMainTable + '|' + MODO_OPERACAO[Ord(aModoLancamento)] + '|' + FormatFloat('0000000000', cdsTabela.FieldByName('ID').AsInteger));
+      Writeln(flOperacao_eS1040, 'S1040|' + aMainTable + '|' + MODO_OPERACAO[Ord(aModoLancamento)] + '|' + FormatFloat('0000000000', cdsTabela.FieldByName('ID').AsInteger) + '|ID');
       cdsTabela.Next;
     end;
 
@@ -1974,7 +1983,7 @@ begin
       Application.ProcessMessages;
       Inc(I);
 
-      Writeln(flOperacao_eS1050, 'S1050|' + aMainTable + '|' + MODO_OPERACAO[Ord(aModoLancamento)] + '|' + FormatFloat('0000000000', cdsTabela.FieldByName('ID').AsInteger));
+      Writeln(flOperacao_eS1050, 'S1050|' + aMainTable + '|' + MODO_OPERACAO[Ord(aModoLancamento)] + '|' + FormatFloat('0000000000', cdsTabela.FieldByName('ID').AsInteger) + '|ID');
       cdsTabela.Next;
     end;
 
@@ -2114,7 +2123,7 @@ begin
       Application.ProcessMessages;
       Inc(I);
 
-      Writeln(flOperacao_eS1060, 'S1060|' + aMainTable + '|' + MODO_OPERACAO[Ord(aModoLancamento)] + '|' + FormatFloat('0000000000', cdsTabela.FieldByName('ID').AsInteger));
+      Writeln(flOperacao_eS1060, 'S1060|' + aMainTable + '|' + MODO_OPERACAO[Ord(aModoLancamento)] + '|' + FormatFloat('0000000000', cdsTabela.FieldByName('ID').AsInteger) + '|ID');
       cdsTabela.Next;
     end;
 
@@ -2123,6 +2132,340 @@ begin
   finally
     CloseFile(flOperacao_eS1060);
     if not aProtocolo.S1060 then
+      DeleteFile(aFileProcesso);
+
+    aSQL.Free;
+    Result := aRetorno;
+  end;
+end;
+
+function TdmESocial.Gerar_eSocial1200(aCompetencia: TCompetencia; aZerarBase: Boolean;
+  aModoLancamento: TModoLancamento; aLabel: TLabel; aProcesso: TGauge;
+  var aProtocolo: TProtocoloESocial): Boolean;
+var
+  aRetorno : Boolean;
+  aSQL : TStringList;
+  ok   : Boolean;
+  aEventoID,
+  I    : Integer;
+  aDataInicial,
+  aDataFinal  : TDateTime;
+  aParcela      ,
+  aMainTable    ,
+  aFileProcesso : String;
+  aFatorRubrica : Currency;
+  aNatRubrica_9219 : Boolean;
+begin
+  aParcela      := '0'; // -- Pagamento Normal
+  aMainTable    := 'INICIALIZA_MES_SERVIDOR';
+  aFileProcesso := '.\log\eS1200.txt';
+  AssignFile(flOperacao_eS1200, aFileProcesso);
+  Rewrite(flOperacao_eS1200);
+
+  aDataInicial := aCompetencia.DataInicial; // StrToDate('01/' + Copy(aCompetencia, 6, 2) + '/' + Copy(aCompetencia, 1, 4));
+  aDataFinal   := aCompetencia.DataFinal;   // StrToDate(FormatFloat('00', DaysInMonth(aDataInicial)) + FormatDateTime('/mm/yyyy', aDataInicial));
+
+  aRetorno := False;
+  aSQL := TStringList.Create;
+  ok   := True;
+  try
+    aSQL.BeginUpdate;
+    aSQL.Clear;
+    aSQL.Add('Select ');
+    aSQL.Add('    m.* ');
+    aSQL.Add('  , b.parcela');
+    aSQL.Add('  , s.nome_servidor as nome ');
+    aSQL.Add('  , p.dt_nascimento ');
+    aSQL.Add('  , coalesce(nullif(trim(s.pis_pasep_pf), ''''), nullif(trim(p.pis_pasep), ''''), ''00000000000'') as nis_trabalhador ');
+    aSQL.Add('  , coalesce(s.matricula, substring(s.id from 1 for char_length(s.id) - 1)) as matricula');
+    aSQL.Add('  , s.dt_admissao ');
+    aSQL.Add('  , c.cod_cbo ');
+    aSQL.Add('  , s.categoria_trab  as categoria ');
+    aSQL.Add('  , m.id_unid_lotacao as lotacao ');
+    aSQL.Add('  , m.id_depto        as depto ');
+    aSQL.Add('  , m.qtd_dias_trab   as dias_trabalhados ');
+    aSQL.Add('  , NULL as dec_terc_salario');
+    aSQL.Add('from INICIALIZA_MES_SERVIDOR m ');
+    aSQL.Add('  inner join BASE_CALC_MES_SERVIDOR b on (b.ano_mes = m.ano_mes and b.id_servidor = m.id_servidor) ');
+    aSQL.Add('  inner join SERVIDOR s on (s.id = m.id_servidor) ');
+    aSQL.Add('  inner join PESSOA_FISICA p on (p.id = s.id_pessoa_fisica) ');
+    aSQL.Add('  left join CARGO_FUNCAO c on (c.id = coalesce(s.id_cargo_atual, s.id_cargo_origem)) ');
+    aSQL.Add('where m.ano_mes = ' + QuotedStr(IntToStr(aCompetencia.ID)) );
+    aSQL.Add('  and b.parcela = ' + QuotedStr(aParcela));
+
+//    case aModoLancamento of
+//      mlInclusao  : aSQL.Add('  and s.tipo_operacao = ' + QuotedStr(FLAG_OPERACAO_INSERIR));
+//      mlAlteracao : aSQL.Add('  and s.tipo_operacao = ' + QuotedStr(FLAG_OPERACAO_ALTERAR));
+//      mlExclusao  : aSQL.Add('  and s.tipo_operacao = ' + QuotedStr(FLAG_OPERACAO_EXCLUIR));
+//    end;
+
+    aSQL.EndUpdate;
+    aSQL.SaveToFile('.\log\eS1200.sql');
+    SetSQL(aSQL);
+
+    I := 1;
+
+    aProcesso.MaxValue := cdsTabela.RecordCount;
+    aProcesso.Progress := 0;
+    Application.ProcessMessages;
+
+    ACBrESocial.Eventos.Periodicos.S1200.Clear;
+
+    cdsTabela.First;
+    while not cdsTabela.Eof do
+    begin
+      with ACBrESocial.Eventos.Periodicos.S1200.Add do
+      begin
+        with EvtRemun do
+        begin
+          aEventoID := StrToInt(IncrementGenerator('GEN_ESOCIAL_EVENTO_S1200', 1));
+          Sequencial:= aEventoID;
+
+          if AmbienteWebServiceProducao then
+            IdeEvento.TpAmb := TpTpAmb(0) //taProducao
+          else
+            IdeEvento.TpAmb := taProducaoRestrita;
+
+          IdeEvento.indRetif := ireOriginal; // (ireOriginal, ireRetificacao);
+
+          if (IdeEvento.indRetif = ireRetificacao) then
+            IdeEvento.NrRecibo := '65.5454.987798798798' // Preencher com o número do recibo do arquivo a ser retificado.
+          else
+            IdeEvento.NrRecibo := EmptyStr;
+
+          IdeEvento.ProcEmi := peAplicEmpregador;
+          IdeEvento.VerProc := Versao_Executavel(ParamStr(0));
+
+          if (Trim(cdsTabela.FieldByName('dec_terc_salario').AsString) = 'S') then
+            IdeEvento.IndApuracao := tpIndApuracao(ipaAnual)
+          else
+            IdeEvento.IndApuracao := tpIndApuracao(iapuMensal);
+
+          IdeEvento.perApur := Copy(aCompetencia.Codigo, 6, 2) + Copy(aCompetencia.Codigo, 1, 4); // '052015';
+
+          IdeEmpregador.TpInsc := tiCNPJ;
+          IdeEmpregador.NrInsc := Criptografa(Pesquisa('CONFIG_ORGAO', 'ID', '1', 'CNPJ', ''),'2', 14); //Criptografa(cdsTabela.FieldByName('CNPJ').AsString, '2', 14);
+
+          with ACBrESocial.Configuracoes do
+            Geral.IdEmpregador := EvtRemun.IdeEmpregador.NrInsc;
+
+          with ideTrabalhador do
+          begin
+            CpfTrab := OnlyNumber(Trim(cdsTabela.FieldByName('cpf').AsString));
+            NisTrab := Trim(cdsTabela.FieldByName('nis_trabalhador').AsString);
+
+//            with infoMV do
+//            begin
+//              indMV := imvDescontadaempregador;
+//
+//              { Os Grupos abaixo são opcionais
+//                O grupo abaixocorresponde a funcionários que tenham dois empregos em empresas diferentes }
+//              remunOutrEmpr.Clear;
+//
+//              with remunOutrEmpr.Add do
+//              begin
+//                TpInsc     := tiCNPJ;
+//                NrInsc     := '01234567890123';
+//                CodCateg   := 222;
+//                vlrRemunOE := 1230.10;
+//              end;
+//            end;
+//
+//            // o grupo abaixo corresponde apenas a trabalhadores cuja categoria não está sujeita ao evento de admissão
+//            // ou TSV-início
+//            with infoComplem do
+//            begin
+//              NmTrab       := Trim(cdsTabela.FieldByName('nome').AsString);
+//              DtNascto     := cdsTabela.FieldByName('dt_nascimento').AsDateTime;
+//              codCBO       := Trim(cdsTabela.FieldByName('cod_cbo').AsString);
+//              NatAtividade := navUrbano;
+//              qtdDiasTrab  := 0;
+//
+//              with sucessaoVinc do
+//              begin
+//                cnpjEmpregAnt := '12345678987654';
+//                MatricAnt     := '123';
+//                DtAdm         := Now;
+//                observacao    := 'obs sucessao vinc';
+//              end;
+//            end;
+//
+//            // Os dados abaixo só devem ser informados em caso do processo existir e houver decisão que incida sobre as
+//            // contribuições
+//            procJudTrab.Clear;
+//
+//            with procJudTrab.Add do
+//            begin
+//              tpTrib    := tptPrevidenciaria;
+//              nrProcJud := '95135703320156150258';
+//              codSusp   := 1;
+//            end;
+          end;
+
+          dmDev.Clear;
+
+          with dmDev.Add do
+          begin
+            ideDmDev := FormatFloat('#', StrToIntDef(Trim(cdsTabela.FieldByName('parcela').AsString), 0) + 1);
+            CodCateg := StrToIntDef(Trim(cdsTabela.FieldByName('categoria').AsString), COD_CATEGORIA_AGENTE_PUBLICO); // Agente Público - Outros
+
+            with infoPerApur.ideEstabLot.Add do
+            begin
+              TpInsc     := IdeEmpregador.TpInsc;
+              NrInsc     := IdeEmpregador.NrInsc;
+              codLotacao := FormatFloat('0000000', StrToIntDef(Pesquisa('CONFIG_ORGAO', 'ID', '1', 'ID', ''), 1) );
+              qtdDiasAv  := cdsTabela.FieldByName('dias_trabalhados').AsInteger;
+
+              aNatRubrica_9219 := False;
+
+              remunPerAnt.Clear;
+
+              with remunPerApur.Add do
+              begin
+                Matricula  := Trim(cdsTabela.FieldByName('matricula').AsString);
+                indSimples := idsIntegralmente;
+
+                itensRemun.Clear;
+
+                aSQL.BeginUpdate;
+                aSQL.Clear;
+                aSQL.Add('Select');
+                aSQL.Add('    r.*');
+                aSQL.Add('  , e.codigo as cd_evento');
+                aSQL.Add('  , e.nat_rubrica');
+                aSQL.Add('from LANCTO_EVENTO_CALC r');
+                aSQL.Add('  inner join EVENTO e on (e.id = r.id_evento)');
+                aSQL.Add('where r.ano_mes     = ' + QuotedStr(IntToStr(aCompetencia.ID)));
+                aSQL.Add('  and r.parcela     = ' + QuotedStr(aParcela));
+                aSQL.Add('  and r.id_servidor = ' + cdsTabela.FieldByName('id_servidor').AsString);
+                aSQL.EndUpdate;
+                SetSQL_Detalhe(aSQL);
+
+                cdsDetalhe.First;
+                if (cdsDetalhe.RecordCount > 0) then
+                begin
+                  while not cdsDetalhe.Eof do
+                  begin
+                    with itensRemun.Add do
+                    begin
+                      if (Pos('%', Trim(cdsDetalhe.FieldByName('observacao').AsString)) = 0) then
+                        fatorRubr := 0.0
+                      else
+                        fatorRubr := StrToCurrDef(OnlyNumber(Trim(cdsDetalhe.FieldByName('observacao').AsString)), 0.0);
+
+                      CodRubr    := Trim(cdsDetalhe.FieldByName('cd_evento').AsString);
+                      ideTabRubr := Trim(cdsDetalhe.FieldByName('id_evento').AsString);
+                      qtdRubr    := cdsDetalhe.FieldByName('qtd').AsCurrency;
+                      fatorRubr  := aFatorRubrica;
+                      vrUnit     := cdsDetalhe.FieldByName('valor').AsCurrency;
+                      vrRubr     := cdsDetalhe.FieldByName('valor').AsCurrency;
+
+                      if (not aNatRubrica_9219) then
+                        aNatRubrica_9219 := (Trim(cdsDetalhe.FieldByName('nat_rubrica').AsString) = NAT_RUBRICA_DESC_ASSIST_MEDICA);
+                    end;
+
+                    cdsDetalhe.Next;
+                  end;
+                end;
+                cdsDetalhe.Close;
+
+                infoSaudeColet.detOper.Clear; // Plano Privado Coletivo de Assistência à Saúde
+
+//                if aNatRubrica_9219 then
+//                  with infoSaudeColet.detOper.Add do
+//                  begin
+//                    cnpjOper := '01234567898765';
+//                    regANS   := 'A1B2C3';
+//                    vrPgTit  := 155.50;
+//
+//                    detPlano.Clear;
+//
+//                    with detPlano.Add do
+//                    begin
+//                      tpDep    := tdConjuge;
+//                      cpfDep   := '01234567898';
+//                      nmDep    := 'José das Areias';
+//                      DtNascto := date;
+//                      vlrPgDep := 0.75;
+//                    end;
+//                  end;
+
+                infoAgNocivo.grauExp := ge1;
+              end;
+            end;
+
+            infoPerAnt.ideADC.Clear; // Remuneração relativa a diferenças salariais
+
+//            with infoPerAnt.ideADC.Add do  // Instrumento ou situação ensejadora da remuneração em Períodos Anteriores
+//            begin
+//              dtAcConv   := Now;
+//              tpAcConv   := tacLegislacaoFederalEstadualMunicipalDistrital;
+//              dtEfAcConv := Now;
+//              compAcConv := '2017-01';
+//              dsc        := 'Dissídio';
+//
+//              idePeriodo.Clear;
+//
+//              with IdePeriodo.Add do
+//              begin
+//                perRef := '201504';
+//
+//                ideEstabLot.Clear;
+//
+//                with ideEstabLot.Add do
+//                begin
+//                  TpInsc     := IdeEmpregador.TpInsc;
+//                  NrInsc     := IdeEmpregador.NrInsc;
+//                  codLotacao := FormatFloat('0000000', StrToIntDef(Pesquisa('CONFIG_ORGAO', 'ID', '1', 'ID', ''), 1) );
+//
+//                  remunPerAnt.Clear;
+//
+//                  with remunPerAnt.Add do
+//                  begin
+//                    Matricula  := Trim(cdsTabela.FieldByName('matricula').AsString);
+//                    indSimples := idsIntegralmente;
+//
+//                    itensRemun.Clear;
+//
+//                    with itensRemun.Add do
+//                    begin
+//                      CodRubr := '987654';
+//                      ideTabRubr := 'E380';
+//                      qtdRubr := 100;
+//                      fatorRubr := 50;
+//                      vrUnit := 3296.35;
+//                      vrRubr := 3330.30;
+//                    end;
+//
+//                    infoAgNocivo.grauExp := ge1;
+//                  end;
+//                end;
+//              end;
+//            end;
+
+            infoTrabInterm.Clear;
+//
+//            with infoTrabInterm.Add do
+//              codConv := '123456'; // Código de Convocação do TRabalhador Intermitente
+          end;
+        end;
+      end;
+
+      aLabel.Caption     := Trim(cdsTabela.FieldByName('nome').AsString);
+      aProcesso.Progress := I;
+      Application.ProcessMessages;
+      Inc(I);
+
+//      Writeln(flOperacao_eS1200, 'S1200|' + aMainTable + '|' + MODO_OPERACAO[Ord(aModoLancamento)] + '|' + cdsTabela.FieldByName('ANO_MES').AsString + FormatFloat('0000000000', cdsTabela.FieldByName('ID_SERVIDOR').AsInteger) + '|ANO_MES');
+      Writeln(flOperacao_eS1200, 'S1200|' + aMainTable + '|' + MODO_OPERACAO[Ord(aModoLancamento)] + '|' + cdsTabela.FieldByName('ANO_MES').AsString + '|ANO_MES');
+      cdsTabela.Next;
+    end;
+
+    aRetorno := True;
+    aProtocolo.S2200 := (cdsTabela.RecordCount > 0);
+  finally
+    CloseFile(flOperacao_eS2200);
+    if not aProtocolo.S2200 then
       DeleteFile(aFileProcesso);
 
     aSQL.Free;
@@ -2180,6 +2523,7 @@ begin
     aSQL.Add('  , s.id_situacao_tcm');
     aSQL.Add('  , s.id_cargo_origem');
     aSQL.Add('  , s.id_cargo_atual');
+    aSQL.Add('  , s.categoria_trab as categoria');
     aSQL.Add('  , f.id_tipo_cargo_tcm');
     aSQL.Add('  , coalesce(s.vencto_base, f.vencto_base) as vencto_base');
     aSQL.Add('  , s.observacao');
@@ -2540,7 +2884,7 @@ begin
           begin
             CodCargo    := cdsTabela.FieldByName('id_cargo_origem').AsString;
             CodFuncao   := IfThen(cdsTabela.FieldByName('id_tipo_cargo_tcm').AsInteger = 10, cdsTabela.FieldByName('id_cargo_origem').AsString, EmptyStr);
-            CodCateg    := 309; // Agente Público - Outros
+            CodCateg    := StrToIntDef(Trim(cdsTabela.FieldByName('categoria').AsString), COD_CATEGORIA_AGENTE_PUBLICO); // Agente Público - Outros
             codCarreira := EmptyStr;
             dtIngrCarr  := StrToDate(EMPTY_DATE);
 
@@ -2661,7 +3005,7 @@ begin
       Application.ProcessMessages;
       Inc(I);
 
-      Writeln(flOperacao_eS2200, 'S2200|' + aMainTable + '|' + MODO_OPERACAO[Ord(aModoLancamento)] + '|' + FormatFloat('0000000000', cdsTabela.FieldByName('ID_SERVIDOR').AsInteger));
+      Writeln(flOperacao_eS2200, 'S2200|' + aMainTable + '|' + MODO_OPERACAO[Ord(aModoLancamento)] + '|' + FormatFloat('0000000000', cdsTabela.FieldByName('ID_SERVIDOR').AsInteger) + '|ID');
       cdsTabela.Next;
     end;
 
@@ -3010,7 +3354,7 @@ begin
       Application.ProcessMessages;
       Inc(I);
 
-      Writeln(flOperacao_eS2205, 'S2205|' + aMainTable + '|' + MODO_OPERACAO[Ord(aModoLancamento)] + '|' + FormatFloat('0000000000', cdsTabela.FieldByName('ID').AsInteger));
+      Writeln(flOperacao_eS2205, 'S2205|' + aMainTable + '|' + MODO_OPERACAO[Ord(aModoLancamento)] + '|' + FormatFloat('0000000000', cdsTabela.FieldByName('ID').AsInteger) + '|ID');
       cdsTabela.Next;
     end;
 
@@ -3076,6 +3420,7 @@ begin
     aSQL.Add('  , s.id_situacao_tcm');
     aSQL.Add('  , s.id_cargo_origem');
     aSQL.Add('  , s.id_cargo_atual');
+    aSQL.Add('  , s.categoria_trab as categoria');
     aSQL.Add('  , f.id_tipo_cargo_tcm');
     aSQL.Add('  , coalesce(s.vencto_base, f.vencto_base) as vencto_base');
     aSQL.Add('  , s.observacao');
@@ -3256,7 +3601,7 @@ begin
         begin
           CodCargo    := cdsTabela.FieldByName('id_cargo_origem').AsString;
           CodFuncao   := IfThen(cdsTabela.FieldByName('id_tipo_cargo_tcm').AsInteger = 10, cdsTabela.FieldByName('id_cargo_origem').AsString, EmptyStr);
-          CodCateg    := 309; // Agente Público - Outros
+          CodCateg    := StrToIntDef(Trim(cdsTabela.FieldByName('categoria').AsString), COD_CATEGORIA_AGENTE_PUBLICO); // Agente Público - Outros
           codCarreira := EmptyStr;
           dtIngrCarr  := StrToDate(EMPTY_DATE);
 
@@ -3342,7 +3687,7 @@ begin
       Application.ProcessMessages;
       Inc(I);
 
-      Writeln(flOperacao_eS2206, 'S2206|' + aMainTable + '|' + MODO_OPERACAO[Ord(aModoLancamento)] + '|' + FormatFloat('0000000000', cdsTabela.FieldByName('ID_SERVIDOR').AsInteger));
+      Writeln(flOperacao_eS2206, 'S2206|' + aMainTable + '|' + MODO_OPERACAO[Ord(aModoLancamento)] + '|' + FormatFloat('0000000000', cdsTabela.FieldByName('ID_SERVIDOR').AsInteger) + '|ID');
       cdsTabela.Next;
     end;
 
@@ -3695,7 +4040,7 @@ begin
       Application.ProcessMessages;
       Inc(I);
 
-      Writeln(flOperacao_eS2240, 'S2240|' + aMainTable + '|' + MODO_OPERACAO[Ord(aModoLancamento)] + '|' + FormatFloat('0000000000', cdsTabela.FieldByName('ID_SERVIDOR').AsInteger));
+      Writeln(flOperacao_eS2240, 'S2240|' + aMainTable + '|' + MODO_OPERACAO[Ord(aModoLancamento)] + '|' + FormatFloat('0000000000', cdsTabela.FieldByName('ID_SERVIDOR').AsInteger) + '|ID');
       cdsTabela.Next;
     end;
 
@@ -4022,7 +4367,7 @@ begin
       Application.ProcessMessages;
       Inc(I);
 
-      Writeln(flOperacao_eS2241, 'S2241|' + aMainTable + '|' + MODO_OPERACAO[Ord(aModoLancamento)] + '|' + FormatFloat('0000000000', cdsTabela.FieldByName('ID_SERVIDOR').AsInteger));
+      Writeln(flOperacao_eS2241, 'S2241|' + aMainTable + '|' + MODO_OPERACAO[Ord(aModoLancamento)] + '|' + FormatFloat('0000000000', cdsTabela.FieldByName('ID_SERVIDOR').AsInteger) + '|ID');
       cdsTabela.Next;
     end;
 
@@ -4167,7 +4512,7 @@ begin
       cbVersaoDF.ItemIndex        := Ini.ReadInteger('Geral', 'VersaoDF', 0);
       ckSalvar.Checked            := Ini.ReadBool('Geral', 'Salvar', True);
       cbxRetirarAcentos.Checked   := Ini.ReadBool('Geral', 'RetirarAcentos', True);
-      edtIdEmpregador.Text        := Ini.ReadString ('Geral', 'IdEmpregador', Pesquisa('CONFIG_ORGAO', 'ID', '1', 'CNPJ',''));
+      edtIdEmpregador.Text        := Ini.ReadString ('Geral', 'IdEmpregador', Criptografa(Pesquisa('CONFIG_ORGAO', 'ID', '1', 'CNPJ',''), '2', 14));
       edtIdTransmissor.Text       := Ini.ReadString ('Geral', 'IdTransmissor', '');
       cbTEmpregador.ItemIndex     := Ini.ReadInteger('Geral', 'TipoEmpregador', 0);
 

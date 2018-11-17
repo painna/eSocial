@@ -140,8 +140,8 @@ begin
 
         aProtocolo := TProtocoloESocial.Create(EmptyStr);
 
-//        if aRetorno and cbS1200.Checked then
-//          aRetorno := dmESocial.Gerar_eSocial1200(TCompetencia(cmbAnoMes.Items.Objects[cmbAnoMes.ItemIndex]), Checb_ZeraBase.Checked, mlInclusao, lblProcesso, gagProcesso, aProtocolo);
+        if aRetorno and cbS1200.Checked then
+          aRetorno := dmESocial.Gerar_eSocial1200(TCompetencia(cmbAnoMes.Items.Objects[cmbAnoMes.ItemIndex]), Checb_ZeraBase.Checked, mlInclusao, lblProcesso, gagProcesso, aProtocolo);
 //        if aRetorno and cbS1202.Checked then
 //          aRetorno := dmESocial.Gerar_eSocial1202(TCompetencia(cmbAnoMes.Items.Objects[cmbAnoMes.ItemIndex]), Checb_ZeraBase.Checked, mlInclusao, lblProcesso, gagProcesso, aProtocolo);
 //        if aRetorno and cbS1207.Checked then
