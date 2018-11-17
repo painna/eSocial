@@ -737,7 +737,7 @@ begin
       if aRetorno then
         with ACBrESocial.Eventos, ACBrESocial.WebServices.EnvioLote.RetEnvioLote do
         begin
-          if Status.cdResposta in [201, 202] then
+          if (Status.cdResposta in [201, 202]) then
           begin
             aProtocolo.Versao          := dadosRecLote.versaoAplicRecepcao;
             aProtocolo.DataHora        := dadosRecLote.dhRecepcao;
@@ -2176,6 +2176,7 @@ begin
     aSQL.Add('  , b.parcela');
     aSQL.Add('  , s.nome_servidor as nome ');
     aSQL.Add('  , p.dt_nascimento ');
+    aSQL.Add('  , p.cpf ');
     aSQL.Add('  , coalesce(nullif(trim(s.pis_pasep_pf), ''''), nullif(trim(p.pis_pasep), ''''), ''00000000000'') as nis_trabalhador ');
     aSQL.Add('  , coalesce(s.matricula, substring(s.id from 1 for char_length(s.id) - 1)) as matricula');
     aSQL.Add('  , s.dt_admissao ');
@@ -2193,11 +2194,11 @@ begin
     aSQL.Add('where m.ano_mes = ' + QuotedStr(IntToStr(aCompetencia.ID)) );
     aSQL.Add('  and b.parcela = ' + QuotedStr(aParcela));
 
-//    case aModoLancamento of
-//      mlInclusao  : aSQL.Add('  and s.tipo_operacao = ' + QuotedStr(FLAG_OPERACAO_INSERIR));
-//      mlAlteracao : aSQL.Add('  and s.tipo_operacao = ' + QuotedStr(FLAG_OPERACAO_ALTERAR));
-//      mlExclusao  : aSQL.Add('  and s.tipo_operacao = ' + QuotedStr(FLAG_OPERACAO_EXCLUIR));
-//    end;
+    case aModoLancamento of
+      mlInclusao  : aSQL.Add('  and m.tipo_operacao = ' + QuotedStr(FLAG_OPERACAO_INSERIR));
+      mlAlteracao : aSQL.Add('  and m.tipo_operacao = ' + QuotedStr(FLAG_OPERACAO_ALTERAR));
+      mlExclusao  : aSQL.Add('  and m.tipo_operacao = ' + QuotedStr(FLAG_OPERACAO_EXCLUIR));
+    end;
 
     aSQL.EndUpdate;
     aSQL.SaveToFile('.\log\eS1200.sql');
@@ -2396,7 +2397,7 @@ begin
 
             infoPerAnt.ideADC.Clear; // Remuneração relativa a diferenças salariais
 
-//            with infoPerAnt.ideADC.Add do  // Instrumento ou situação ensejadora da remuneração em Períodos Anteriores
+//            with infoPerAnt.ideADC.Add do  // Instrumento ou situação ensejadora da remuneração em Períodos Anteriores (?)
 //            begin
 //              dtAcConv   := Now;
 //              tpAcConv   := tacLegislacaoFederalEstadualMunicipalDistrital;
@@ -2456,16 +2457,15 @@ begin
       Application.ProcessMessages;
       Inc(I);
 
-//      Writeln(flOperacao_eS1200, 'S1200|' + aMainTable + '|' + MODO_OPERACAO[Ord(aModoLancamento)] + '|' + cdsTabela.FieldByName('ANO_MES').AsString + FormatFloat('0000000000', cdsTabela.FieldByName('ID_SERVIDOR').AsInteger) + '|ANO_MES');
-      Writeln(flOperacao_eS1200, 'S1200|' + aMainTable + '|' + MODO_OPERACAO[Ord(aModoLancamento)] + '|' + cdsTabela.FieldByName('ANO_MES').AsString + '|ANO_MES');
+      Writeln(flOperacao_eS1200, 'S1200|' + aMainTable + '|' + MODO_OPERACAO[Ord(aModoLancamento)] + '|' + cdsTabela.FieldByName('ANO_MES').AsString + ';' + FormatFloat('0000000000', cdsTabela.FieldByName('ID_SERVIDOR').AsInteger) + '|ANO_MES;ID_SERVIDOR');
       cdsTabela.Next;
     end;
 
     aRetorno := True;
-    aProtocolo.S2200 := (cdsTabela.RecordCount > 0);
+    aProtocolo.S1200 := (cdsTabela.RecordCount > 0);
   finally
-    CloseFile(flOperacao_eS2200);
-    if not aProtocolo.S2200 then
+    CloseFile(flOperacao_eS1200);
+    if not aProtocolo.S1200 then
       DeleteFile(aFileProcesso);
 
     aSQL.Free;

@@ -223,3 +223,120 @@ Token unknown - line 5, column 70.
 and.
 
 */
+
+
+/*------ SYSDBA 17/11/2018 19:02:47 --------*/
+
+ALTER TABLE INICIALIZA_MES_SERVIDOR
+    ADD TIPO_OPERACAO ESOCIAL_OPERACAO;
+
+COMMENT ON COLUMN INICIALIZA_MES_SERVIDOR.TIPO_OPERACAO IS
+'eSocial - Operacao do registro:
+I - Inclusao
+A - Alteracao
+E - Exclusao
+P - Processado/Enviado';
+
+
+
+
+/*------ SYSDBA 17/11/2018 19:02:58 --------*/
+
+UPDATE INICIALIZA_MES_SERVIDOR
+SET TIPO_OPERACAO = 'I';
+
+
+
+
+/*------ SYSDBA 17/11/2018 19:15:30 --------*/
+
+ALTER TABLE ESOCIAL_LOG_EVENTO ALTER COLUMN CAMPO TYPE "VARCHAR(120)";
+
+
+
+
+/*------ SYSDBA 17/11/2018 19:15:53 --------*/
+
+SET TERM ^ ;
+
+CREATE OR ALTER procedure set_esocial_log_evento (
+    evento "VARCHAR(10)",
+    tabela "VARCHAR(30)",
+    campo "VARCHAR(120)",
+    operacao esocial_operacao,
+    id "BIGINT",
+    protocolo "VARCHAR(30)")
+as
+begin
+  if (exists(
+    Select
+      pr.id
+    from ESOCIAL_RETORNO_PROTOCOLO pr
+    where pr.numero = :protocolo
+  )) then
+  begin
+    if (not exists(
+      Select
+        lg.tabela
+      from ESOCIAL_LOG_EVENTO lg
+      where lg.evento   = :evento
+        and lg.operacao = :operacao
+        and lg.id       = :id
+    )) then
+    begin
+      Insert Into ESOCIAL_LOG_EVENTO (
+          evento
+        , operacao
+        , id
+        , tabela
+        , campo
+        , protocolo_envio
+      ) values (
+          :evento
+        , :operacao
+        , :id
+        , :tabela
+        , :campo
+        , :protocolo
+      );
+    end
+  end
+end^
+
+SET TERM ; ^
+
+
+
+
+/*------ SYSDBA 17/11/2018 19:16:17 --------*/
+
+SET TERM ^ ;
+
+CREATE OR ALTER procedure sp_esocial_log_evento (
+    protocolo "VARCHAR(30)")
+as
+declare variable tabela "VARCHAR(40)";
+declare variable campo "VARCHAR(120)";
+declare variable id "VARCHAR(40)";
+declare variable scriptupdate "VARCHAR(250)";
+begin
+  for
+    Select
+        lg.tabela
+      , coalesce(lg.campo, 'ID')
+      , cast(lg.id as "VARCHAR(40)")
+    from ESOCIAL_LOG_EVENTO lg
+    where lg.protocolo_envio = :protocolo
+    Into
+        tabela
+      , campo
+      , id
+  do
+  begin
+    scriptUpdate = 'Update ' || :tabela || ' set TIPO_OPERACAO = ''P''  where ' || :campo || ' = ' || :id;
+    execute statement :scriptUpdate;
+  end 
+end^
+
+SET TERM ; ^
+
