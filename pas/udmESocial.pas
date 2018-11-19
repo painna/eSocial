@@ -112,7 +112,8 @@ type
       aS2241 ,
       aS2250 ,
       aS2260 ,
-      aS1200 : Boolean;
+      aS1200 ,
+      aS1202 : Boolean;
 
       procedure SetNumeroInscricao(Value : String);
       procedure SetVersao(Value : String);
@@ -147,6 +148,7 @@ type
       property S2250 : Boolean read aS2250 write aS2250;
       property S2260 : Boolean read aS2260 write aS2260;
       property S1200 : Boolean read aS1200 write aS1200;
+      property S1202 : Boolean read aS1202 write aS1202;
 
       constructor Create(Value : String); overload;
       destructor Destroy; override;
@@ -244,12 +246,14 @@ type
     flOperacao_eS2260 : TextFile;
 
     // LOGs para Eventos Periódicos
-    flOperacao_eS1200 : TextFile;
+    flOperacao_eS1200 ,
+    flOperacao_eS1202 : TextFile;
 
     property MensagemRetorno : TStringList read GetMensagemRetorno;
 
     procedure ListarCompetencias(aLista : TComboBox);
     procedure ListarCompetenciasAdmissao(aLista : TComboBox);
+    procedure ListarCompetenciasFolha(aLista : TComboBox);
     procedure LerConfiguracao;
     procedure GravarProtocoloRetorno(aProtocolo : TProtocoloESocial);
     procedure AtualizarOperacoes(aModoLancamento: TModoLancamento; aProtocolo: TProtocoloESocial);
@@ -333,6 +337,9 @@ type
     function Gerar_eSocial1200(aCompetencia : TCompetencia; aZerarBase : Boolean;
       aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge;
       var aProtocolo : TProtocoloESocial) : Boolean;
+    function Gerar_eSocial1202(aCompetencia : TCompetencia; aZerarBase : Boolean;
+      aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge;
+      var aProtocolo : TProtocoloESocial) : Boolean; virtual; abstract;
 
     function ConfigurarCertificado(const AOwner : TComponent) : Boolean;
     function EventoEnviado_eSocial(aGrupo : TeSocialGrupo; aCompetencia : String;
@@ -416,7 +423,9 @@ procedure TdmESocial.AtualizarOperacoes(aModoLancamento: TModoLancamento; aProto
 
   procedure ProcessarFileLOG(aFileName : String; const aTextFile : TextFile);
   var
+    StrValores,
     aLinha    : String;
+    aValores  ,
     aRegistro : TStringDynArray;
   begin
     if FileExists(aFileName) then
@@ -431,12 +440,24 @@ procedure TdmESocial.AtualizarOperacoes(aModoLancamento: TModoLancamento; aProto
         // Gravar LOGs
         with setLogEvento do
         begin
+          StrValores := Trim(aRegistro[3]);
+          aValores   := SplitString(StrValores, ';');
+
           Close;
           ParamByName('EVENTO').AsString    := aRegistro[0];
           ParamByName('TABELA').AsString    := aRegistro[1];
           ParamByName('OPERACAO').AsString  := aRegistro[2];
           ParamByName('ID').AsString        := aRegistro[3];
           ParamByName('CAMPO').AsString     := aRegistro[4];
+
+          if (Pos(';', StrValores) > 0) then
+          begin
+            ParamByName('ID').AsString      := aValores[0];
+            ParamByName('VALORES').AsString := StrValores;
+          end
+          else
+            ParamByName('VALORES').Clear;
+
           ParamByName('PROTOCOLO').AsString := aProtocolo.Numero;
           ExecProc;
         end;
@@ -494,6 +515,8 @@ begin
 
     if aProtocolo.S1200 then
       ProcessarFileLOG('.\log\eS1200.txt', flOperacao_eS1200);
+    if aProtocolo.S1202 then
+      ProcessarFileLOG('.\log\eS1202.txt', flOperacao_eS1202);
   finally
     // Processar LOGs
     spLogEvento.Close;
@@ -4725,6 +4748,58 @@ begin
   end;
 end;
 
+procedure TdmESocial.ListarCompetenciasFolha(aLista: TComboBox);
+var
+  aSQL : TStringList;
+  i : Integer;
+  s : String;
+  c : TCompetencia;
+begin
+  aLista.Items.BeginUpdate;
+  aLista.Items.Clear;
+
+  aSQL := TStringList.Create;
+  try
+    aSQL.BeginUpdate;
+    aSQL.Clear;
+    aSQL.Add('Select distinct');
+    aSQL.Add('    f.ano_mes');
+    aSQL.Add('  , substring(f.ano_mes from 1 for 4) as nr_ano');
+    aSQL.Add('  , substring(f.ano_mes from 5 for 2) as nr_mes');
+    aSQL.Add('  , substring(f.ano_mes from 1 for 4) || ''-'' ||');
+    aSQL.Add('    substring(f.ano_mes from 5 for 2) as ds_competencia');
+    aSQL.Add('from BASE_CALC_MES_SERVIDOR f');
+    aSQL.Add('order by');
+    aSQL.Add('    1 ');
+    aSQL.EndUpdate;
+
+    SetSQL_Geral(aSQL);
+
+    cdsGeral.First;
+    while not cdsGeral.Eof do
+    begin
+      s := cdsGeral.FieldByName('nr_mes').AsString;
+      if ((s = '13') or (s = '14') or (s = '15')) then
+        s := '12';
+
+      c := TCompetencia.Criar;
+      c.DataInicial := StrToDate('01/' + s + '/' + cdsGeral.FieldByName('nr_ano').AsString);
+      c.DataFinal   := StrToDate(FormatFloat('00', DaysInMonth(c.DataInicial)) + FormatDateTime('/mm/yyyy', c.DataInicial));
+      c.Codigo      := cdsGeral.FieldByName('ds_competencia').AsString;
+      c.Descricao   := FormatDateTime('mmmm"/"yyyy', c.DataInicial);
+
+      aLista.Items.AddObject(c.Codigo, c);
+      cdsGeral.Next;
+    end;
+    cdsGeral.Close;
+  finally
+    aLista.Items.EndUpdate;
+    aLista.ItemIndex := (aLista.Items.Count - 1);
+
+    aSQL.Free;
+  end;
+end;
+
 function TdmESocial.ProximaCompetencia(aCompetencia : String): String;
 var
   aAno ,
@@ -4827,6 +4902,7 @@ begin
   aS2260 := False;
 
   aS1200 := False;
+  aS1202 := False;
 end;
 
 procedure TProtocoloESocial.SetNumeroInscricao(Value: String);

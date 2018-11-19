@@ -340,3 +340,173 @@ end^
 
 SET TERM ; ^
 
+
+
+
+/*------ SYSDBA 18/11/2018 11:15:23 --------*/
+
+ALTER TABLE ESOCIAL_LOG_EVENTO
+    ADD VALORES "VARCHAR(100)";
+
+alter table ESOCIAL_LOG_EVENTO
+alter EVENTO position 1;
+
+alter table ESOCIAL_LOG_EVENTO
+alter OPERACAO position 2;
+
+alter table ESOCIAL_LOG_EVENTO
+alter ID position 3;
+
+alter table ESOCIAL_LOG_EVENTO
+alter TABELA position 4;
+
+alter table ESOCIAL_LOG_EVENTO
+alter CAMPO position 5;
+
+alter table ESOCIAL_LOG_EVENTO
+alter VALORES position 6;
+
+alter table ESOCIAL_LOG_EVENTO
+alter PROTOCOLO_ENVIO position 7;
+
+
+
+
+/*------ SYSDBA 18/11/2018 11:16:09 --------*/
+
+SET TERM ^ ;
+
+CREATE OR ALTER procedure set_esocial_log_evento (
+    evento "VARCHAR(10)",
+    tabela "VARCHAR(30)",
+    campo "VARCHAR(120)",
+    valores "VARCHAR(100)",
+    operacao esocial_operacao,
+    id "BIGINT",
+    protocolo "VARCHAR(30)")
+as
+begin
+  if (exists(
+    Select
+      pr.id
+    from ESOCIAL_RETORNO_PROTOCOLO pr
+    where pr.numero = :protocolo
+  )) then
+  begin
+    if (not exists(
+      Select
+        lg.tabela
+      from ESOCIAL_LOG_EVENTO lg
+      where lg.evento   = :evento
+        and lg.operacao = :operacao
+        and lg.id       = :id
+    )) then
+    begin
+      Insert Into ESOCIAL_LOG_EVENTO (
+          evento
+        , operacao
+        , id
+        , tabela
+        , campo
+        , valores
+        , protocolo_envio
+      ) values (
+          :evento
+        , :operacao
+        , :id
+        , :tabela
+        , :campo
+        , :valores
+        , :protocolo
+      );
+    end
+  end
+end^
+
+SET TERM ; ^
+
+
+
+/*------ SYSDBA 18/11/2018 11:29:17 --------*/
+
+/*!!! Error occured !!!
+Invalid token.
+Dynamic SQL Error.
+SQL error code = -104.
+Token unknown - line 3, column 3.
+case.
+
+*/
+
+/*------ SYSDBA 18/11/2018 11:29:24 --------*/
+
+/*!!! Error occured !!!
+Invalid token.
+Dynamic SQL Error.
+SQL error code = -104.
+Token unknown - line 3, column 5.
+case.
+
+*/
+
+/*------ SYSDBA 18/11/2018 11:30:41 --------*/
+
+/*!!! Error occured !!!
+Invalid token.
+Dynamic SQL Error.
+SQL error code = -104.
+Token unknown - line 8, column 78.
+(.
+
+*/
+
+
+/*------ SYSDBA 18/11/2018 11:39:15 --------*/
+
+SET TERM ^ ;
+
+CREATE OR ALTER procedure sp_esocial_log_evento (
+    protocolo "VARCHAR(30)")
+as
+declare variable tabela "VARCHAR(40)";
+declare variable campo "VARCHAR(120)";
+declare variable valores "VARCHAR(100)";
+declare variable id "VARCHAR(40)";
+declare variable pos_campo Integer;
+declare variable pos_valor Integer;
+declare variable scriptupdate "VARCHAR(250)";
+begin
+  for
+    Select
+        lg.tabela
+      , coalesce(lg.campo, 'ID')
+      , coalesce(lg.valores, '')
+      , cast(lg.id as "VARCHAR(40)")
+    from ESOCIAL_LOG_EVENTO lg
+    where lg.protocolo_envio = :protocolo
+    Into
+        tabela
+      , campo
+      , valores
+      , id
+  do
+  begin
+    if (position(';', :valores) = 0) then
+    begin
+      scriptUpdate = 'Update ' || :tabela || ' set TIPO_OPERACAO = ''P''  where ' || :campo || ' = ' || :id;
+      execute statement :scriptUpdate;
+    end
+    else
+    begin
+      pos_campo = position(';', :campo);
+      pos_valor = position(';', :valores);
+      scriptUpdate = 'Update ' || :tabela || ' set TIPO_OPERACAO = ''P''  ' ||
+        'where ' || substring(:campo from 1 for :pos_campo - 1)                   || ' = ' || substring(:valores from 1 for :pos_valor - 1) ||
+        '  and ' || substring(:campo from :pos_campo + 1 for char_length(:campo)) || ' = ' || substring(:valores from :pos_valor + 1 for char_length(:valores));
+      execute statement :scriptUpdate;
+    end
+  end 
+end^
+
+SET TERM ; ^
+

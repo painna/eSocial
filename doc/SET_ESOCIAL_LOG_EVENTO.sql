@@ -1,7 +1,8 @@
 create or alter procedure set_esocial_log_evento (
     evento "VARCHAR(10)",
     tabela "VARCHAR(30)",
-    campo "VARCHAR(30)",
+    campo "VARCHAR(120)",
+    valores "VARCHAR(100)",
     operacao esocial_operacao,
     id "BIGINT",
     protocolo "VARCHAR(30)")
@@ -29,6 +30,7 @@ begin
         , id
         , tabela
         , campo
+        , valores
         , protocolo_envio
       ) values (
           :evento
@@ -36,6 +38,7 @@ begin
         , :id
         , :tabela
         , :campo
+        , :valores
         , :protocolo
       );
     end
