@@ -102,6 +102,7 @@ begin
   dmESocial.ListarCompetenciasFolha(cmbAnoMes);
   LimparPainelProcesso(False);
   cbS1202.Enabled := (Pesquisa('CONFIG_ESOCIAL', 'ID_CONFIG_ORGAO', '1', 'POSSUI_RPPS', '') = FLAG_SIM);
+  cbS1207.Enabled := (Pesquisa('CONFIG_ESOCIAL', 'ID_CONFIG_ORGAO', '1', 'POSSUI_RPPS', '') = FLAG_SIM);
 end;
 
 function TfrmEnvioEventoPeriodico.GeradoEnviado: Boolean;
@@ -144,8 +145,8 @@ begin
           aRetorno := dmESocial.Gerar_eSocial1200(TCompetencia(cmbAnoMes.Items.Objects[cmbAnoMes.ItemIndex]), Checb_ZeraBase.Checked, mlInclusao, lblProcesso, gagProcesso, aProtocolo);
         if aRetorno and cbS1202.Checked then
           aRetorno := dmESocial.Gerar_eSocial1202(TCompetencia(cmbAnoMes.Items.Objects[cmbAnoMes.ItemIndex]), Checb_ZeraBase.Checked, mlInclusao, lblProcesso, gagProcesso, aProtocolo);
-//        if aRetorno and cbS1207.Checked then
-//          aRetorno := dmESocial.Gerar_eSocial1207(TCompetencia(cmbAnoMes.Items.Objects[cmbAnoMes.ItemIndex]), Checb_ZeraBase.Checked, mlInclusao, lblProcesso, gagProcesso, aProtocolo);
+        if aRetorno and cbS1207.Checked then
+          aRetorno := dmESocial.Gerar_eSocial1207(TCompetencia(cmbAnoMes.Items.Objects[cmbAnoMes.ItemIndex]), Checb_ZeraBase.Checked, mlInclusao, lblProcesso, gagProcesso, aProtocolo);
 
         if aRetorno then
           aRetorno := dmESocial.EventoEnviado_eSocial(egIniciais, cmbAnoMes.Text, lblProcesso, gagProcesso, aProtocolo);

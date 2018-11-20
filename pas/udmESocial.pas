@@ -113,7 +113,8 @@ type
       aS2250 ,
       aS2260 ,
       aS1200 ,
-      aS1202 : Boolean;
+      aS1202 ,
+      aS1207 : Boolean;
 
       procedure SetNumeroInscricao(Value : String);
       procedure SetVersao(Value : String);
@@ -149,6 +150,7 @@ type
       property S2260 : Boolean read aS2260 write aS2260;
       property S1200 : Boolean read aS1200 write aS1200;
       property S1202 : Boolean read aS1202 write aS1202;
+      property S1207 : Boolean read aS1207 write aS1207;
 
       constructor Create(Value : String); overload;
       destructor Destroy; override;
@@ -247,7 +249,8 @@ type
 
     // LOGs para Eventos Periódicos
     flOperacao_eS1200 ,
-    flOperacao_eS1202 : TextFile;
+    flOperacao_eS1202 ,
+    flOperacao_eS1207 : TextFile;
 
     property MensagemRetorno : TStringList read GetMensagemRetorno;
 
@@ -338,6 +341,9 @@ type
       aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge;
       var aProtocolo : TProtocoloESocial) : Boolean;
     function Gerar_eSocial1202(aCompetencia : TCompetencia; aZerarBase : Boolean;
+      aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge;
+      var aProtocolo : TProtocoloESocial) : Boolean;
+    function Gerar_eSocial1207(aCompetencia : TCompetencia; aZerarBase : Boolean;
       aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge;
       var aProtocolo : TProtocoloESocial) : Boolean; virtual; abstract;
 
@@ -517,6 +523,8 @@ begin
       ProcessarFileLOG('.\log\eS1200.txt', flOperacao_eS1200);
     if aProtocolo.S1202 then
       ProcessarFileLOG('.\log\eS1202.txt', flOperacao_eS1202);
+    if aProtocolo.S1207 then
+      ProcessarFileLOG('.\log\eS1207.txt', flOperacao_eS1207);
   finally
     // Processar LOGs
     spLogEvento.Close;
@@ -2333,6 +2341,8 @@ begin
             ideDmDev := FormatFloat('#', StrToIntDef(Trim(cdsTabela.FieldByName('parcela').AsString), 0) + 1);
             CodCateg := StrToIntDef(Trim(cdsTabela.FieldByName('categoria').AsString), COD_CATEGORIA_AGENTE_PUBLICO); // Agente Público - Outros
 
+            infoPerApur.ideEstabLot.Clear;
+
             with infoPerApur.ideEstabLot.Add do
             begin
               TpInsc     := IdeEmpregador.TpInsc;
@@ -2489,6 +2499,304 @@ begin
   finally
     CloseFile(flOperacao_eS1200);
     if not aProtocolo.S1200 then
+      DeleteFile(aFileProcesso);
+
+    aSQL.Free;
+    Result := aRetorno;
+  end;
+end;
+
+function TdmESocial.Gerar_eSocial1202(aCompetencia: TCompetencia; aZerarBase: Boolean;
+  aModoLancamento: TModoLancamento; aLabel: TLabel; aProcesso: TGauge;
+  var aProtocolo: TProtocoloESocial): Boolean;
+var
+  aRetorno : Boolean;
+  aSQL : TStringList;
+  ok   : Boolean;
+  aEventoID,
+  I    : Integer;
+  aDataInicial,
+  aDataFinal  : TDateTime;
+  aParcela      ,
+  aMainTable    ,
+  aFileProcesso : String;
+  aFatorRubrica : Currency;
+  aNatRubrica_9219 : Boolean;
+begin
+  aParcela      := '0'; // -- Pagamento Normal
+  aMainTable    := 'INICIALIZA_MES_SERVIDOR';
+  aFileProcesso := '.\log\eS1202.txt';
+  AssignFile(flOperacao_eS1202, aFileProcesso);
+  Rewrite(flOperacao_eS1202);
+
+  aDataInicial := aCompetencia.DataInicial; // StrToDate('01/' + Copy(aCompetencia, 6, 2) + '/' + Copy(aCompetencia, 1, 4));
+  aDataFinal   := aCompetencia.DataFinal;   // StrToDate(FormatFloat('00', DaysInMonth(aDataInicial)) + FormatDateTime('/mm/yyyy', aDataInicial));
+
+  aRetorno := False;
+  aSQL := TStringList.Create;
+  ok   := True;
+  try
+    aSQL.BeginUpdate;
+    aSQL.Clear;
+    aSQL.Add('Select ');
+    aSQL.Add('    m.* ');
+    aSQL.Add('  , b.parcela');
+    aSQL.Add('  , s.nome_servidor as nome ');
+    aSQL.Add('  , p.dt_nascimento ');
+    aSQL.Add('  , p.cpf ');
+    aSQL.Add('  , coalesce(nullif(trim(s.pis_pasep_pf), ''''), nullif(trim(p.pis_pasep), ''''), ''00000000000'') as nis_trabalhador ');
+    aSQL.Add('  , coalesce(s.matricula, substring(s.id from 1 for char_length(s.id) - 1)) as matricula');
+    aSQL.Add('  , s.dt_admissao ');
+    aSQL.Add('  , c.cod_cbo ');
+    aSQL.Add('  , s.categoria_trab  as categoria ');
+    aSQL.Add('  , m.id_unid_lotacao as lotacao ');
+    aSQL.Add('  , m.id_depto        as depto ');
+    aSQL.Add('  , m.qtd_dias_trab   as dias_trabalhados ');
+    aSQL.Add('  , NULL as dec_terc_salario');
+    aSQL.Add('  , coalesce((');
+    aSQL.Add('      Select');
+    aSQL.Add('        count(sd.id)');
+    aSQL.Add('      from SERVIDOR_DEPENDENTE sd');
+    aSQL.Add('      where sd.id_servidor = m.id_servidor');
+    aSQL.Add('    ), 0) qt_dependentes');
+    aSQL.Add('from INICIALIZA_MES_SERVIDOR m ');
+    aSQL.Add('  inner join BASE_CALC_MES_SERVIDOR b on (b.ano_mes = m.ano_mes and b.id_servidor = m.id_servidor) ');
+    aSQL.Add('  inner join SERVIDOR s on (s.id = m.id_servidor) ');
+    aSQL.Add('  inner join PESSOA_FISICA p on (p.id = s.id_pessoa_fisica) ');
+    aSQL.Add('  left join CARGO_FUNCAO c on (c.id = coalesce(s.id_cargo_atual, s.id_cargo_origem)) ');
+    aSQL.Add('where (m.id_unid_gestora in (');
+    aSQL.Add('  Select                    ');
+    aSQL.Add('    es.id_unid_gestora      ');
+    aSQL.Add('  from CONFIG_ESOCIAL es    ');
+    aSQL.Add('  where es.possui_rpps =    ' + QuotedStr(FLAG_SIM));
+    aSQL.Add('))');
+    aSQL.Add('  and (m.ano_mes = ' + QuotedStr(IntToStr(aCompetencia.ID)) + ')');
+    aSQL.Add('  and (b.parcela = ' + QuotedStr(aParcela) + ')');
+
+    case aModoLancamento of
+      mlInclusao  : aSQL.Add('  and (m.tipo_operacao = ' + QuotedStr(FLAG_OPERACAO_INSERIR) + ')');
+      mlAlteracao : aSQL.Add('  and (m.tipo_operacao = ' + QuotedStr(FLAG_OPERACAO_ALTERAR) + ')');
+      mlExclusao  : aSQL.Add('  and (m.tipo_operacao = ' + QuotedStr(FLAG_OPERACAO_EXCLUIR) + ')');
+    end;
+
+    aSQL.EndUpdate;
+    aSQL.SaveToFile('.\log\eS1202.sql');
+    SetSQL(aSQL);
+
+    I := 1;
+
+    aProcesso.MaxValue := cdsTabela.RecordCount;
+    aProcesso.Progress := 0;
+    Application.ProcessMessages;
+
+    ACBrESocial.Eventos.Periodicos.S1202.Clear;
+
+    cdsTabela.First;
+    while not cdsTabela.Eof do
+    begin
+      with ACBrESocial.Eventos.Periodicos.S1202.Add do
+      begin
+        with evtRmnRPPS do
+        begin
+          aEventoID := StrToInt(IncrementGenerator('GEN_ESOCIAL_EVENTO_S1200', 1));
+          Sequencial:= aEventoID;
+
+          if AmbienteWebServiceProducao then
+            IdeEvento.TpAmb := TpTpAmb(0) //taProducao
+          else
+            IdeEvento.TpAmb := taProducaoRestrita;
+
+          IdeEvento.indRetif := ireOriginal; // (ireOriginal, ireRetificacao);
+
+          if (IdeEvento.indRetif = ireRetificacao) then
+            IdeEvento.NrRecibo := '65.5454.987798798798' // Preencher com o número do recibo do arquivo a ser retificado.
+          else
+            IdeEvento.NrRecibo := EmptyStr;
+
+          IdeEvento.ProcEmi := peAplicEmpregador;
+          IdeEvento.VerProc := Versao_Executavel(ParamStr(0));
+
+          if (Trim(cdsTabela.FieldByName('dec_terc_salario').AsString) = 'S') then
+            IdeEvento.IndApuracao := tpIndApuracao(ipaAnual)
+          else
+            IdeEvento.IndApuracao := tpIndApuracao(iapuMensal);
+
+          IdeEvento.perApur := Copy(aCompetencia.Codigo, 6, 2) + Copy(aCompetencia.Codigo, 1, 4); // '052015';
+
+          IdeEmpregador.TpInsc := tiCNPJ;
+          IdeEmpregador.NrInsc := Criptografa(Pesquisa('CONFIG_ORGAO', 'ID', '1', 'CNPJ', ''),'2', 14); //Criptografa(cdsTabela.FieldByName('CNPJ').AsString, '2', 14);
+
+          with ACBrESocial.Configuracoes do
+            Geral.IdEmpregador := evtRmnRPPS.IdeEmpregador.NrInsc;
+
+          with ideTrabalhador do
+          begin
+            CpfTrab  := OnlyNumber(Trim(cdsTabela.FieldByName('cpf').AsString));
+            NisTrab  := Trim(cdsTabela.FieldByName('nis_trabalhador').AsString);
+            qtdDepFP := cdsTabela.FieldByName('qt_dependentes').AsInteger;
+
+            // os dados abaixo só devem ser informados em caso do processo existir
+            // e houver decisão que incida sobre as  contribuições
+            procJudTrab.Clear;
+
+//            with procJudTrab.Add do
+//            begin
+//              tpTrib    := tptPrevidenciaria;
+//              nrProcJud := '95135703320156150258';
+//              codSusp   := 1;
+//            end;
+          end;
+
+          dmDev.Clear;
+
+          with dmDev.Add do
+          begin
+            ideDmDev := FormatFloat('#', StrToIntDef(Trim(cdsTabela.FieldByName('parcela').AsString), 0) + 1);
+
+            infoPerApur.ideEstab.Clear;
+
+            with infoPerApur.ideEstab.Add do
+            begin
+              TpInsc     := IdeEmpregador.TpInsc;
+              NrInsc     := IdeEmpregador.NrInsc;
+
+              aNatRubrica_9219 := False;
+
+              remunPerAnt.Clear;
+
+              with remunPerApur.Add do
+              begin
+                Matricula := Trim(cdsTabela.FieldByName('matricula').AsString);
+                CodCateg  := StrToIntDef(Trim(cdsTabela.FieldByName('categoria').AsString), COD_CATEGORIA_AGENTE_PUBLICO); // Agente Público - Outros
+
+                itensRemun.Clear;
+
+                aSQL.BeginUpdate;
+                aSQL.Clear;
+                aSQL.Add('Select');
+                aSQL.Add('    r.*');
+                aSQL.Add('  , e.codigo as cd_evento');
+                aSQL.Add('  , e.nat_rubrica');
+                aSQL.Add('from LANCTO_EVENTO_CALC r');
+                aSQL.Add('  inner join EVENTO e on (e.id = r.id_evento)');
+                aSQL.Add('where r.ano_mes     = ' + QuotedStr(IntToStr(aCompetencia.ID)));
+                aSQL.Add('  and r.parcela     = ' + QuotedStr(aParcela));
+                aSQL.Add('  and r.id_servidor = ' + cdsTabela.FieldByName('id_servidor').AsString);
+                aSQL.EndUpdate;
+                SetSQL_Detalhe(aSQL);
+
+                cdsDetalhe.First;
+                if (cdsDetalhe.RecordCount > 0) then
+                begin
+                  while not cdsDetalhe.Eof do
+                  begin
+                    with itensRemun.Add do
+                    begin
+                      if (Pos('%', Trim(cdsDetalhe.FieldByName('observacao').AsString)) = 0) then
+                        fatorRubr := 0.0
+                      else
+                        fatorRubr := StrToCurrDef(OnlyNumber(Trim(cdsDetalhe.FieldByName('observacao').AsString)), 0.0);
+
+                      CodRubr    := Trim(cdsDetalhe.FieldByName('cd_evento').AsString);
+                      ideTabRubr := Trim(cdsDetalhe.FieldByName('id_evento').AsString);
+                      qtdRubr    := cdsDetalhe.FieldByName('qtd').AsCurrency;
+                      fatorRubr  := aFatorRubrica;
+                      vrUnit     := cdsDetalhe.FieldByName('valor').AsCurrency;
+                      vrRubr     := cdsDetalhe.FieldByName('valor').AsCurrency;
+
+                      if (not aNatRubrica_9219) then
+                        aNatRubrica_9219 := (Trim(cdsDetalhe.FieldByName('nat_rubrica').AsString) = NAT_RUBRICA_DESC_ASSIST_MEDICA);
+                    end;
+
+                    cdsDetalhe.Next;
+                  end;
+                end;
+                cdsDetalhe.Close;
+
+                infoSaudeColet.detOper.Clear; // Plano Privado Coletivo de Assistência à Saúde
+
+//                if aNatRubrica_9219 then
+//                  with infoSaudeColet.detOper.Add do
+//                  begin
+//                    cnpjOper := '01234567898765';
+//                    regANS   := 'A1B2C3';
+//                    vrPgTit  := 155.50;
+//
+//                    detPlano.Clear;
+//
+//                    with detPlano.Add do
+//                    begin
+//                      tpDep    := tdConjuge;
+//                      cpfDep   := '01234567898';
+//                      nmDep    := 'José das Areias';
+//                      DtNascto := date;
+//                      vlrPgDep := 0.75;
+//                    end;
+//                  end;
+              end;
+            end;
+
+            infoPerAnt.ideADC.Clear; // Remuneração relativa a diferenças salariais
+
+//            with infoPerAnt.ideADC.Add do  // Instrumento ou situação ensejadora da remuneração em Períodos Anteriores (?)
+//            begin
+//              dtLei := Now;
+//              nrLei := '321321/2017';
+//              dtEf  := Now;
+//
+//              idePeriodo.Clear;
+//
+//              with IdePeriodo.Add do
+//              begin
+//                perRef := '201504';
+//
+//                ideEstab.Clear;
+//
+//                with IdeEstab.Add do
+//                begin
+//                  TpInsc := tiCNPJ;
+//                  NrInsc := '01234567898765';
+//
+//                  remunPerAnt.Clear;
+//
+//                  with remunPerAnt.Add do
+//                  begin
+//                    Matricula := 'A1234';
+//                    CodCateg := 101;
+//
+//                    itensRemun.Clear;
+//
+//                    with itensRemun.Add do
+//                    begin
+//                      CodRubr    := '987654';
+//                      ideTabRubr := 'E380';
+//                      qtdRubr    := 100;
+//                      fatorRubr  := 50;
+//                      vrUnit     := 3296.35;
+//                      vrRubr     := 3330.30;
+//                    end;
+//                  end;
+//                end;
+//              end;
+//            end;
+          end;
+        end;
+      end;
+
+      aLabel.Caption     := Trim(cdsTabela.FieldByName('nome').AsString);
+      aProcesso.Progress := I;
+      Application.ProcessMessages;
+      Inc(I);
+
+      Writeln(flOperacao_eS1202, 'S1202|' + aMainTable + '|' + MODO_OPERACAO[Ord(aModoLancamento)] + '|' + cdsTabela.FieldByName('ANO_MES').AsString + ';' + FormatFloat('0000000000', cdsTabela.FieldByName('ID_SERVIDOR').AsInteger) + '|ANO_MES;ID_SERVIDOR');
+      cdsTabela.Next;
+    end;
+
+    aRetorno := True;
+    aProtocolo.S1202 := (cdsTabela.RecordCount > 0);
+  finally
+    CloseFile(flOperacao_eS1202);
+    if not aProtocolo.S1202 then
       DeleteFile(aFileProcesso);
 
     aSQL.Free;
@@ -4903,6 +5211,7 @@ begin
 
   aS1200 := False;
   aS1202 := False;
+  aS1207 := False;
 end;
 
 procedure TProtocoloESocial.SetNumeroInscricao(Value: String);
