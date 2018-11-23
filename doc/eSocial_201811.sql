@@ -567,3 +567,14 @@ Token unknown - line 7, column 85.
 00000000000.
 
 */
+
+/*------ SYSDBA 23/11/2018 19:27:48 --------*/
+
+/*!!! Error occured !!!
+Invalid token.
+Dynamic SQL Error.
+SQL error code = -104.
+Token unknown - line 8, column 3.
+and.
+
+*/

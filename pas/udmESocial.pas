@@ -2257,6 +2257,7 @@ begin
     aSQL.Add('  left join DEPOSITO_BANCARIO pg on (pg.ano_mes = m.ano_mes and pg.id_servidor = m.id_servidor and pg.parcela = b.parcela)');
     aSQL.Add('  left join PAGTO_QUITACAO q on (q.ano_mes = m.ano_mes and q.id_servidor = m.id_servidor and q.parcela = b.parcela and q.id_quitacao = ''1'')');
     aSQL.Add('where (m.qtd_dias_trab > 0) ' ); // Apenas quem trabalho e tem direito de receber
+    aSQL.Add('  and (coalesce(pg.dt_deposito, q.dt_quitacao) is not null) ' ); // Apenas pagamentos realizados
     aSQL.Add('  and (m.ano_mes = ' + QuotedStr(IntToStr(aCompetencia.ID)) + ')' );
     aSQL.Add('  and (b.parcela = ' + QuotedStr(aParcela) + ')');
 
@@ -2421,6 +2422,9 @@ begin
                         aFatorRubrica := 0.0
                       else
                         aFatorRubrica := StrToCurrDef(OnlyNumber(Trim(cdsDetalhe.FieldByName('observacao').AsString)), 0.0);
+
+                      if (aFatorRubrica < 0) or (aFatorRubrica > 100) then
+                        aFatorRubrica := 0.0;
 
                       CodRubr    := Trim(cdsDetalhe.FieldByName('cd_evento').AsString);
                       ideTabRubr := Trim(cdsDetalhe.FieldByName('id_evento').AsString);
@@ -2606,6 +2610,7 @@ begin
     aSQL.Add('  where es.possui_rpps =    ' + QuotedStr(FLAG_SIM));
     aSQL.Add('))');
     aSQL.Add('  and (m.qtd_dias_trab > 0) ' ); // Apenas quem trabalho e tem direito de receber
+    aSQL.Add('  and (coalesce(pg.dt_deposito, q.dt_quitacao) is not null) ' ); // Apenas pagamentos realizados
     aSQL.Add('  and (m.ano_mes = ' + QuotedStr(IntToStr(aCompetencia.ID)) + ')');
     aSQL.Add('  and (b.parcela = ' + QuotedStr(aParcela) + ')');
 
@@ -2729,9 +2734,12 @@ begin
                     with itensRemun.Add do
                     begin
                       if (Pos('%', Trim(cdsDetalhe.FieldByName('observacao').AsString)) = 0) then
-                        fatorRubr := 0.0
+                        aFatorRubrica := 0.0
                       else
-                        fatorRubr := StrToCurrDef(OnlyNumber(Trim(cdsDetalhe.FieldByName('observacao').AsString)), 0.0);
+                        aFatorRubrica := StrToCurrDef(OnlyNumber(Trim(cdsDetalhe.FieldByName('observacao').AsString)), 0.0);
+
+                      if (aFatorRubrica < 0) or (aFatorRubrica > 100) then
+                        aFatorRubrica := 0.0;
 
                       CodRubr    := Trim(cdsDetalhe.FieldByName('cd_evento').AsString);
                       ideTabRubr := Trim(cdsDetalhe.FieldByName('id_evento').AsString);
@@ -2905,6 +2913,7 @@ begin
     aSQL.Add('  where es.possui_rpps =    ' + QuotedStr(FLAG_SIM));
     aSQL.Add('))');
     aSQL.Add('  and (m.qtd_dias_trab > 0) ' ); // Apenas quem trabalho e tem direito de receber
+    aSQL.Add('  and (coalesce(pg.dt_deposito, q.dt_quitacao) is not null) ' ); // Apenas pagamentos realizados
     aSQL.Add('  and (m.ano_mes = ' + QuotedStr(IntToStr(aCompetencia.ID)) + ')');
     aSQL.Add('  and (b.parcela = ' + QuotedStr(aParcela) + ')');
     aSQL.Add('  and (s.id_situacao_tcm in (51, 52)) ');  // PENSIONISTA DE MAIOR IDADE e PENSIONISTA DE MENOR IDADE
@@ -3089,6 +3098,9 @@ begin
     aSQL.Add('  , q.dt_quitacao ');
     aSQL.Add('  , coalesce(pg.dt_deposito, q.dt_quitacao) as dt_pagto');
     aSQL.Add('  , b.sal_liquido');
+    aSQL.Add('  , null as dt_inicio_ferias   ');
+    aSQL.Add('  , null as dt_final_ferias    ');
+    aSQL.Add('  , null as vl_liquido_ferias  ');
     aSQL.Add('from INICIALIZA_MES_SERVIDOR m ');
     aSQL.Add('  inner join BASE_CALC_MES_SERVIDOR b on (b.ano_mes = m.ano_mes and b.id_servidor = m.id_servidor) ');
     aSQL.Add('  inner join SERVIDOR s on (s.id = m.id_servidor) ');
@@ -3097,6 +3109,7 @@ begin
     aSQL.Add('  left join DEPOSITO_BANCARIO pg on (pg.ano_mes = m.ano_mes and pg.id_servidor = m.id_servidor and pg.parcela = b.parcela)');
     aSQL.Add('  left join PAGTO_QUITACAO q on (q.ano_mes = m.ano_mes and q.id_servidor = m.id_servidor and q.parcela = b.parcela and q.id_quitacao = ''1'')');
     aSQL.Add('where (m.qtd_dias_trab > 0) ' ); // Apenas quem trabalho e tem direito de receber
+    aSQL.Add('  and (coalesce(pg.dt_deposito, q.dt_quitacao) is not null) ' ); // Apenas pagamentos realizados
     aSQL.Add('  and (m.ano_mes = ' + QuotedStr(IntToStr(aCompetencia.ID)) + ')' );
     aSQL.Add('  and (b.parcela = ' + QuotedStr(aParcela) + ')');
 
@@ -3173,6 +3186,26 @@ begin
               // grupo detPgtoFl agora é um collection
               detPgtoFl.Clear;
 
+              aSQL.BeginUpdate;
+              aSQL.Clear;
+              aSQL.Add('Select');
+              aSQL.Add('    r.*');
+              aSQL.Add('  , e.codigo as cd_evento');
+              aSQL.Add('  , e.nat_rubrica   ');
+              aSQL.Add('  , b.cpf_benefic   ');
+              aSQL.Add('  , b.nome_benefic  ');
+              aSQL.Add('  , p.dt_nascimento ');
+              aSQL.Add('  , b.valor_fixo    ');
+              aSQL.Add('from LANCTO_EVENTO_CALC r');
+              aSQL.Add('  inner join EVENTO e on (e.id = r.id_evento)');
+              aSQL.Add('  left join BENEFIC_PENSAO_ALIMENT b on (b.id_servidor = r.id_servidor and b.id_evento = r.id_evento)');
+              aSQL.Add('  left join PESSOA_FISICA p on (p.id = b.id_pessoa)');
+              aSQL.Add('where r.ano_mes     = ' + QuotedStr(IntToStr(aCompetencia.ID)));
+              aSQL.Add('  and r.parcela     = ' + QuotedStr(aParcela));
+              aSQL.Add('  and r.id_servidor = ' + cdsTabela.FieldByName('id_servidor').AsString);
+              aSQL.EndUpdate;
+              SetSQL_Detalhe(aSQL);
+
               if (tpPgto in [tpPgtoRemun1200, tpPgtoRemun1202, tpPgtoResc2299, tpPgtoResc2399]) then
                 with detPgtoFl.Add do
                 begin
@@ -3185,20 +3218,6 @@ begin
                   retPagtoTot.Clear;
 
                   infoPgtoParc.Clear;
-
-                  aSQL.BeginUpdate;
-                  aSQL.Clear;
-                  aSQL.Add('Select');
-                  aSQL.Add('    r.*');
-                  aSQL.Add('  , e.codigo as cd_evento');
-                  aSQL.Add('  , e.nat_rubrica');
-                  aSQL.Add('from LANCTO_EVENTO_CALC r');
-                  aSQL.Add('  inner join EVENTO e on (e.id = r.id_evento)');
-                  aSQL.Add('where r.ano_mes     = ' + QuotedStr(IntToStr(aCompetencia.ID)));
-                  aSQL.Add('  and r.parcela     = ' + QuotedStr(aParcela));
-                  aSQL.Add('  and r.id_servidor = ' + cdsTabela.FieldByName('id_servidor').AsString);
-                  aSQL.EndUpdate;
-                  SetSQL_Detalhe(aSQL);
 
                   cdsDetalhe.First;
                   if (cdsDetalhe.RecordCount > 0) then
@@ -3214,6 +3233,9 @@ begin
                           else
                             aFatorRubrica := StrToCurrDef(OnlyNumber(Trim(cdsDetalhe.FieldByName('observacao').AsString)), 0.0);
 
+                          if (aFatorRubrica < 0) or (aFatorRubrica > 100) then
+                            aFatorRubrica := 0.0;
+
                           CodRubr    := Trim(cdsDetalhe.FieldByName('cd_evento').AsString);
                           ideTabRubr := Trim(cdsDetalhe.FieldByName('id_evento').AsString);
                           qtdRubr    := cdsDetalhe.FieldByName('qtd').AsCurrency;
@@ -3223,13 +3245,14 @@ begin
 
                           penAlim.Clear;
 
-//                          with penAlim.Add do
-//                          begin
-//                            cpfBenef      := '12345698745';
-//                            dtNasctoBenef := Now;
-//                            nmBenefic     := 'Beneficiário da pensão';
-//                            vlrPensao     := 556.32;
-//                          end;
+                          if (Trim(cdsDetalhe.FieldByName('cpf_benefic').AsString) <> EmptyStr) then
+                            with penAlim.Add do
+                            begin
+                              cpfBenef      := OnlyNumber(Trim(cdsDetalhe.FieldByName('cpf_benefic').AsString));
+                              dtNasctoBenef := cdsDetalhe.FieldByName('dt_nascimento').AsDateTime;
+                              nmBenefic     := Trim(cdsDetalhe.FieldByName('nome_benefic').AsString);
+                              vlrPensao     := cdsDetalhe.FieldByName('valor').AsCurrency;
+                            end;
                         end;
                       end
                       else
@@ -3241,6 +3264,9 @@ begin
                             aFatorRubrica := 0.0
                           else
                             aFatorRubrica := StrToCurrDef(OnlyNumber(Trim(cdsDetalhe.FieldByName('observacao').AsString)), 0.0);
+
+                          if (aFatorRubrica < 0) or (aFatorRubrica > 100) then
+                            aFatorRubrica := 0.0;
 
                           CodRubr    := Trim(cdsDetalhe.FieldByName('cd_evento').AsString);
                           ideTabRubr := Trim(cdsDetalhe.FieldByName('id_evento').AsString);
@@ -3260,11 +3286,66 @@ begin
               if (tpPgto = tpPgtoBenefPrev1207) then
                 with detPgtoBenPr do  // Detalhamento de pagamentos relativos a benefícios previdenciários.
                 begin
+                  perRef    := aCompetencia.Codigo;
+                  ideDmDev  := FormatFloat('#', StrToIntDef(Trim(cdsTabela.FieldByName('parcela').AsString), 0) + 1);
+                  indPgtoTt := tpSim;
+                  vrLiq     := cdsTabela.FieldByName('sal_liquido').AsCurrency;
 
+                  retPgtoTot.Clear;
 
+                  infoPgtoParc.Clear;
 
+                  cdsDetalhe.First;
+                  if (cdsDetalhe.RecordCount > 0) then
+                  begin
+                    while not cdsDetalhe.Eof do
+                    begin
+                      if (indPgtoTt = tpSim) then
+                      begin
+                        with retPgtoTot.Add do
+                        begin
+                          if (Pos('%', Trim(cdsDetalhe.FieldByName('observacao').AsString)) = 0) then
+                            aFatorRubrica := 0.0
+                          else
+                            aFatorRubrica := StrToCurrDef(OnlyNumber(Trim(cdsDetalhe.FieldByName('observacao').AsString)), 0.0);
 
+                          if (aFatorRubrica < 0) or (aFatorRubrica > 100) then
+                            aFatorRubrica := 0.0;
 
+                          CodRubr    := Trim(cdsDetalhe.FieldByName('cd_evento').AsString);
+                          ideTabRubr := Trim(cdsDetalhe.FieldByName('id_evento').AsString);
+                          qtdRubr    := cdsDetalhe.FieldByName('qtd').AsCurrency;
+                          fatorRubr  := aFatorRubrica;
+                          vrUnit     := cdsDetalhe.FieldByName('valor').AsCurrency;
+                          vrRubr     := cdsDetalhe.FieldByName('valor').AsCurrency;
+                        end;
+                      end
+                      else
+                      if (indPgtoTt = tpNao) then
+                      begin
+                        with infoPgtoParc.Add do
+                        begin
+                          if (Pos('%', Trim(cdsDetalhe.FieldByName('observacao').AsString)) = 0) then
+                            aFatorRubrica := 0.0
+                          else
+                            aFatorRubrica := StrToCurrDef(OnlyNumber(Trim(cdsDetalhe.FieldByName('observacao').AsString)), 0.0);
+
+                          if (aFatorRubrica < 0) or (aFatorRubrica > 100) then
+                            aFatorRubrica := 0.0;
+
+                          CodRubr    := Trim(cdsDetalhe.FieldByName('cd_evento').AsString);
+                          ideTabRubr := Trim(cdsDetalhe.FieldByName('id_evento').AsString);
+                          qtdRubr    := cdsDetalhe.FieldByName('qtd').AsCurrency;
+                          fatorRubr  := aFatorRubrica;
+                          vrUnit     := cdsDetalhe.FieldByName('valor').AsCurrency;
+                          vrRubr     := cdsDetalhe.FieldByName('valor').AsCurrency;
+                        end;
+                      end;
+
+                      cdsDetalhe.Next;
+                    end;
+                  end;
+                  cdsDetalhe.Close;
                 end;
 
               detPgtoFer.Clear;
@@ -3272,11 +3353,52 @@ begin
               if (tpPgto = tpPgtoFerias) then
                 with detPgtoFer.Add do // Detalhamento dos pagamentos de férias
                 begin
+                  CodCateg  := StrToIntDef(Trim(cdsTabela.FieldByName('categoria').AsString), COD_CATEGORIA_AGENTE_PUBLICO); // Agente Público - Outros;
+                  matricula := Trim(cdsTabela.FieldByName('matricula').AsString);
+                  dtIniGoz  := cdsTabela.FieldByName('dt_inicio_ferias').AsDateTime;
+                  qtDias    := DaysBetween(cdsTabela.FieldByName('dt_inicio_ferias').AsDateTime, cdsTabela.FieldByName('dt_final_ferias').AsDateTime);
+                  vrLiq     := cdsTabela.FieldByName('vl_liquido_ferias').AsCurrency;
 
+                  detRubrFer.Clear;
 
+                  cdsDetalhe.First;
+                  if (cdsDetalhe.RecordCount > 0) then
+                  begin
+                    while not cdsDetalhe.Eof do
+                    begin
+                      with detRubrFer.Add do
+                      begin
+                        if (Pos('%', Trim(cdsDetalhe.FieldByName('observacao').AsString)) = 0) then
+                          aFatorRubrica := 0.0
+                        else
+                          aFatorRubrica := StrToCurrDef(OnlyNumber(Trim(cdsDetalhe.FieldByName('observacao').AsString)), 0.0);
 
+                        if (aFatorRubrica < 0) or (aFatorRubrica > 100) then
+                          aFatorRubrica := 0.0;
 
+                        CodRubr    := Trim(cdsDetalhe.FieldByName('cd_evento').AsString);
+                        ideTabRubr := Trim(cdsDetalhe.FieldByName('id_evento').AsString);
+                        qtdRubr    := cdsDetalhe.FieldByName('qtd').AsCurrency;
+                        fatorRubr  := aFatorRubrica;
+                        vrUnit     := cdsDetalhe.FieldByName('valor').AsCurrency;
+                        vrRubr     := cdsDetalhe.FieldByName('valor').AsCurrency;
 
+                        penAlim.Clear;
+
+                        if (Trim(cdsDetalhe.FieldByName('cpf_benefic').AsString) <> EmptyStr) then
+                          with penAlim.Add do
+                          begin
+                            cpfBenef      := OnlyNumber(Trim(cdsDetalhe.FieldByName('cpf_benefic').AsString));
+                            dtNasctoBenef := cdsDetalhe.FieldByName('dt_nascimento').AsDateTime;
+                            nmBenefic     := Trim(cdsDetalhe.FieldByName('nome_benefic').AsString);
+                            vlrPensao     := cdsDetalhe.FieldByName('valor').AsCurrency;
+                          end;
+                      end;
+
+                      cdsDetalhe.Next;
+                    end;
+                  end;
+                  cdsDetalhe.Close;
                 end;
 
               detPgtoAnt.Clear;

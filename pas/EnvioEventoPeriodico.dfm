@@ -135,7 +135,7 @@ inherited frmEnvioEventoPeriodico: TfrmEnvioEventoPeriodico
       Top = 24
       Width = 306
       Height = 17
-      Caption = 'S-1200 Remunera'#231#227'o do Trabalhador'
+      Caption = 'S-1200 - Remunera'#231#227'o do Trabalhador'
       TabOrder = 1
     end
     object cbS1202: TCheckBox
