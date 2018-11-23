@@ -510,3 +510,60 @@ end^
 
 SET TERM ; ^
 
+
+
+
+/*------ SYSDBA 22/11/2018 19:50:54 --------*/
+
+CREATE TABLE ESOCIAL_TIPO_BENEFICIO_RPPS (
+    CODIGO "CHAR(2)" NOT NULL,
+    DESCRICAO "VARCHAR(250)");
+
+ALTER TABLE ESOCIAL_TIPO_BENEFICIO_RPPS
+ADD CONSTRAINT PK_ESOCIAL_TIPO_BENEFICIO_RPPS
+PRIMARY KEY (CODIGO);
+
+COMMENT ON COLUMN ESOCIAL_TIPO_BENEFICIO_RPPS.CODIGO IS
+'Codigo';
+
+COMMENT ON COLUMN ESOCIAL_TIPO_BENEFICIO_RPPS.DESCRICAO IS
+'Descricao';
+
+
+
+
+/*------ SYSDBA 22/11/2018 19:50:55 --------*/
+
+COMMENT ON TABLE ESOCIAL_TIPO_BENEFICIO_RPPS IS 'Tabela de Tipos de Beneficios do RPPS
+
+    Autor   :   Isaque Marinho Ribeiro
+    Data    :   22/11/2018
+
+Tabela responsavel por armazenar os codigos e as descricoes dos tipos de acordo
+com a "Tabela 25" (Tipos de Beneficios Previdenciarios dos Regimes Proprios de
+Previdencia) do ESocial.';
+
+
+
+/*------ 22/11/2018 19:52:29 --------*/
+
+GRANT ALL ON ESOCIAL_TIPO_BENEFICIO_RPPS TO "GERASYS.TI" WITH GRANT OPTION;
+
+/*------ 22/11/2018 19:52:29 --------*/
+
+GRANT ALL ON ESOCIAL_TIPO_BENEFICIO_RPPS TO GERASYSTI WITH GRANT OPTION;
+
+/*------ 22/11/2018 19:52:29 --------*/
+
+GRANT ALL ON ESOCIAL_TIPO_BENEFICIO_RPPS TO PUBLIC WITH GRANT OPTION;
+
+/*------ SYSDBA 23/11/2018 10:58:52 --------*/
+
+/*!!! Error occured !!!
+Invalid token.
+Dynamic SQL Error.
+SQL error code = -104.
+Token unknown - line 7, column 85.
+00000000000.
+
+*/

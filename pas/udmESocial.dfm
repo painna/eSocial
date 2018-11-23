@@ -690,6 +690,18 @@ object dmESocial: TdmESocial
         ParamType = ptInput
       end
       item
+        DataType = ftString
+        Precision = 120
+        Name = 'CAMPO'
+        ParamType = ptInput
+      end
+      item
+        DataType = ftString
+        Precision = 100
+        Name = 'VALORES'
+        ParamType = ptInput
+      end
+      item
         DataType = ftFixedChar
         Precision = 1
         Name = 'OPERACAO'

@@ -114,6 +114,7 @@ begin
   dmESocial.ListarCompetenciasAdmissao(cmbAnoMes);
   LimparPainelProcesso(False);
 //  cbS1035.Enabled := (Pesquisa('CONFIG_ESOCIAL', 'ID_CONFIG_ORGAO', '1', 'POSSUI_TABELA_CARREIRA', '') = FLAG_SIM);
+  cbS2400.Enabled := (Pesquisa('CONFIG_ESOCIAL', 'ID_CONFIG_ORGAO', '1', 'POSSUI_RPPS', '') = FLAG_SIM);
 end;
 
 function TfrmEnvioEventoNaoPeriodico.GeradoEnviado : Boolean;
@@ -184,8 +185,8 @@ begin
 //          aRetorno := dmESocial.Gerar_eSocial1050(cmbAnoMes.Text, Checb_ZeraBase.Checked, aModoLancamento, lblProcesso, gagProcesso, aProtocolo);
 //        if aRetorno and cbS1060.Checked  then
 //          aRetorno := dmESocial.Gerar_eSocial1060(cmbAnoMes.Text, Checb_ZeraBase.Checked, aModoLancamento, lblProcesso, gagProcesso, aProtocolo);
-//        if aRetorno and cbS1070.Checked  then
-//          aRetorno := dmESocial.Gerar_eSocial1070(cmbAnoMes.Text, Checb_ZeraBase.Checked, aModoLancamento, lblProcesso, gagProcesso, aProtocolo);
+        if aRetorno and cbS2400.Checked  then
+          aRetorno := dmESocial.Gerar_eSocial2400(TCompetencia(cmbAnoMes.Items.Objects[cmbAnoMes.ItemIndex]), Checb_ZeraBase.Checked, aModoLancamento, lblProcesso, gagProcesso, aProtocolo);
 //        if aRetorno and cbS1080.Checked  then
 //          aRetorno := dmESocial.Gerar_eSocial1080(cmbAnoMes.Text, Checb_ZeraBase.Checked, aModoLancamento, lblProcesso, gagProcesso, aProtocolo);
 

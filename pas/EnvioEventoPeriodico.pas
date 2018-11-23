@@ -147,6 +147,8 @@ begin
           aRetorno := dmESocial.Gerar_eSocial1202(TCompetencia(cmbAnoMes.Items.Objects[cmbAnoMes.ItemIndex]), Checb_ZeraBase.Checked, mlInclusao, lblProcesso, gagProcesso, aProtocolo);
         if aRetorno and cbS1207.Checked then
           aRetorno := dmESocial.Gerar_eSocial1207(TCompetencia(cmbAnoMes.Items.Objects[cmbAnoMes.ItemIndex]), Checb_ZeraBase.Checked, mlInclusao, lblProcesso, gagProcesso, aProtocolo);
+        if aRetorno and cbS1210.Checked then
+          aRetorno := dmESocial.Gerar_eSocial1210(TCompetencia(cmbAnoMes.Items.Objects[cmbAnoMes.ItemIndex]), Checb_ZeraBase.Checked, mlInclusao, lblProcesso, gagProcesso, aProtocolo);
 
         if aRetorno then
           aRetorno := dmESocial.EventoEnviado_eSocial(egIniciais, cmbAnoMes.Text, lblProcesso, gagProcesso, aProtocolo);

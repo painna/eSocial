@@ -169,6 +169,7 @@ inherited frmEnvioEventoPeriodico: TfrmEnvioEventoPeriodico
       Height = 16
       Caption = 'S-1250 - Aquisi'#231#227'o de Produ'#231#227'o Rural'
       Ctl3D = False
+      Enabled = False
       ParentCtl3D = False
       TabOrder = 5
     end
@@ -179,6 +180,7 @@ inherited frmEnvioEventoPeriodico: TfrmEnvioEventoPeriodico
       Height = 17
       Caption = 'S-1260 - Comercializa'#231#227'o da Produ'#231#227'o Rural Pessoa F'#237'sica'
       Ctl3D = False
+      Enabled = False
       ParentCtl3D = False
       TabOrder = 6
     end
@@ -189,6 +191,7 @@ inherited frmEnvioEventoPeriodico: TfrmEnvioEventoPeriodico
       Height = 15
       Caption = 'S-1300 - Contribui'#231#227'o Sindical Patronal'
       Ctl3D = False
+      Enabled = False
       ParentCtl3D = False
       TabOrder = 7
     end
@@ -199,6 +202,7 @@ inherited frmEnvioEventoPeriodico: TfrmEnvioEventoPeriodico
       Height = 17
       Caption = 'S-1299 - Fechamento dos Eventos Peri'#243'dicos'
       Ctl3D = False
+      Enabled = False
       ParentCtl3D = False
       TabOrder = 8
     end
@@ -209,6 +213,7 @@ inherited frmEnvioEventoPeriodico: TfrmEnvioEventoPeriodico
       Height = 17
       Caption = 'S-1298 - Reabertura dos Eventos Peri'#243'dicos'
       Ctl3D = False
+      Enabled = False
       ParentCtl3D = False
       TabOrder = 9
     end
@@ -218,6 +223,7 @@ inherited frmEnvioEventoPeriodico: TfrmEnvioEventoPeriodico
       Width = 332
       Height = 17
       Caption = 'S-1295 - Solicita'#231#227'o de Totaliza'#231#227'o para Pgto. em Conting'#234'ncia'
+      Enabled = False
       TabOrder = 10
     end
     object cbS1280: TCheckBox
@@ -227,6 +233,7 @@ inherited frmEnvioEventoPeriodico: TfrmEnvioEventoPeriodico
       Height = 18
       Caption = 'S-1280 - Informa'#231#245'es Complementares aos Eventos Peri'#243'dicos'
       Ctl3D = False
+      Enabled = False
       ParentCtl3D = False
       TabOrder = 11
     end
@@ -237,6 +244,7 @@ inherited frmEnvioEventoPeriodico: TfrmEnvioEventoPeriodico
       Height = 17
       Caption = 'S-1270 - Contrata'#231#227'o de Trabalhadores Avulsos N'#227'o Portu'#225'rios'
       Ctl3D = False
+      Enabled = False
       ParentCtl3D = False
       TabOrder = 12
     end
