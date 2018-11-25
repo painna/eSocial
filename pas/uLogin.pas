@@ -87,8 +87,9 @@ begin
    glb_iIdOperLogado := StrToInt(sIdUsuario);
    glb_iIdOperExecut := glb_iIdOperLogado;
 
-   Close;
+   gUsuarioLogin := Trim(edUsuario.Text);
 
+   Close;
 end;
 
 procedure TfrmLogin.edSenhaExit(Sender: TObject);

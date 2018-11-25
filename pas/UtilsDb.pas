@@ -3,7 +3,7 @@ unit UtilsDb;
 interface
 
 USES SysUtils, WinTypes, WinProcs, Classes, Messages, Controls, DateUtils,
-     Forms, Dialogs, stdCtrls, Grids, DBGrids, DBClient,
+     System.Types, Forms, Dialogs, stdCtrls, Grids, DBGrids, DBClient,
      Graphics, Db, JPEG, SqlExpr, Provider, StrUtils, Variants,
      cxGridTableView, cxGridDBTableView, cxGrid;
 
@@ -146,16 +146,37 @@ End;
 
 Function Pesquisa(sTabela, sCampoPesq, sTextPesq, sCampoRet, sMensagem: String): String;
 Var
-   oQry1: TSQLQuery;
+   oQry1 : TSQLQuery;
+   aCamposPesquisa  ,
+   aValoresPesquisa : TStringDynArray;
+   I : Integer;
 Begin
+   aCamposPesquisa  := SplitString(sCampoPesq, ';');
+   aValoresPesquisa := SplitString(sTextPesq, ';');
 
-   oQry1 := TSQLQuery.Create(Nil);
-   oQry1.SQLConnection := dmPrincipal.SConPrincipal;
-   oQry1.SQL.Clear;
-   oQry1.SQL.Add('SELECT '+UpperCase(sCampoRet)+' FROM '+UpperCase(sTabela)+
-                          ' WHERE '+UpperCase(sCampoPesq)+' = :Param1');
+   if (Length(aCamposPesquisa) = 1) then
+   begin
+     oQry1 := TSQLQuery.Create(Nil);
+     oQry1.SQLConnection := dmPrincipal.SConPrincipal;
+     oQry1.SQL.Clear;
+     oQry1.SQL.Add('SELECT ' + UpperCase(sCampoRet) + ' FROM ' + UpperCase(sTabela) + ' WHERE '+UpperCase(sCampoPesq) + ' = :Param1');
 
-   oQry1.Params[0].AsString := Trim(sTextPesq);
+     oQry1.Params[0].AsString := Trim(sTextPesq);
+   end
+   else
+   begin
+     oQry1 := TSQLQuery.Create(Nil);
+     oQry1.SQLConnection := dmPrincipal.SConPrincipal;
+     oQry1.SQL.Clear;
+     oQry1.SQL.Add('SELECT ' + UpperCase(sCampoRet) + ' FROM ' + UpperCase(sTabela));
+     oQry1.SQL.Add('WHERE (' + UpperCase(sCampoRet) + ' is not null)');
+     for I := Low(aCamposPesquisa) to High(aCamposPesquisa) do
+      oQry1.SQL.Add('  and (' + UpperCase(aCamposPesquisa[I]) + ' = :' + UpperCase(aCamposPesquisa[I]) + ')');
+
+     for I := Low(aValoresPesquisa) to High(aValoresPesquisa) do
+      oQry1.ParamByName(aCamposPesquisa[I]).AsString := Trim(aValoresPesquisa[I]);
+   end;
+
    Try
      oQry1.Open;
      Try

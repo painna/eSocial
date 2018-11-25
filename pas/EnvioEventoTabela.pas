@@ -147,6 +147,7 @@ begin
           Mensagem('Certificado não válido!', 'Aviso', MB_ICONINFORMATION);
 
         aProtocolo := TProtocoloESocial.Create(EmptyStr);
+        aProtocolo.CompetenciaID := IntToStr(TCompetencia(cmbAnoMes.Items.Objects[cmbAnoMes.ItemIndex]).ID);
 
         if aRetorno and cbS1000.Checked then
           aRetorno := dmESocial.Gerar_eSocial1000(cmbAnoMes.Text, Checb_ZeraBase.Checked, aModoLancamento, lblProcesso, gagProcesso, aProtocolo);
@@ -177,7 +178,7 @@ begin
         if aRetorno then
         begin
           dmESocial.GravarProtocoloRetorno(aProtocolo);
-          dmESocial.AtualizarOperacoes(aModoLancamento, aProtocolo);
+          dmESocial.AtualizarOperacoes(aModoLancamento, aProtocolo, TCompetencia(cmbAnoMes.Items.Objects[cmbAnoMes.ItemIndex]));
           Mensagem('Protocolo : ' + aProtocolo.Numero + #13#13 + aProtocolo.Arquivos.Text, 'Informe', MB_ICONINFORMATION);
         end
         else

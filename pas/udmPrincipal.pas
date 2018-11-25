@@ -227,6 +227,8 @@ type
 var
   dmPrincipal: TdmPrincipal;
 
+  gUsuarioLogin : String;
+
 implementation
 
 uses gsLib, UtilsDb, VarGlobais;
@@ -833,5 +835,8 @@ end;
      end;
   End;
 }
+
+initialization
+  gUsuarioLogin := EmptyStr;
 
 end.

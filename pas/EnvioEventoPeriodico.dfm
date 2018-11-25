@@ -100,6 +100,7 @@ inherited frmEnvioEventoPeriodico: TfrmEnvioEventoPeriodico
       Height = 21
       Style = csDropDownList
       TabOrder = 0
+      OnChange = cmbAnoMesChange
     end
   end
   object gpbEvento: TGroupBox

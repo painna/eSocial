@@ -738,4 +738,60 @@ object dmESocial: TdmESocial
     Left = 648
     Top = 376
   end
+  object setProcessoEvento: TSQLStoredProc
+    MaxBlobSize = -1
+    Params = <
+      item
+        DataType = ftString
+        Precision = 10
+        Name = 'EVENTO'
+        ParamType = ptInput
+      end
+      item
+        DataType = ftFixedChar
+        Precision = 6
+        Name = 'COMPETENCIA'
+        ParamType = ptInput
+      end
+      item
+        DataType = ftDate
+        Precision = 4
+        Name = 'PROCESSO_DATA'
+        ParamType = ptInput
+      end
+      item
+        DataType = ftString
+        Precision = 20
+        Name = 'PROCESSO_USUARIO'
+        ParamType = ptInput
+      end
+      item
+        DataType = ftFixedChar
+        Precision = 1
+        Name = 'PROCESSADO'
+        ParamType = ptInput
+      end
+      item
+        DataType = ftFixedChar
+        Precision = 1
+        Name = 'ENVIADO'
+        ParamType = ptInput
+      end
+      item
+        DataType = ftFixedChar
+        Precision = 1
+        Name = 'VALIDO'
+        ParamType = ptInput
+      end
+      item
+        DataType = ftString
+        Precision = 30
+        Name = 'PROTOCOLO'
+        ParamType = ptInput
+      end>
+    SQLConnection = dmPrincipal.SConPrincipal
+    StoredProcName = 'SET_ESOCIAL_EVENTO'
+    Left = 648
+    Top = 424
+  end
 end

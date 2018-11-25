@@ -86,8 +86,10 @@ type
     private
       aDataHota : TDateTime;
       aNumeroInscricao,
+      aCompetenciaID,
       aVersao   ,
       aNumero   : String;
+      aValido   : Boolean;
       aArquivos : TStringList;
 
       aS1000 ,
@@ -118,7 +120,8 @@ type
       aS1200 ,
       aS1202 ,
       aS1207 ,
-      aS1210 : Boolean;
+      aS1210 ,
+      aS1295 : Boolean;
 
       procedure SetNumeroInscricao(Value : String);
       procedure SetVersao(Value : String);
@@ -126,8 +129,10 @@ type
     public
       property DataHora : TDateTime read aDataHota write aDataHota;
       property NumeroInscricao : String read aNumeroInscricao write SetNumeroInscricao;
+      property CompetenciaID   : String read aCompetenciaID write aCompetenciaID;
       property Versao   : String read aVersao write SetVersao;
       property Numero   : String read aNumero write SetNumero;
+      property Valido   : Boolean read aValido write aValido;
       property Arquivos : TStringList read aArquivos write aArquivos;
 
       property S1000 : Boolean read aS1000 write aS1000;
@@ -159,6 +164,7 @@ type
       property S1202 : Boolean read aS1202 write aS1202;
       property S1207 : Boolean read aS1207 write aS1207;
       property S1210 : Boolean read aS1210 write aS1210;
+      property S1295 : Boolean read aS1295 write aS1295;
 
       constructor Create(Value : String); overload;
       destructor Destroy; override;
@@ -209,6 +215,7 @@ type
     cdsLogEventoPROTOCOLO_ENVIO: TStringField;
     setLogEvento: TSQLStoredProc;
     spLogEvento: TSQLStoredProc;
+    setProcessoEvento: TSQLStoredProc;
     procedure DataModuleCreate(Sender: TObject);
     procedure DataModuleDestroy(Sender: TObject);
     procedure btnSalvar(Sender: TObject);
@@ -260,7 +267,8 @@ type
     flOperacao_eS1200 ,
     flOperacao_eS1202 ,
     flOperacao_eS1207 ,
-    flOperacao_eS1210 : TextFile;
+    flOperacao_eS1210 ,
+    flOperacao_eS1295 : TextFile;
 
     property MensagemRetorno : TStringList read GetMensagemRetorno;
 
@@ -269,7 +277,9 @@ type
     procedure ListarCompetenciasFolha(aLista : TComboBox);
     procedure LerConfiguracao;
     procedure GravarProtocoloRetorno(aProtocolo : TProtocoloESocial);
-    procedure AtualizarOperacoes(aModoLancamento: TModoLancamento; aProtocolo: TProtocoloESocial);
+    procedure AtualizarOperacoes(aModoLancamento: TModoLancamento; aProtocolo: TProtocoloESocial; aCompetencia : TCompetencia);
+    procedure SetEventoESocial(aEvento, aCompetencia, aProtocolo, aUsuario : String;
+      aDataProcesso : TDateTime; aProcessado, aEnviado, aValido : Boolean);
 
     function CertificadoInstalado : Boolean;
     function CertificadoValido : Boolean;
@@ -441,7 +451,9 @@ begin
     Result := aFalse;
 end;
 
-procedure TdmESocial.AtualizarOperacoes(aModoLancamento: TModoLancamento; aProtocolo: TProtocoloESocial);
+procedure TdmESocial.AtualizarOperacoes(aModoLancamento: TModoLancamento; aProtocolo: TProtocoloESocial; aCompetencia : TCompetencia);
+var
+  aEventoTemp : String;
 
   procedure ProcessarFileLOG(aFileName : String; const aTextFile : TextFile);
   var
@@ -483,6 +495,18 @@ procedure TdmESocial.AtualizarOperacoes(aModoLancamento: TModoLancamento; aProto
           ParamByName('PROTOCOLO').AsString := aProtocolo.Numero;
           ExecProc;
         end;
+
+        if (aEventoTemp <> aRegistro[0]) then
+          SetEventoESocial(aRegistro[0]
+            , IntToStr(aCompetencia.ID)
+            , aProtocolo.Numero
+            , gUsuarioLogin
+            , aProtocolo.DataHora
+            , True
+            , True
+            , aProtocolo.Valido);
+
+        aEventoTemp := aRegistro[0];
       end;
       CloseFile(aTextFile);
       DeleteFile(aFileName);
@@ -491,6 +515,8 @@ procedure TdmESocial.AtualizarOperacoes(aModoLancamento: TModoLancamento; aProto
 
 begin
   try
+    aEventoTemp := EmptyStr;
+
     if aProtocolo.S1000 then
       ProcessarFileLOG('.\log\eS1000.txt', flOperacao_eS1000);
     if aProtocolo.S1005 then
@@ -545,6 +571,8 @@ begin
       ProcessarFileLOG('.\log\eS1207.txt', flOperacao_eS1207);
     if aProtocolo.S1210 then
       ProcessarFileLOG('.\log\eS1210.txt', flOperacao_eS1210);
+    if aProtocolo.S1295 then
+      ProcessarFileLOG('.\log\eS1295.txt', flOperacao_eS1295);
   finally
     // Processar LOGs
     spLogEvento.Close;
@@ -793,6 +821,7 @@ begin
             aProtocolo.Versao          := dadosRecLote.versaoAplicRecepcao;
             aProtocolo.DataHora        := dadosRecLote.dhRecepcao;
             aProtocolo.Numero          := dadosRecLote.Protocolo;
+            aProtocolo.Valido          := True;
             aProtocolo.NumeroInscricao := IdeTransmissor.NrInsc;
 
             if (Trim(aProtocolo.Versao) = EmptyStr) then
@@ -1095,7 +1124,16 @@ begin
   finally
     CloseFile(flOperacao_eS1000);
     if not aProtocolo.s1000 then
-      DeleteFile(aFileProcesso);
+      DeleteFile(aFileProcesso)
+    else
+      SetEventoESocial('S1000'
+        , aProtocolo.CompetenciaID
+        , aProtocolo.Numero
+        , gUsuarioLogin
+        , Now
+        , True
+        , False
+        , False);
 
     aSQL.Free;
     Result := aRetorno;
@@ -1268,7 +1306,16 @@ begin
   finally
     CloseFile(flOperacao_eS1005);
     if not aProtocolo.s1005 then
-      DeleteFile(aFileProcesso);
+      DeleteFile(aFileProcesso)
+    else
+      SetEventoESocial('S1005'
+        , aProtocolo.CompetenciaID
+        , aProtocolo.Numero
+        , gUsuarioLogin
+        , Now
+        , True
+        , False
+        , False);
 
     aSQL.Free;
     Result := aRetorno;
@@ -1463,7 +1510,16 @@ begin
   finally
     CloseFile(flOperacao_eS1010);
     if not aProtocolo.S1010 then
-      DeleteFile(aFileProcesso);
+      DeleteFile(aFileProcesso)
+    else
+      SetEventoESocial('S1010'
+        , aProtocolo.CompetenciaID
+        , aProtocolo.Numero
+        , gUsuarioLogin
+        , Now
+        , True
+        , False
+        , False);
 
     aSQL.Free;
     Result := aRetorno;
@@ -1666,7 +1722,16 @@ begin
   finally
     CloseFile(flOperacao_eS1020);
     if not aProtocolo.S1020 then
-      DeleteFile(aFileProcesso);
+      DeleteFile(aFileProcesso)
+    else
+      SetEventoESocial('S1020'
+        , aProtocolo.CompetenciaID
+        , aProtocolo.Numero
+        , gUsuarioLogin
+        , Now
+        , True
+        , False
+        , False);
 
     aSQL.Free;
     Result := aRetorno;
@@ -1794,7 +1859,16 @@ begin
   finally
     CloseFile(flOperacao_eS1030);
     if not aProtocolo.S1030 then
-      DeleteFile(aFileProcesso);
+      DeleteFile(aFileProcesso)
+    else
+      SetEventoESocial('S1030'
+        , aProtocolo.CompetenciaID
+        , aProtocolo.Numero
+        , gUsuarioLogin
+        , Now
+        , True
+        , False
+        , False);
 
     aSQL.Free;
     Result := aRetorno;
@@ -1921,7 +1995,16 @@ begin
   finally
     CloseFile(flOperacao_eS1040);
     if not aProtocolo.S1040 then
-      DeleteFile(aFileProcesso);
+      DeleteFile(aFileProcesso)
+    else
+      SetEventoESocial('S1040'
+        , aProtocolo.CompetenciaID
+        , aProtocolo.Numero
+        , gUsuarioLogin
+        , Now
+        , True
+        , False
+        , False);
 
     aSQL.Free;
     Result := aRetorno;
@@ -2046,7 +2129,16 @@ begin
   finally
     CloseFile(flOperacao_eS1050);
     if not aProtocolo.S1050 then
-      DeleteFile(aFileProcesso);
+      DeleteFile(aFileProcesso)
+    else
+      SetEventoESocial('S1050'
+        , aProtocolo.CompetenciaID
+        , aProtocolo.Numero
+        , gUsuarioLogin
+        , Now
+        , True
+        , False
+        , False);
 
     aSQL.Free;
     Result := aRetorno;
@@ -2186,7 +2278,16 @@ begin
   finally
     CloseFile(flOperacao_eS1060);
     if not aProtocolo.S1060 then
-      DeleteFile(aFileProcesso);
+      DeleteFile(aFileProcesso)
+    else
+      SetEventoESocial('S1060'
+        , aProtocolo.CompetenciaID
+        , aProtocolo.Numero
+        , gUsuarioLogin
+        , Now
+        , True
+        , False
+        , False);
 
     aSQL.Free;
     Result := aRetorno;
@@ -2538,7 +2639,16 @@ begin
   finally
     CloseFile(flOperacao_eS1200);
     if not aProtocolo.S1200 then
-      DeleteFile(aFileProcesso);
+      DeleteFile(aFileProcesso)
+    else
+      SetEventoESocial('S1200'
+        , aProtocolo.CompetenciaID
+        , aProtocolo.Numero
+        , gUsuarioLogin
+        , Now
+        , True
+        , False
+        , False);
 
     aSQL.Free;
     Result := aRetorno;
@@ -2598,11 +2708,16 @@ begin
     aSQL.Add('      from SERVIDOR_DEPENDENTE sd');
     aSQL.Add('      where sd.id_servidor = m.id_servidor');
     aSQL.Add('    ), 0) qt_dependentes');
+    aSQL.Add('  , pg.dt_deposito');
+    aSQL.Add('  , q.dt_quitacao ');
+    aSQL.Add('  , coalesce(pg.dt_deposito, q.dt_quitacao) as dt_pagto');
     aSQL.Add('from INICIALIZA_MES_SERVIDOR m ');
     aSQL.Add('  inner join BASE_CALC_MES_SERVIDOR b on (b.ano_mes = m.ano_mes and b.id_servidor = m.id_servidor) ');
     aSQL.Add('  inner join SERVIDOR s on (s.id = m.id_servidor) ');
     aSQL.Add('  inner join PESSOA_FISICA p on (p.id = s.id_pessoa_fisica) ');
     aSQL.Add('  left join CARGO_FUNCAO c on (c.id = coalesce(s.id_cargo_atual, s.id_cargo_origem)) ');
+    aSQL.Add('  left join DEPOSITO_BANCARIO pg on (pg.ano_mes = m.ano_mes and pg.id_servidor = m.id_servidor and pg.parcela = b.parcela)');
+    aSQL.Add('  left join PAGTO_QUITACAO q on (q.ano_mes = m.ano_mes and q.id_servidor = m.id_servidor and q.parcela = b.parcela and q.id_quitacao = ''1'')');
     aSQL.Add('where (m.id_unid_gestora in (');
     aSQL.Add('  Select                    ');
     aSQL.Add('    es.id_unid_gestora      ');
@@ -2841,7 +2956,16 @@ begin
   finally
     CloseFile(flOperacao_eS1202);
     if not aProtocolo.S1202 then
-      DeleteFile(aFileProcesso);
+      DeleteFile(aFileProcesso)
+    else
+      SetEventoESocial('S1202'
+        , aProtocolo.CompetenciaID
+        , aProtocolo.Numero
+        , gUsuarioLogin
+        , Now
+        , True
+        , False
+        , False);
 
     aSQL.Free;
     Result := aRetorno;
@@ -2901,11 +3025,16 @@ begin
     aSQL.Add('      from SERVIDOR_DEPENDENTE sd');
     aSQL.Add('      where sd.id_servidor = m.id_servidor');
     aSQL.Add('    ), 0) qt_dependentes');
+    aSQL.Add('  , pg.dt_deposito');
+    aSQL.Add('  , q.dt_quitacao ');
+    aSQL.Add('  , coalesce(pg.dt_deposito, q.dt_quitacao) as dt_pagto');
     aSQL.Add('from INICIALIZA_MES_SERVIDOR m ');
     aSQL.Add('  inner join BASE_CALC_MES_SERVIDOR b on (b.ano_mes = m.ano_mes and b.id_servidor = m.id_servidor) ');
     aSQL.Add('  inner join SERVIDOR s on (s.id = m.id_servidor) ');
     aSQL.Add('  inner join PESSOA_FISICA p on (p.id = s.id_pessoa_fisica) ');
     aSQL.Add('  left join CARGO_FUNCAO c on (c.id = coalesce(s.id_cargo_atual, s.id_cargo_origem)) ');
+    aSQL.Add('  left join DEPOSITO_BANCARIO pg on (pg.ano_mes = m.ano_mes and pg.id_servidor = m.id_servidor and pg.parcela = b.parcela)');
+    aSQL.Add('  left join PAGTO_QUITACAO q on (q.ano_mes = m.ano_mes and q.id_servidor = m.id_servidor and q.parcela = b.parcela and q.id_quitacao = ''1'')');
     aSQL.Add('where (m.id_unid_gestora in (');
     aSQL.Add('  Select                    ');
     aSQL.Add('    es.id_unid_gestora      ');
@@ -3034,7 +3163,16 @@ begin
   finally
     CloseFile(flOperacao_eS1207);
     if not aProtocolo.S1207 then
-      DeleteFile(aFileProcesso);
+      DeleteFile(aFileProcesso)
+    else
+      SetEventoESocial('S1207'
+        , aProtocolo.CompetenciaID
+        , aProtocolo.Numero
+        , gUsuarioLogin
+        , Now
+        , True
+        , False
+        , False);
 
     aSQL.Free;
     Result := aRetorno;
@@ -3451,7 +3589,16 @@ begin
   finally
     CloseFile(flOperacao_eS1210);
     if not aProtocolo.S1210 then
-      DeleteFile(aFileProcesso);
+      DeleteFile(aFileProcesso)
+    else
+      SetEventoESocial('S1210'
+        , aProtocolo.CompetenciaID
+        , aProtocolo.Numero
+        , gUsuarioLogin
+        , Now
+        , True
+        , False
+        , False);
 
     aSQL.Free;
     Result := aRetorno;
@@ -3999,7 +4146,16 @@ begin
   finally
     CloseFile(flOperacao_eS2200);
     if not aProtocolo.S2200 then
-      DeleteFile(aFileProcesso);
+      DeleteFile(aFileProcesso)
+    else
+      SetEventoESocial('S2200'
+        , aProtocolo.CompetenciaID
+        , aProtocolo.Numero
+        , gUsuarioLogin
+        , Now
+        , True
+        , False
+        , False);
 
     aSQL.Free;
     Result := aRetorno;
@@ -4348,7 +4504,16 @@ begin
   finally
     CloseFile(flOperacao_eS2205);
     if not aProtocolo.S2205 then
-      DeleteFile(aFileProcesso);
+      DeleteFile(aFileProcesso)
+    else
+      SetEventoESocial('S2205'
+        , aProtocolo.CompetenciaID
+        , aProtocolo.Numero
+        , gUsuarioLogin
+        , Now
+        , True
+        , False
+        , False);
 
     aSQL.Free;
     Result := aRetorno;
@@ -4681,7 +4846,16 @@ begin
   finally
     CloseFile(flOperacao_eS2206);
     if not aProtocolo.S2206 then
-      DeleteFile(aFileProcesso);
+      DeleteFile(aFileProcesso)
+    else
+      SetEventoESocial('S2206'
+        , aProtocolo.CompetenciaID
+        , aProtocolo.Numero
+        , gUsuarioLogin
+        , Now
+        , True
+        , False
+        , False);
 
     aSQL.Free;
     Result := aRetorno;
@@ -5034,7 +5208,16 @@ begin
   finally
     CloseFile(flOperacao_eS2240);
     if not aProtocolo.S2240 then
-      DeleteFile(aFileProcesso);
+      DeleteFile(aFileProcesso)
+    else
+      SetEventoESocial('S2240'
+        , aProtocolo.CompetenciaID
+        , aProtocolo.Numero
+        , gUsuarioLogin
+        , Now
+        , True
+        , False
+        , False);
 
     aSQL.Free;
     Result := aRetorno;
@@ -5361,7 +5544,16 @@ begin
   finally
     CloseFile(flOperacao_eS2241);
     if not aProtocolo.S2241 then
-      DeleteFile(aFileProcesso);
+      DeleteFile(aFileProcesso)
+    else
+      SetEventoESocial('S2241'
+        , aProtocolo.CompetenciaID
+        , aProtocolo.Numero
+        , gUsuarioLogin
+        , Now
+        , True
+        , False
+        , False);
 
     aSQL.Free;
     Result := aRetorno;
@@ -5596,7 +5788,16 @@ begin
   finally
     CloseFile(flOperacao_eS2400);
     if not aProtocolo.S2400 then
-      DeleteFile(aFileProcesso);
+      DeleteFile(aFileProcesso)
+    else
+      SetEventoESocial('S2400'
+        , aProtocolo.CompetenciaID
+        , aProtocolo.Numero
+        , gUsuarioLogin
+        , Now
+        , True
+        , False
+        , False);
 
     aSQL.Free;
     Result := aRetorno;
@@ -6016,6 +6217,39 @@ begin
   Result := aRetorno;
 end;
 
+procedure TdmESocial.SetEventoESocial(aEvento, aCompetencia, aProtocolo, aUsuario: String;
+  aDataProcesso: TDateTime;
+  aProcessado, aEnviado, aValido: Boolean);
+begin
+  // Gravar Evento processado
+  with setProcessoEvento do
+  begin
+    Close;
+    ParamByName('EVENTO').AsString           := AnsiUpperCase(Trim(aEvento));
+    ParamByName('COMPETENCIA').AsString      := Trim(aCompetencia);
+
+    if (Trim(aProtocolo) <> EmptyStr) then
+      ParamByName('PROTOCOLO').AsString := Trim(aProtocolo)
+    else
+      ParamByName('PROTOCOLO').Clear;
+
+    if (aDataProcesso <> StrToDate(EMPTY_DATE)) then
+      ParamByName('PROCESSO_DATA').AsDateTime := aDataProcesso
+    else
+      ParamByName('PROCESSO_DATA').Clear;
+
+    if (Trim(aUsuario) <> EmptyStr) then
+      ParamByName('PROCESSO_USUARIO').AsString := Trim(aUsuario)
+    else
+      ParamByName('PROCESSO_USUARIO').Clear;
+
+    ParamByName('PROCESSADO').AsString       := IfThen(aProcessado, FLAG_SIM, FLAG_NAO);
+    ParamByName('ENVIADO').AsString          := IfThen(aEnviado,    FLAG_SIM, FLAG_NAO);
+    ParamByName('VALIDO').AsString           := IfThen(aValido,     FLAG_SIM, FLAG_NAO);
+    ExecProc;
+  end;
+end;
+
 procedure TdmESocial.SetSQL(aSQL: TStringList);
 begin
   if cdsTabela.Active then
@@ -6071,8 +6305,10 @@ begin
   inherited Create;
   aDataHota := Now;
   aNumeroInscricao := EmptyStr;
+  aCompetenciaID   := EmptyStr;
   aVersao   := EmptyStr;
   aNumero   := Trim(Value);
+  aValido   := False;
   aArquivos := TStringList.Create;
   aArquivos.Clear;
 
@@ -6105,6 +6341,7 @@ begin
   aS1202 := False;
   aS1207 := False;
   aS1210 := False;
+  aS1295 := False;
 end;
 
 procedure TProtocoloESocial.SetNumeroInscricao(Value: String);
@@ -6125,7 +6362,7 @@ end;
 
 procedure TProtocoloESocial.SetVersao(Value: String);
 begin
-  aNumero := Trim(Value);
+  aVersao := Trim(Value);
 end;
 
 end.

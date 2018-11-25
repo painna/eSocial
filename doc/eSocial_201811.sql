@@ -578,3 +578,334 @@ Token unknown - line 8, column 3.
 and.
 
 */
+
+
+/*------ SYSDBA 25/11/2018 10:11:23 --------*/
+
+COMMENT ON COLUMN CONFIG_ESOCIAL.ID_UNID_GESTORA IS
+'Unidade Gestora Principal';
+
+
+
+
+/*------ SYSDBA 25/11/2018 10:36:40 --------*/
+
+CREATE TABLE ESOCIAL_EVENTO (
+    EVENTO "VARCHAR(10)" NOT NULL,
+    COMPETENCIA "CHAR(6)" NOT NULL,
+    PRAZO_ENVIO "DATE",
+    PROCESSADO SIM_NAO,
+    ENVIADO SIM_NAO,
+    PROCESSO_DATA "DATE",
+    PROCESSO_USUARIO "VARCHAR(20)",
+    PROCESSO_VALIDO SIM_NAO,
+    PROTOCOLO_ENVIO "VARCHAR(30)");
+
+ALTER TABLE ESOCIAL_EVENTO
+ADD CONSTRAINT PK_ESOCIAL_EVENTO
+PRIMARY KEY (EVENTO,COMPETENCIA);
+
+COMMENT ON COLUMN ESOCIAL_EVENTO.EVENTO IS
+'Evento.';
+
+COMMENT ON COLUMN ESOCIAL_EVENTO.COMPETENCIA IS
+'Competencia (Formato : YYYYMM).';
+
+COMMENT ON COLUMN ESOCIAL_EVENTO.PRAZO_ENVIO IS
+'Prazo limite para envio do evento.';
+
+COMMENT ON COLUMN ESOCIAL_EVENTO.PROCESSADO IS
+'Evento processado:
+N - Nao
+S - Sim';
+
+COMMENT ON COLUMN ESOCIAL_EVENTO.ENVIADO IS
+'Evento enviado:
+N - Nao
+S - Sim';
+
+COMMENT ON COLUMN ESOCIAL_EVENTO.PROCESSO_DATA IS
+'Data do processamento.';
+
+COMMENT ON COLUMN ESOCIAL_EVENTO.PROCESSO_USUARIO IS
+'Usuario responsavel pelo processamento.';
+
+COMMENT ON COLUMN ESOCIAL_EVENTO.PROCESSO_VALIDO IS
+'Processamento validado (Processo sem erros retornados pelo eSocial - REGRA_VALIDA_FECHAMENTO_FOPAG)
+N - Nao
+S - Sim';
+
+COMMENT ON COLUMN ESOCIAL_EVENTO.PROTOCOLO_ENVIO IS
+'Numero do Protocolo de retorno.';
+
+
+
+
+/*------ SYSDBA 25/11/2018 10:36:41 --------*/
+
+COMMENT ON TABLE ESOCIAL_EVENTO IS 'Tabela Eventos eSocial
+    
+    Autor   :   Isaque Marinho Ribeiro
+    Data    :   25/11/2018
+
+Tabela responsavel por armazenar os parametros e/ou dados de processamento de cada
+evento do eSocial em suas devidas competencias. Dados como prazo de processamento
+e as datas em que ocorreram sao encontradas nessa tabela.';
+
+
+
+/*------ 25/11/2018 10:37:18 --------*/
+
+GRANT ALL ON ESOCIAL_EVENTO TO "GERASYS.TI" WITH GRANT OPTION;
+
+/*------ 25/11/2018 10:37:18 --------*/
+
+GRANT ALL ON ESOCIAL_EVENTO TO GERASYSTI WITH GRANT OPTION;
+
+/*------ 25/11/2018 10:37:18 --------*/
+
+GRANT ALL ON ESOCIAL_EVENTO TO PUBLIC;
+
+/*------ 25/11/2018 10:37:18 --------*/
+
+GRANT ALL ON ESOCIAL_EVENTO TO PUBLIC WITH GRANT OPTION;
+
+
+/*------ SYSDBA 25/11/2018 10:38:00 --------*/
+
+ALTER TABLE ESOCIAL_EVENTO
+ADD CONSTRAINT FK_ESOCIAL_EVENTO_1
+FOREIGN KEY (PROTOCOLO_ENVIO)
+REFERENCES ESOCIAL_RETORNO_PROTOCOLO(NUMERO);
+
+
+
+
+/*------ SYSDBA 25/11/2018 10:38:14 --------*/
+
+ALTER TABLE ESOCIAL_EVENTO DROP CONSTRAINT FK_ESOCIAL_EVENTO_1;
+
+
+
+
+/*------ SYSDBA 25/11/2018 10:38:38 --------*/
+
+ALTER TABLE ESOCIAL_EVENTO
+ADD CONSTRAINT FK_ESOCIAL_EVENTO_PROTOCOLO
+FOREIGN KEY (PROTOCOLO_ENVIO)
+REFERENCES ESOCIAL_RETORNO_PROTOCOLO(NUMERO);
+
+
+
+
+/*------ SYSDBA 25/11/2018 10:39:45 --------*/
+
+CREATE INDEX IDX_ESOCIAL_EVENTO_VALIDO
+ON ESOCIAL_EVENTO (PROCESSO_VALIDO);
+
+CREATE INDEX IDX_ESOCIAL_EVENTO_ENVIO
+ON ESOCIAL_EVENTO (ENVIADO);
+
+CREATE INDEX IDX_ESOCIAL_EVENTO_PROCESS
+ON ESOCIAL_EVENTO (PROCESSADO);
+
+
+
+
+/*------ SYSDBA 25/11/2018 11:22:39 --------*/
+
+SET TERM ^ ;
+
+create or alter procedure set_esocial_evento (
+    evento "VARCHAR(10)",
+    competencia "CHAR(6)",
+    processo_data "DATE",
+    processo_usuario "VARCHAR(20)",
+    processado sim_nao,
+    enviado sim_nao,
+    valido sim_nao)
+as
+begin
+  if (not exists(
+    Select
+      e.evento
+    from ESOCIAL_EVENTO e
+    where e.evento      = :evento
+      and e.competencia = :competencia
+  )) then
+  begin
+    Insert Into ESOCIAL_EVENTO (
+        evento
+      , competencia
+      , prazo_envio
+      , protocolo_envio
+      , processo_data
+      , processo_usuario
+      , processo_valido
+      , processado
+      , enviado
+    ) values (
+        :evento
+      , :competencia
+      , null
+      , null
+      , :processo_data
+      , :processo_usuario
+      , :valido
+      , :processado
+      , :enviado
+    );
+  end
+  else
+  begin
+    Update ESOCIAL_EVENTO e Set
+        e.processado       = :processado
+      , e.enviado          = :enviado
+      , e.processo_valido  = :valido
+      , e.processo_data    = :processo_data
+      , e.processo_usuario = :processo_usuario
+    where e.evento      = :evento
+      and e.competencia = :competencia;
+  end 
+end^
+
+SET TERM ; ^
+
+
+
+
+/*------ SYSDBA 25/11/2018 11:23:27 --------*/
+
+SET TERM ^ ;
+
+CREATE OR ALTER procedure set_esocial_evento (
+    evento "VARCHAR(10)",
+    competencia "CHAR(6)",
+    processo_data "DATE",
+    processo_usuario "VARCHAR(20)",
+    processado sim_nao,
+    enviado sim_nao,
+    valido sim_nao)
+as
+begin
+  if (not exists(
+    Select
+      e.evento
+    from ESOCIAL_EVENTO e
+    where e.evento      = :evento
+      and e.competencia = :competencia
+  )) then
+  begin
+    Insert Into ESOCIAL_EVENTO (
+        evento
+      , competencia
+      , prazo_envio
+      , protocolo_envio
+      , processo_data
+      , processo_usuario
+      , processo_valido
+      , processado
+      , enviado
+    ) values (
+        :evento
+      , :competencia
+      , null
+      , null
+      , :processo_data
+      , :processo_usuario
+      , :valido
+      , :processado
+      , :enviado
+    );
+  end
+  else
+  begin
+    Update ESOCIAL_EVENTO e Set
+        e.processado       = :processado
+      , e.enviado          = :enviado
+      , e.processo_valido  = :valido
+      , e.processo_data    = :processo_data
+      , e.processo_usuario = :processo_usuario
+    where e.evento      = :evento
+      and e.competencia = :competencia;
+  end 
+end^
+
+SET TERM ; ^
+
+
+
+/*------ 25/11/2018 11:24:21 --------*/
+
+GRANT EXECUTE ON PROCEDURE SET_ESOCIAL_EVENTO TO "GERASYS.TI";
+
+/*------ 25/11/2018 11:24:21 --------*/
+
+GRANT EXECUTE ON PROCEDURE SET_ESOCIAL_EVENTO TO GERASYSTI;
+
+/*------ 25/11/2018 11:24:21 --------*/
+
+GRANT EXECUTE ON PROCEDURE SET_ESOCIAL_EVENTO TO PUBLIC;
+
+
+/*------ SYSDBA 25/11/2018 11:40:44 --------*/
+
+SET TERM ^ ;
+
+CREATE OR ALTER procedure set_esocial_evento (
+    evento "VARCHAR(10)",
+    competencia "CHAR(6)",
+    processo_data "DATE",
+    processo_usuario "VARCHAR(20)",
+    processado sim_nao,
+    enviado sim_nao,
+    valido sim_nao,
+    protocolo "VARCHAR(30)")
+as
+begin
+  if (not exists(
+    Select
+      e.evento
+    from ESOCIAL_EVENTO e
+    where e.evento      = :evento
+      and e.competencia = :competencia
+  )) then
+  begin
+    Insert Into ESOCIAL_EVENTO (
+        evento
+      , competencia
+      , prazo_envio
+      , protocolo_envio
+      , processo_data
+      , processo_usuario
+      , processo_valido
+      , processado
+      , enviado
+    ) values (
+        :evento
+      , :competencia
+      , null
+      , :protocolo
+      , :processo_data
+      , :processo_usuario
+      , :valido
+      , :processado
+      , :enviado
+    );
+  end
+  else
+  begin
+    Update ESOCIAL_EVENTO e Set
+        e.processado       = :processado
+      , e.enviado          = :enviado
+      , e.protocolo_envio  = :protocolo
+      , e.processo_valido  = :valido
+      , e.processo_data    = :processo_data
+      , e.processo_usuario = :processo_usuario
+    where e.evento      = :evento
+      and e.competencia = :competencia;
+  end 
+end^
+
+SET TERM ; ^
+

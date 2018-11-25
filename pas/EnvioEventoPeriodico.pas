@@ -35,6 +35,7 @@ type
     cbS1270: TCheckBox;
     procedure FormCreate(Sender: TObject);
     procedure btnOkClick(Sender: TObject);
+    procedure cmbAnoMesChange(Sender: TObject);
   private
     { Private declarations }
     procedure LimparPainelProcesso(aVisualizar : Boolean);
@@ -72,6 +73,22 @@ begin
   else
   if GeradoEnviado then
     ModalResult := mrOk;
+end;
+
+procedure TfrmEnvioEventoPeriodico.cmbAnoMesChange(Sender: TObject);
+var
+  aCompetencia : TCompetencia;
+begin
+  if (cmbAnoMes.ItemIndex > -1) then
+  begin
+    aCompetencia    := TCompetencia(cmbAnoMes.Items.Objects[cmbAnoMes.ItemIndex]);
+    // O Evento S1295 é necessário quando o envio do evento S1299 não passar
+    // pela validação REGRA_VALIDA_FECHAMENTO_FOPAG
+    cbS1295.Enabled := (Pesquisa('ESOCIAL_EVENTO'
+      , 'EVENTO;COMPETENCIA;PROCESSADO;ENVIADO'
+      , 'S1299;' + IntToStr(aCompetencia.ID) + ';S;S'
+      , 'PROCESSO_VALIDO', EmptyStr) = FLAG_NAO);
+  end;
 end;
 
 function TfrmEnvioEventoPeriodico.EventoSelecionado: Boolean;
@@ -140,6 +157,7 @@ begin
           Mensagem('Certificado não válido!', 'Aviso', MB_ICONINFORMATION);
 
         aProtocolo := TProtocoloESocial.Create(EmptyStr);
+        aProtocolo.CompetenciaID := IntToStr(TCompetencia(cmbAnoMes.Items.Objects[cmbAnoMes.ItemIndex]).ID);
 
         if aRetorno and cbS1200.Checked then
           aRetorno := dmESocial.Gerar_eSocial1200(TCompetencia(cmbAnoMes.Items.Objects[cmbAnoMes.ItemIndex]), Checb_ZeraBase.Checked, mlInclusao, lblProcesso, gagProcesso, aProtocolo);
@@ -156,7 +174,7 @@ begin
         if aRetorno then
         begin
           dmESocial.GravarProtocoloRetorno(aProtocolo);
-          dmESocial.AtualizarOperacoes(aModoLancamento, aProtocolo);
+          dmESocial.AtualizarOperacoes(aModoLancamento, aProtocolo, TCompetencia(cmbAnoMes.Items.Objects[cmbAnoMes.ItemIndex]));
           Mensagem('Protocolo : ' + aProtocolo.Numero + #13#13 + aProtocolo.Arquivos.Text, 'Informe', MB_ICONINFORMATION);
         end
         else
