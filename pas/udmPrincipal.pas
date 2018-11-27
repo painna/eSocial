@@ -247,6 +247,7 @@ procedure TdmPrincipal.DataModuleCreate(Sender: TObject);
 begin
 
   Screen.Cursor := crHourGlass;
+  SConPrincipal.Connected := False;
 
   glb_sMultiOrgao := ini_le_secao('Multi_Orgao');
   if Trim(glb_sMultiOrgao) = '' then

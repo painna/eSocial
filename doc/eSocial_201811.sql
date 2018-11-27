@@ -909,3 +909,187 @@ end^
 
 SET TERM ; ^
 
+
+
+
+/*------ SYSDBA 26/11/2018 21:19:44 --------*/
+
+ALTER TABLE CONFIG_ESOCIAL
+    ADD RESPONSAVEL_NOME "VARCHAR(50)",
+    ADD RESPONSAVEL_CPF "VARCHAR(11)",
+    ADD RESPONSAVEL_FONEFIXO "VARCHAR(10)",
+    ADD RESPONSAVEL_FONECELULAR "VARCHAR(11)",
+    ADD RESPONSAVEL_EMAIL "VARCHAR(60)";
+
+alter table CONFIG_ESOCIAL
+alter ID_CONFIG_ORGAO position 1;
+
+alter table CONFIG_ESOCIAL
+alter ID_UNID_GESTORA position 2;
+
+alter table CONFIG_ESOCIAL
+alter CONTADOR_NOME position 3;
+
+alter table CONFIG_ESOCIAL
+alter CONTADOR_CPF position 4;
+
+alter table CONFIG_ESOCIAL
+alter CONTADOR_FONEFIXO position 5;
+
+alter table CONFIG_ESOCIAL
+alter CONTADOR_FONECELULAR position 6;
+
+alter table CONFIG_ESOCIAL
+alter CONTADOR_EMAIL position 7;
+
+alter table CONFIG_ESOCIAL
+alter RESPONSAVEL_NOME position 8;
+
+alter table CONFIG_ESOCIAL
+alter RESPONSAVEL_CPF position 9;
+
+alter table CONFIG_ESOCIAL
+alter RESPONSAVEL_FONEFIXO position 10;
+
+alter table CONFIG_ESOCIAL
+alter RESPONSAVEL_FONECELULAR position 11;
+
+alter table CONFIG_ESOCIAL
+alter RESPONSAVEL_EMAIL position 12;
+
+alter table CONFIG_ESOCIAL
+alter NAT_JURIDICA position 13;
+
+alter table CONFIG_ESOCIAL
+alter NRO_SIAFI position 14;
+
+alter table CONFIG_ESOCIAL
+alter SUBTETO_VENCTO_TIPO position 15;
+
+alter table CONFIG_ESOCIAL
+alter SUBTETO_VENCTO_VALOR position 16;
+
+alter table CONFIG_ESOCIAL
+alter POSSUI_RPPS position 17;
+
+alter table CONFIG_ESOCIAL
+alter POSSUI_TABELA_CARREIRA position 18;
+
+alter table CONFIG_ESOCIAL
+alter TIPO_OPERACAO position 19;
+
+alter table CONFIG_ESOCIAL
+alter DATA_IMPLANTACAO position 20;
+
+
+
+
+/*------ SYSDBA 26/11/2018 22:29:36 --------*/
+
+SET TERM ^ ;
+
+CREATE OR ALTER procedure set_esocial_log_evento (
+    evento "VARCHAR(10)",
+    tabela "VARCHAR(30)",
+    campo "VARCHAR(120)",
+    valores "VARCHAR(100)",
+    operacao esocial_operacao,
+    id "BIGINT",
+    protocolo "VARCHAR(30)")
+as
+begin
+  if (exists(
+    Select
+      pr.id
+    from ESOCIAL_RETORNO_PROTOCOLO pr
+    where pr.numero = :protocolo
+  )) then
+  begin
+    if (not exists(
+      Select
+        lg.tabela
+      from ESOCIAL_LOG_EVENTO lg
+      where lg.evento   = :evento
+        and lg.operacao = :operacao
+        and lg.id       = :id
+        and lg.protocolo_envio = :protocolo
+    )) then
+    begin
+      Insert Into ESOCIAL_LOG_EVENTO (
+          evento
+        , operacao
+        , id
+        , tabela
+        , campo
+        , valores
+        , protocolo_envio
+      ) values (
+          :evento
+        , :operacao
+        , :id
+        , :tabela
+        , :campo
+        , :valores
+        , :protocolo
+      );
+    end
+  end
+end^
+
+SET TERM ; ^
+
+
+
+
+/*------ SYSDBA 26/11/2018 22:30:04 --------*/
+
+ALTER TABLE ESOCIAL_LOG_EVENTO DROP CONSTRAINT PK_ESOCIAL_LOG_EVENTO;
+
+ALTER TABLE ESOCIAL_LOG_EVENTO
+ADD CONSTRAINT PK_ESOCIAL_LOG_EVENTO
+PRIMARY KEY (EVENTO,OPERACAO,ID,PROTOCOLO_ENVIO)
+USING INDEX PK_ESOCIAL_LOG_EVENTO;
+
+
+
+
+/*------ SYSDBA 26/11/2018 22:30:20 --------*/
+
+alter table ESOCIAL_LOG_EVENTO
+alter column EVENTO position 1;
+
+
+/*------ SYSDBA 26/11/2018 22:30:20 --------*/
+
+alter table ESOCIAL_LOG_EVENTO
+alter column OPERACAO position 2;
+
+
+/*------ SYSDBA 26/11/2018 22:30:20 --------*/
+
+alter table ESOCIAL_LOG_EVENTO
+alter column PROTOCOLO_ENVIO position 3;
+
+
+/*------ SYSDBA 26/11/2018 22:30:20 --------*/
+
+alter table ESOCIAL_LOG_EVENTO
+alter column ID position 4;
+
+
+/*------ SYSDBA 26/11/2018 22:30:20 --------*/
+
+alter table ESOCIAL_LOG_EVENTO
+alter column TABELA position 5;
+
+
+/*------ SYSDBA 26/11/2018 22:30:20 --------*/
+
+alter table ESOCIAL_LOG_EVENTO
+alter column CAMPO position 6;
+
+
+/*------ SYSDBA 26/11/2018 22:30:20 --------*/
+
+alter table ESOCIAL_LOG_EVENTO
+alter column VALORES position 7;

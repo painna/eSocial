@@ -90,6 +90,27 @@ type
     dbePOSSUI_TABELA_CARREIRA: TcxDBCheckBox;
     sds1POSSUI_TABELA_CARREIRA: TStringField;
     cds1POSSUI_TABELA_CARREIRA: TStringField;
+    tbsResponsavel: TcxTabSheet;
+    cxLabel1: TcxLabel;
+    dbeRESPONSAVEL_NOME: TcxDBTextEdit;
+    cxLabel2: TcxLabel;
+    dbeRESPONSAVEL_CPF: TcxDBMaskEdit;
+    cxLabel3: TcxLabel;
+    dbeRESPONSAVEL_FONEFIXO: TcxDBMaskEdit;
+    cxLabel4: TcxLabel;
+    dbeRESPONSAVEL_FONECELULAR: TcxDBMaskEdit;
+    cxLabel5: TcxLabel;
+    dbeRESPONSAVEL_EMAIL: TcxDBTextEdit;
+    sds1RESPONSAVEL_NOME: TStringField;
+    sds1RESPONSAVEL_CPF: TStringField;
+    sds1RESPONSAVEL_FONEFIXO: TStringField;
+    sds1RESPONSAVEL_FONECELULAR: TStringField;
+    sds1RESPONSAVEL_EMAIL: TStringField;
+    cds1RESPONSAVEL_NOME: TStringField;
+    cds1RESPONSAVEL_CPF: TStringField;
+    cds1RESPONSAVEL_FONEFIXO: TStringField;
+    cds1RESPONSAVEL_FONECELULAR: TStringField;
+    cds1RESPONSAVEL_EMAIL: TStringField;
     procedure FormCreate(Sender: TObject);
     procedure cds1NewRecord(DataSet: TDataSet);
     procedure FormShow(Sender: TObject);
@@ -112,9 +133,15 @@ uses udmESocial, udmPrincipal, gsLib, UtilsDb;
 procedure TfrmConfigurarESocial.cds1BeforePost(DataSet: TDataSet);
 begin
   inherited;
+  if not ValidarCPF(dbeRESPONSAVEL_CPF.Text) then
+  begin
+    Mensagem('CPF do Responsável é Inválido!', 'Alerta', MB_ICONWARNING);
+    Abort;
+  end
+  else
   if not ValidarCPF(dbeCONTADOR_CPF.Text) then
   begin
-    Mensagem('CPF Inválido!', 'Alerta', MB_ICONWARNING);
+    Mensagem('CPF do Contador é Inválido!', 'Alerta', MB_ICONWARNING);
     Abort;
   end
   else

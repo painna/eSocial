@@ -121,7 +121,8 @@ type
       aS1202 ,
       aS1207 ,
       aS1210 ,
-      aS1295 : Boolean;
+      aS1295 ,
+      aS1298 : Boolean;
 
       procedure SetNumeroInscricao(Value : String);
       procedure SetVersao(Value : String);
@@ -165,6 +166,7 @@ type
       property S1207 : Boolean read aS1207 write aS1207;
       property S1210 : Boolean read aS1210 write aS1210;
       property S1295 : Boolean read aS1295 write aS1295;
+      property S1298 : Boolean read aS1298 write aS1298;
 
       constructor Create(Value : String); overload;
       destructor Destroy; override;
@@ -268,7 +270,8 @@ type
     flOperacao_eS1202 ,
     flOperacao_eS1207 ,
     flOperacao_eS1210 ,
-    flOperacao_eS1295 : TextFile;
+    flOperacao_eS1295 ,
+    flOperacao_eS1298 : TextFile;
 
     property MensagemRetorno : TStringList read GetMensagemRetorno;
 
@@ -372,6 +375,12 @@ type
     function Gerar_eSocial1210(aCompetencia : TCompetencia; aZerarBase : Boolean;
       aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge;
       var aProtocolo : TProtocoloESocial) : Boolean;
+    function Gerar_eSocial1295(aCompetencia : TCompetencia; aZerarBase : Boolean;
+      aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge;
+      var aProtocolo : TProtocoloESocial) : Boolean;
+    function Gerar_eSocial1298(aCompetencia : TCompetencia; aZerarBase : Boolean;
+      aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge;
+      var aProtocolo : TProtocoloESocial) : Boolean; virtual; abstract;
 
     function ConfigurarCertificado(const AOwner : TComponent) : Boolean;
     function EventoEnviado_eSocial(aGrupo : TeSocialGrupo; aCompetencia : String;
@@ -573,6 +582,8 @@ begin
       ProcessarFileLOG('.\log\eS1210.txt', flOperacao_eS1210);
     if aProtocolo.S1295 then
       ProcessarFileLOG('.\log\eS1295.txt', flOperacao_eS1295);
+    if aProtocolo.S1298 then
+      ProcessarFileLOG('.\log\eS1298.txt', flOperacao_eS1298);
   finally
     // Processar LOGs
     spLogEvento.Close;
@@ -1080,11 +1091,11 @@ begin
 //          dadosIsencao.DtDou        := date;
 //          dadosIsencao.PagDou       := '111';
 
-          Contato.NmCtt    := Trim(cdsTabela.FieldByName('CONTADOR_NOME').AsString);
-          Contato.CpfCtt   := OnlyNumber(Trim(cdsTabela.FieldByName('CONTADOR_CPF').AsString));
-          Contato.FoneFixo := OnlyNumber(Trim(cdsTabela.FieldByName('CONTADOR_FONEFIXO').AsString));
-          Contato.FoneCel  := OnlyNumber(Trim(cdsTabela.FieldByName('CONTADOR_FONECELULAR').AsString));
-          Contato.email    := AnsiLowerCase(Trim(cdsTabela.FieldByName('CONTADOR_EMAIL').AsString));
+          Contato.NmCtt    := Trim(cdsTabela.FieldByName('RESPONSAVEL_NOME').AsString);
+          Contato.CpfCtt   := OnlyNumber(Trim(cdsTabela.FieldByName('RESPONSAVEL_CPF').AsString));
+          Contato.FoneFixo := OnlyNumber(Trim(cdsTabela.FieldByName('RESPONSAVEL_FONEFIXO').AsString));
+          Contato.FoneCel  := OnlyNumber(Trim(cdsTabela.FieldByName('RESPONSAVEL_FONECELULAR').AsString));
+          Contato.email    := AnsiLowerCase(Trim(cdsTabela.FieldByName('RESPONSAVEL_EMAIL').AsString));
 
           InfoOrgInternacional.IndAcordoIsenMulta := iaiSemacordo;  // (iaiSemacordo, iaiComacordo);
         end;
@@ -3592,6 +3603,132 @@ begin
       DeleteFile(aFileProcesso)
     else
       SetEventoESocial('S1210'
+        , aProtocolo.CompetenciaID
+        , aProtocolo.Numero
+        , gUsuarioLogin
+        , Now
+        , True
+        , False
+        , False);
+
+    aSQL.Free;
+    Result := aRetorno;
+  end;
+end;
+
+function TdmESocial.Gerar_eSocial1295(aCompetencia: TCompetencia; aZerarBase: Boolean;
+  aModoLancamento : TModoLancamento; aLabel: TLabel; aProcesso: TGauge;
+  var aProtocolo: TProtocoloESocial): Boolean;
+var
+  aRetorno : Boolean;
+  aSQL : TStringList;
+  ok   : Boolean;
+  aEventoID     : Integer;
+  aMainTable    ,
+  aFileProcesso : String;
+begin
+  aMainTable    := 'CONFIG_ESOCIAL';
+  aFileProcesso := '.\log\eS1295.txt';
+  AssignFile(flOperacao_eS1295, aFileProcesso);
+  Rewrite(flOperacao_eS1295);
+
+  aRetorno := False;
+  aSQL := TStringList.Create;
+  ok   := True;
+  try
+    aSQL.BeginUpdate;
+    aSQL.Clear;
+    aSQL.Add('Select');
+    aSQL.Add('    c.*');
+    aSQL.Add('  , e.*');
+    aSQL.Add('  , u.RAZAO_SOCIAL as ENTE_FERERATIVO');
+    aSQL.Add('  , u.cnpj as ENTE_CNPJ');
+    aSQL.Add('  , null   as DEC_TERC_SALARIO');
+    aSQL.Add('from CONFIG_ORGAO c');
+    aSQL.Add('  inner join CONFIG_ESOCIAL e on (e.ID_CONFIG_ORGAO = c.ID)');
+    aSQL.Add('  inner join UNID_GESTORA   u on (u.ID = e.ID_UNID_GESTORA)');
+    aSQL.Add('where c.id = 1');
+    aSQL.EndUpdate;
+    SetSQL(aSQL);
+
+    if cdsTabela.IsEmpty then
+      raise Exception.Create('Dados de configuração de eSocial ainda não foram informado!');
+
+    aSQL.BeginUpdate;
+
+    aSQL.EndUpdate;
+    aSQL.SaveToFile('.\log\eS1295.sql');
+    SetSQL(aSQL);
+
+    aProcesso.MaxValue := cdsTabela.RecordCount;
+    aProcesso.Progress := 0;
+    Application.ProcessMessages;
+
+    if not cdsTabela.IsEmpty then
+      aEventoID := StrToInt(IncrementGenerator('GEN_ESOCIAL_EVENTO_S1295', 1));
+
+    ACBrESocial.Eventos.Periodicos.S1295.Clear;
+
+    cdsTabela.First;
+    while not cdsTabela.Eof do
+    begin
+      with ACBrESocial.Eventos.Periodicos.S1295.Add, evtTotConting do
+      begin
+        if AmbienteWebServiceProducao then
+          IdeEvento.TpAmb := TpTpAmb(0) //taProducao
+        else
+          IdeEvento.TpAmb := taProducaoRestrita;
+
+        IdeEvento.indRetif := ireOriginal; // (ireOriginal, ireRetificacao);
+
+        if (IdeEvento.indRetif = ireRetificacao) then
+          IdeEvento.NrRecibo := '65.5454.987798798798' // Preencher com o número do recibo do arquivo a ser retificado.
+        else
+          IdeEvento.NrRecibo := EmptyStr;
+
+        IdeEvento.ProcEmi := peAplicEmpregador;
+        IdeEvento.VerProc := Versao_Executavel(ParamStr(0));
+
+        if (Trim(cdsTabela.FieldByName('dec_terc_salario').AsString) = 'S') then
+          IdeEvento.IndApuracao := tpIndApuracao(ipaAnual)
+        else
+          IdeEvento.IndApuracao := tpIndApuracao(iapuMensal);
+
+        IdeEvento.perApur := aCompetencia.Codigo;
+
+        IdeEmpregador.TpInsc := tiCNPJ;
+        IdeEmpregador.NrInsc := Criptografa(Pesquisa('CONFIG_ORGAO', 'ID', '1', 'CNPJ', ''),'2', 14); //Criptografa(cdsTabela.FieldByName('CNPJ').AsString, '2', 14);
+
+        with ACBrESocial.Configuracoes do
+          Geral.IdEmpregador := evtTotConting.IdeEmpregador.NrInsc;
+
+        with IdeRespInf do
+        begin
+          nmResp   := Trim(cdsTabela.FieldByName('RESPONSAVEL_NOME').AsString);
+          cpfResp  := OnlyNumber(Trim(cdsTabela.FieldByName('RESPONSAVEL_CPF').AsString));
+          Telefone := OnlyNumber(IfThen(Trim(cdsTabela.FieldByName('RESPONSAVEL_FONECELULAR').AsString) <> EmptyStr,
+            Trim(cdsTabela.FieldByName('RESPONSAVEL_FONECELULAR').AsString),
+            Trim(cdsTabela.FieldByName('RESPONSAVEL_FONEFIXO').AsString)));
+          email    := Trim(cdsTabela.FieldByName('RESPONSAVEL_EMAIL').AsString);
+        end;
+      end;
+
+      aLabel.Caption     := Trim(cdsTabela.FieldByName('ENTE_FERERATIVO').AsString);
+      aProcesso.Progress := aProcesso.MaxValue;
+      Application.ProcessMessages;
+
+      Writeln(flOperacao_eS1295, 'S1295|' + aMainTable + '|' + MODO_OPERACAO[Ord(aModoLancamento)] + '|' + FormatFloat('0000000000', cdsTabela.FieldByName('ID_CONFIG_ORGAO').AsInteger) + '|ID_CONFIG_ORGAO');
+      cdsTabela.Next;
+    end;
+
+    aRetorno := True;
+    aProtocolo.s1295 := (cdsTabela.RecordCount > 0);
+  finally
+    CloseFile(flOperacao_eS1295);
+    if not aProtocolo.s1295 then
+      DeleteFile(aFileProcesso)
+    else
+      SetEventoESocial('S1295'
         , aProtocolo.CompetenciaID
         , aProtocolo.Numero
         , gUsuarioLogin
@@ -6342,6 +6479,7 @@ begin
   aS1207 := False;
   aS1210 := False;
   aS1295 := False;
+  aS1298 := False;
 end;
 
 procedure TProtocoloESocial.SetNumeroInscricao(Value: String);

@@ -88,7 +88,13 @@ begin
       , 'EVENTO;COMPETENCIA;PROCESSADO;ENVIADO'
       , 'S1299;' + IntToStr(aCompetencia.ID) + ';S;S'
       , 'PROCESSO_VALIDO', EmptyStr) = FLAG_NAO);
+    cbS1298.Enabled := (Pesquisa('ESOCIAL_EVENTO'
+      , 'EVENTO;COMPETENCIA;PROCESSADO;ENVIADO'
+      , 'S1299;' + IntToStr(aCompetencia.ID) + ';S;S'
+      , 'PROCESSO_VALIDO', EmptyStr) = FLAG_SIM);
   end;
+  // PARA TESTES
+  cbS1298.Enabled := True;
 end;
 
 function TfrmEnvioEventoPeriodico.EventoSelecionado: Boolean;
@@ -167,6 +173,10 @@ begin
           aRetorno := dmESocial.Gerar_eSocial1207(TCompetencia(cmbAnoMes.Items.Objects[cmbAnoMes.ItemIndex]), Checb_ZeraBase.Checked, mlInclusao, lblProcesso, gagProcesso, aProtocolo);
         if aRetorno and cbS1210.Checked then
           aRetorno := dmESocial.Gerar_eSocial1210(TCompetencia(cmbAnoMes.Items.Objects[cmbAnoMes.ItemIndex]), Checb_ZeraBase.Checked, mlInclusao, lblProcesso, gagProcesso, aProtocolo);
+        if aRetorno and cbS1295.Checked then
+          aRetorno := dmESocial.Gerar_eSocial1295(TCompetencia(cmbAnoMes.Items.Objects[cmbAnoMes.ItemIndex]), Checb_ZeraBase.Checked, mlInclusao, lblProcesso, gagProcesso, aProtocolo);
+        if aRetorno and cbS1298.Checked then
+          aRetorno := dmESocial.Gerar_eSocial1298(TCompetencia(cmbAnoMes.Items.Objects[cmbAnoMes.ItemIndex]), Checb_ZeraBase.Checked, mlInclusao, lblProcesso, gagProcesso, aProtocolo);
 
         if aRetorno then
           aRetorno := dmESocial.EventoEnviado_eSocial(egIniciais, cmbAnoMes.Text, lblProcesso, gagProcesso, aProtocolo);

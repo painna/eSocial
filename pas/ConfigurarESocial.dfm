@@ -42,10 +42,11 @@ inherited frmConfigurarESocial: TfrmConfigurarESocial
       ParentBackground = False
       ParentFont = False
       TabOrder = 1
-      Properties.ActivePage = tbsUNG
+      Properties.ActivePage = tbsResponsavel
       Properties.CustomButtons.Buttons = <>
       Properties.Options = [pcoAlwaysShowGoDialogButton, pcoGradient, pcoGradientClientArea, pcoRedrawOnResize, pcoSort]
       Properties.Style = 9
+      ExplicitLeft = -2
       ClientRectBottom = 364
       ClientRectRight = 668
       ClientRectTop = 23
@@ -271,8 +272,147 @@ inherited frmConfigurarESocial: TfrmConfigurarESocial
           Transparent = True
         end
       end
+      object tbsResponsavel: TcxTabSheet
+        Caption = '&2 - Respons'#225'vel eSocial'
+        ImageIndex = 2
+        object cxLabel1: TcxLabel
+          Left = 66
+          Top = 17
+          Caption = 'Nome Completo:'
+          FocusControl = dbeRESPONSAVEL_NOME
+          ParentFont = False
+          Style.StyleController = dmPrincipal.cxLabelStyleNormal
+          Properties.Alignment.Horz = taRightJustify
+          Transparent = True
+          AnchorX = 147
+        end
+        object dbeRESPONSAVEL_NOME: TcxDBTextEdit
+          Left = 152
+          Top = 16
+          DataBinding.DataField = 'RESPONSAVEL_NOME'
+          DataBinding.DataSource = ds1
+          ParentFont = False
+          Properties.CharCase = ecUpperCase
+          Style.Font.Charset = DEFAULT_CHARSET
+          Style.Font.Color = clDefault
+          Style.Font.Height = -11
+          Style.Font.Name = 'Arial'
+          Style.Font.Style = [fsBold]
+          Style.IsFontAssigned = True
+          TabOrder = 1
+          Width = 439
+        end
+        object cxLabel2: TcxLabel
+          Left = 121
+          Top = 41
+          Caption = 'CPF:'
+          FocusControl = dbeRESPONSAVEL_CPF
+          ParentFont = False
+          Style.StyleController = dmPrincipal.cxLabelStyleNormal
+          Properties.Alignment.Horz = taRightJustify
+          Transparent = True
+          AnchorX = 147
+        end
+        object dbeRESPONSAVEL_CPF: TcxDBMaskEdit
+          Left = 152
+          Top = 40
+          DataBinding.DataField = 'RESPONSAVEL_CPF'
+          DataBinding.DataSource = ds1
+          ParentFont = False
+          Properties.EditMask = '000.000.000-00;0; '
+          Style.Font.Charset = DEFAULT_CHARSET
+          Style.Font.Color = clDefault
+          Style.Font.Height = -11
+          Style.Font.Name = 'Arial'
+          Style.Font.Style = [fsBold]
+          Style.IsFontAssigned = True
+          TabOrder = 3
+          Width = 121
+        end
+        object cxLabel3: TcxLabel
+          Left = 76
+          Top = 65
+          Caption = 'Telefone Fixo:'
+          FocusControl = dbeRESPONSAVEL_FONEFIXO
+          ParentFont = False
+          Style.StyleController = dmPrincipal.cxLabelStyleNormal
+          Properties.Alignment.Horz = taRightJustify
+          Transparent = True
+          AnchorX = 147
+        end
+        object dbeRESPONSAVEL_FONEFIXO: TcxDBMaskEdit
+          Left = 152
+          Top = 64
+          DataBinding.DataField = 'RESPONSAVEL_FONEFIXO'
+          DataBinding.DataSource = ds1
+          ParentFont = False
+          Properties.EditMask = '(00)0000-0000;0; '
+          Style.Font.Charset = DEFAULT_CHARSET
+          Style.Font.Color = clDefault
+          Style.Font.Height = -11
+          Style.Font.Name = 'Arial'
+          Style.Font.Style = [fsBold]
+          Style.IsFontAssigned = True
+          TabOrder = 5
+          Width = 121
+        end
+        object cxLabel4: TcxLabel
+          Left = 63
+          Top = 89
+          Caption = 'Telefone Celular:'
+          FocusControl = dbeRESPONSAVEL_FONECELULAR
+          ParentFont = False
+          Style.StyleController = dmPrincipal.cxLabelStyleNormal
+          Properties.Alignment.Horz = taRightJustify
+          Transparent = True
+          AnchorX = 147
+        end
+        object dbeRESPONSAVEL_FONECELULAR: TcxDBMaskEdit
+          Left = 152
+          Top = 88
+          DataBinding.DataField = 'RESPONSAVEL_FONECELULAR'
+          DataBinding.DataSource = ds1
+          ParentFont = False
+          Properties.EditMask = '(00)0000-0000;0; '
+          Style.Font.Charset = DEFAULT_CHARSET
+          Style.Font.Color = clDefault
+          Style.Font.Height = -11
+          Style.Font.Name = 'Arial'
+          Style.Font.Style = [fsBold]
+          Style.IsFontAssigned = True
+          TabOrder = 7
+          Width = 121
+        end
+        object cxLabel5: TcxLabel
+          Left = 112
+          Top = 113
+          Caption = 'E-mail:'
+          FocusControl = dbeRESPONSAVEL_EMAIL
+          ParentFont = False
+          Style.StyleController = dmPrincipal.cxLabelStyleNormal
+          Properties.Alignment.Horz = taRightJustify
+          Transparent = True
+          AnchorX = 147
+        end
+        object dbeRESPONSAVEL_EMAIL: TcxDBTextEdit
+          Left = 152
+          Top = 112
+          DataBinding.DataField = 'RESPONSAVEL_EMAIL'
+          DataBinding.DataSource = ds1
+          ParentFont = False
+          Properties.CharCase = ecLowerCase
+          Style.Font.Charset = DEFAULT_CHARSET
+          Style.Font.Color = clDefault
+          Style.Font.Height = -11
+          Style.Font.Name = 'Arial'
+          Style.Font.Style = [fsBold]
+          Style.IsFontAssigned = True
+          TabOrder = 9
+          Width = 439
+        end
+      end
       object tbsContador: TcxTabSheet
-        Caption = '&2 - Contador'
+        Caption = '&3 - Contador'
         ImageIndex = 1
         object lblCONTADOR_NOME: TcxLabel
           Left = 66
@@ -467,6 +607,26 @@ inherited frmConfigurarESocial: TfrmConfigurarESocial
       ProviderFlags = [pfInUpdate]
       Size = 60
     end
+    object sds1RESPONSAVEL_NOME: TStringField
+      FieldName = 'RESPONSAVEL_NOME'
+      Size = 50
+    end
+    object sds1RESPONSAVEL_CPF: TStringField
+      FieldName = 'RESPONSAVEL_CPF'
+      Size = 11
+    end
+    object sds1RESPONSAVEL_FONEFIXO: TStringField
+      FieldName = 'RESPONSAVEL_FONEFIXO'
+      Size = 10
+    end
+    object sds1RESPONSAVEL_FONECELULAR: TStringField
+      FieldName = 'RESPONSAVEL_FONECELULAR'
+      Size = 11
+    end
+    object sds1RESPONSAVEL_EMAIL: TStringField
+      FieldName = 'RESPONSAVEL_EMAIL'
+      Size = 60
+    end
     object sds1NAT_JURIDICA: TStringField
       FieldName = 'NAT_JURIDICA'
       ProviderFlags = [pfInUpdate]
@@ -559,6 +719,31 @@ inherited frmConfigurarESocial: TfrmConfigurarESocial
         Size = 60
       end
       item
+        Name = 'RESPONSAVEL_NOME'
+        DataType = ftString
+        Size = 50
+      end
+      item
+        Name = 'RESPONSAVEL_CPF'
+        DataType = ftString
+        Size = 11
+      end
+      item
+        Name = 'RESPONSAVEL_FONEFIXO'
+        DataType = ftString
+        Size = 10
+      end
+      item
+        Name = 'RESPONSAVEL_FONECELULAR'
+        DataType = ftString
+        Size = 11
+      end
+      item
+        Name = 'RESPONSAVEL_EMAIL'
+        DataType = ftString
+        Size = 60
+      end
+      item
         Name = 'NAT_JURIDICA'
         Attributes = [faFixed]
         DataType = ftString
@@ -591,7 +776,7 @@ inherited frmConfigurarESocial: TfrmConfigurarESocial
         Name = 'POSSUI_TABELA_CARREIRA'
         Attributes = [faRequired, faFixed]
         DataType = ftString
-        Size = 10
+        Size = 1
       end
       item
         Name = 'TIPO_OPERACAO'
@@ -646,6 +831,26 @@ inherited frmConfigurarESocial: TfrmConfigurarESocial
     object cds1CONTADOR_EMAIL: TStringField
       FieldName = 'CONTADOR_EMAIL'
       ProviderFlags = [pfInUpdate]
+      Size = 60
+    end
+    object cds1RESPONSAVEL_NOME: TStringField
+      FieldName = 'RESPONSAVEL_NOME'
+      Size = 50
+    end
+    object cds1RESPONSAVEL_CPF: TStringField
+      FieldName = 'RESPONSAVEL_CPF'
+      Size = 11
+    end
+    object cds1RESPONSAVEL_FONEFIXO: TStringField
+      FieldName = 'RESPONSAVEL_FONEFIXO'
+      Size = 10
+    end
+    object cds1RESPONSAVEL_FONECELULAR: TStringField
+      FieldName = 'RESPONSAVEL_FONECELULAR'
+      Size = 11
+    end
+    object cds1RESPONSAVEL_EMAIL: TStringField
+      FieldName = 'RESPONSAVEL_EMAIL'
       Size = 60
     end
     object cds1NAT_JURIDICA: TStringField
