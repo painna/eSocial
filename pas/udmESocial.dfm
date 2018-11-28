@@ -794,4 +794,326 @@ object dmESocial: TdmESocial
     Left = 648
     Top = 424
   end
+  object dspFechamento: TDataSetProvider
+    DataSet = qryFechamento
+    Exported = False
+    Options = [poAllowCommandText, poUseQuoteChar]
+    UpdateMode = upWhereKeyOnly
+    Left = 632
+    Top = 120
+  end
+  object cdsFechamento: TClientDataSet
+    Aggregates = <>
+    FieldDefs = <
+      item
+        Name = 'EVENTO'
+        Attributes = [faRequired]
+        DataType = ftString
+        Size = 10
+      end
+      item
+        Name = 'COMPETENCIA'
+        Attributes = [faRequired, faFixed]
+        DataType = ftString
+        Size = 6
+      end
+      item
+        Name = 'FECHADO'
+        Attributes = [faRequired, faFixed]
+        DataType = ftString
+        Size = 1
+      end
+      item
+        Name = 'DATA_ENVIO'
+        DataType = ftDate
+      end
+      item
+        Name = 'USUARIO_ENVIO'
+        DataType = ftString
+        Size = 20
+      end
+      item
+        Name = 'PROTOCOLO'
+        DataType = ftString
+        Size = 30
+      end
+      item
+        Name = 'POSSUI_REMUNERACAO'
+        Attributes = [faRequired, faFixed]
+        DataType = ftString
+        Size = 1
+      end
+      item
+        Name = 'POSSUI_PAGTOS_1210'
+        Attributes = [faRequired, faFixed]
+        DataType = ftString
+        Size = 1
+      end
+      item
+        Name = 'POSSUI_AQUISICAO_PRODUTO_1250'
+        Attributes = [faRequired, faFixed]
+        DataType = ftString
+        Size = 1
+      end
+      item
+        Name = 'POSSUI_PRODUCAO_1260'
+        Attributes = [faRequired, faFixed]
+        DataType = ftString
+        Size = 1
+      end
+      item
+        Name = 'POSSUI_CONTRATO_AVULSO_1270'
+        Attributes = [faRequired, faFixed]
+        DataType = ftString
+        Size = 1
+      end
+      item
+        Name = 'POSSUI_DESONERACAO_1280'
+        Attributes = [faRequired, faFixed]
+        DataType = ftString
+        Size = 1
+      end
+      item
+        Name = 'SEM_MOVIMENTO'
+        Attributes = [faFixed]
+        DataType = ftString
+        Size = 1
+      end
+      item
+        Name = 'COM_MOVIMENTO'
+        Attributes = [faFixed]
+        DataType = ftString
+        Size = 1
+      end>
+    IndexDefs = <>
+    Params = <
+      item
+        DataType = ftString
+        Name = 'evento'
+        ParamType = ptInput
+        Value = ''
+      end
+      item
+        DataType = ftString
+        Name = 'competencia'
+        ParamType = ptInput
+        Value = ''
+      end>
+    ProviderName = 'dspFechamento'
+    StoreDefs = True
+    Left = 632
+    Top = 168
+    object cdsFechamentoEVENTO: TStringField
+      FieldName = 'EVENTO'
+      ProviderFlags = [pfInUpdate, pfInWhere, pfInKey]
+      Required = True
+      Size = 10
+    end
+    object cdsFechamentoCOMPETENCIA: TStringField
+      FieldName = 'COMPETENCIA'
+      ProviderFlags = [pfInUpdate, pfInWhere, pfInKey]
+      Required = True
+      FixedChar = True
+      Size = 6
+    end
+    object cdsFechamentoFECHADO: TStringField
+      FieldName = 'FECHADO'
+      ProviderFlags = [pfInUpdate]
+      Required = True
+      FixedChar = True
+      Size = 1
+    end
+    object cdsFechamentoDATA_ENVIO: TDateField
+      FieldName = 'DATA_ENVIO'
+      ProviderFlags = [pfInUpdate]
+    end
+    object cdsFechamentoUSUARIO_ENVIO: TStringField
+      FieldName = 'USUARIO_ENVIO'
+      ProviderFlags = [pfInUpdate]
+    end
+    object cdsFechamentoPROTOCOLO: TStringField
+      FieldName = 'PROTOCOLO'
+      ProviderFlags = [pfInUpdate]
+      Size = 30
+    end
+    object cdsFechamentoPOSSUI_REMUNERACAO: TStringField
+      FieldName = 'POSSUI_REMUNERACAO'
+      ProviderFlags = [pfInUpdate]
+      Required = True
+      FixedChar = True
+      Size = 1
+    end
+    object cdsFechamentoPOSSUI_PAGTOS_1210: TStringField
+      FieldName = 'POSSUI_PAGTOS_1210'
+      ProviderFlags = [pfInUpdate]
+      Required = True
+      FixedChar = True
+      Size = 1
+    end
+    object cdsFechamentoPOSSUI_AQUISICAO_PRODUTO_1250: TStringField
+      FieldName = 'POSSUI_AQUISICAO_PRODUTO_1250'
+      ProviderFlags = [pfInUpdate]
+      Required = True
+      FixedChar = True
+      Size = 1
+    end
+    object cdsFechamentoPOSSUI_PRODUCAO_1260: TStringField
+      FieldName = 'POSSUI_PRODUCAO_1260'
+      ProviderFlags = [pfInUpdate]
+      Required = True
+      FixedChar = True
+      Size = 1
+    end
+    object cdsFechamentoPOSSUI_CONTRATO_AVULSO_1270: TStringField
+      FieldName = 'POSSUI_CONTRATO_AVULSO_1270'
+      ProviderFlags = [pfInUpdate]
+      Required = True
+      FixedChar = True
+      Size = 1
+    end
+    object cdsFechamentoPOSSUI_DESONERACAO_1280: TStringField
+      FieldName = 'POSSUI_DESONERACAO_1280'
+      ProviderFlags = [pfInUpdate]
+      Required = True
+      FixedChar = True
+      Size = 1
+    end
+    object cdsFechamentoSEM_MOVIMENTO: TStringField
+      FieldName = 'SEM_MOVIMENTO'
+      ProviderFlags = []
+      FixedChar = True
+      Size = 1
+    end
+    object cdsFechamentoCOM_MOVIMENTO: TStringField
+      FieldName = 'COM_MOVIMENTO'
+      ProviderFlags = []
+      FixedChar = True
+      Size = 1
+    end
+  end
+  object qryFechamento: TSQLQuery
+    MaxBlobSize = 1
+    Params = <
+      item
+        DataType = ftString
+        Name = 'evento'
+        ParamType = ptInput
+        Value = ''
+      end
+      item
+        DataType = ftString
+        Name = 'competencia'
+        ParamType = ptInput
+        Value = ''
+      end>
+    SQL.Strings = (
+      'Select'
+      '    f.evento'
+      '  , f.competencia'
+      '  , f.fechado'
+      '  , f.data_envio'
+      '  , f.usuario_envio'
+      '  , f.protocolo'
+      '  , f.possui_remuneracao'
+      '  , f.possui_pagtos_1210'
+      '  , f.possui_aquisicao_produto_1250'
+      '  , f.possui_producao_1260'
+      '  , f.possui_contrato_avulso_1270'
+      '  , f.possui_desoneracao_1280'
+      '  , f.sem_movimento'
+      '  , f.com_movimento'
+      'from ESOCIAL_FECH_PERIODICO f'
+      'where f.evento      = :evento'
+      '  and f.competencia = :competencia')
+    SQLConnection = dmPrincipal.SConPrincipal
+    Left = 632
+    Top = 72
+    object qryFechamentoEVENTO: TStringField
+      FieldName = 'EVENTO'
+      ProviderFlags = [pfInUpdate, pfInWhere, pfInKey]
+      Required = True
+      Size = 10
+    end
+    object qryFechamentoCOMPETENCIA: TStringField
+      FieldName = 'COMPETENCIA'
+      ProviderFlags = [pfInUpdate, pfInWhere, pfInKey]
+      Required = True
+      FixedChar = True
+      Size = 6
+    end
+    object qryFechamentoFECHADO: TStringField
+      FieldName = 'FECHADO'
+      ProviderFlags = [pfInUpdate]
+      Required = True
+      FixedChar = True
+      Size = 1
+    end
+    object qryFechamentoDATA_ENVIO: TDateField
+      FieldName = 'DATA_ENVIO'
+      ProviderFlags = [pfInUpdate]
+    end
+    object qryFechamentoUSUARIO_ENVIO: TStringField
+      FieldName = 'USUARIO_ENVIO'
+      ProviderFlags = [pfInUpdate]
+    end
+    object qryFechamentoPROTOCOLO: TStringField
+      FieldName = 'PROTOCOLO'
+      ProviderFlags = [pfInUpdate]
+      Size = 30
+    end
+    object qryFechamentoPOSSUI_REMUNERACAO: TStringField
+      FieldName = 'POSSUI_REMUNERACAO'
+      ProviderFlags = [pfInUpdate]
+      Required = True
+      FixedChar = True
+      Size = 1
+    end
+    object qryFechamentoPOSSUI_PAGTOS_1210: TStringField
+      FieldName = 'POSSUI_PAGTOS_1210'
+      ProviderFlags = [pfInUpdate]
+      Required = True
+      FixedChar = True
+      Size = 1
+    end
+    object qryFechamentoPOSSUI_AQUISICAO_PRODUTO_1250: TStringField
+      FieldName = 'POSSUI_AQUISICAO_PRODUTO_1250'
+      ProviderFlags = [pfInUpdate]
+      Required = True
+      FixedChar = True
+      Size = 1
+    end
+    object qryFechamentoPOSSUI_PRODUCAO_1260: TStringField
+      FieldName = 'POSSUI_PRODUCAO_1260'
+      ProviderFlags = [pfInUpdate]
+      Required = True
+      FixedChar = True
+      Size = 1
+    end
+    object qryFechamentoPOSSUI_CONTRATO_AVULSO_1270: TStringField
+      FieldName = 'POSSUI_CONTRATO_AVULSO_1270'
+      ProviderFlags = [pfInUpdate]
+      Required = True
+      FixedChar = True
+      Size = 1
+    end
+    object qryFechamentoPOSSUI_DESONERACAO_1280: TStringField
+      FieldName = 'POSSUI_DESONERACAO_1280'
+      ProviderFlags = [pfInUpdate]
+      Required = True
+      FixedChar = True
+      Size = 1
+    end
+    object qryFechamentoSEM_MOVIMENTO: TStringField
+      FieldName = 'SEM_MOVIMENTO'
+      ProviderFlags = []
+      FixedChar = True
+      Size = 1
+    end
+    object qryFechamentoCOM_MOVIMENTO: TStringField
+      FieldName = 'COM_MOVIMENTO'
+      ProviderFlags = []
+      FixedChar = True
+      Size = 1
+    end
+  end
 end

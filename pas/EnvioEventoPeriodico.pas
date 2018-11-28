@@ -36,6 +36,7 @@ type
     procedure FormCreate(Sender: TObject);
     procedure btnOkClick(Sender: TObject);
     procedure cmbAnoMesChange(Sender: TObject);
+    procedure FormShow(Sender: TObject);
   private
     { Private declarations }
     procedure LimparPainelProcesso(aVisualizar : Boolean);
@@ -88,13 +89,19 @@ begin
       , 'EVENTO;COMPETENCIA;PROCESSADO;ENVIADO'
       , 'S1299;' + IntToStr(aCompetencia.ID) + ';S;S'
       , 'PROCESSO_VALIDO', EmptyStr) = FLAG_NAO);
+
+    // O Evento S1298 é necessário quando o envio do evento S1299 já fora processado e o período de apuração estiver fechado
     cbS1298.Enabled := (Pesquisa('ESOCIAL_EVENTO'
       , 'EVENTO;COMPETENCIA;PROCESSADO;ENVIADO'
       , 'S1299;' + IntToStr(aCompetencia.ID) + ';S;S'
       , 'PROCESSO_VALIDO', EmptyStr) = FLAG_SIM);
+
+    // O Evento S1299 é necessário quando o período de apuração estiver aberto
+    cbS1299.Enabled := (Pesquisa('ESOCIAL_EVENTO'
+      , 'EVENTO;COMPETENCIA;PROCESSADO;ENVIADO'
+      , 'S1299;' + IntToStr(aCompetencia.ID) + ';S;S'
+      , 'PROCESSO_VALIDO', EmptyStr) <> FLAG_SIM);
   end;
-  // PARA TESTES
-  cbS1298.Enabled := True;
 end;
 
 function TfrmEnvioEventoPeriodico.EventoSelecionado: Boolean;
@@ -109,12 +116,12 @@ begin
   if cbS1210.Checked then Inc(I);
   if cbS1250.Checked then Inc(I);
   if cbS1260.Checked then Inc(I);
-  if cbS1300.Checked then Inc(I);
-  if cbS1299.Checked then Inc(I);
-  if cbS1298.Checked then Inc(I);
-  if cbS1295.Checked then Inc(I);
-  if cbS1280.Checked then Inc(I);
   if cbS1270.Checked then Inc(I);
+  if cbS1280.Checked then Inc(I);
+  if cbS1295.Checked then Inc(I);
+  if cbS1298.Checked then Inc(I);
+  if cbS1299.Checked then Inc(I);
+  if cbS1300.Checked then Inc(I);
 
   Result := (I > 0);
 end;
@@ -126,6 +133,12 @@ begin
   LimparPainelProcesso(False);
   cbS1202.Enabled := (Pesquisa('CONFIG_ESOCIAL', 'ID_CONFIG_ORGAO', '1', 'POSSUI_RPPS', '') = FLAG_SIM);
   cbS1207.Enabled := (Pesquisa('CONFIG_ESOCIAL', 'ID_CONFIG_ORGAO', '1', 'POSSUI_RPPS', '') = FLAG_SIM);
+end;
+
+procedure TfrmEnvioEventoPeriodico.FormShow(Sender: TObject);
+begin
+  inherited;
+  cmbAnoMesChange(nil);
 end;
 
 function TfrmEnvioEventoPeriodico.GeradoEnviado: Boolean;
@@ -177,6 +190,8 @@ begin
           aRetorno := dmESocial.Gerar_eSocial1295(TCompetencia(cmbAnoMes.Items.Objects[cmbAnoMes.ItemIndex]), Checb_ZeraBase.Checked, mlInclusao, lblProcesso, gagProcesso, aProtocolo);
         if aRetorno and cbS1298.Checked then
           aRetorno := dmESocial.Gerar_eSocial1298(TCompetencia(cmbAnoMes.Items.Objects[cmbAnoMes.ItemIndex]), Checb_ZeraBase.Checked, mlInclusao, lblProcesso, gagProcesso, aProtocolo);
+        if aRetorno and cbS1299.Checked then
+          aRetorno := dmESocial.Gerar_eSocial1299(TCompetencia(cmbAnoMes.Items.Objects[cmbAnoMes.ItemIndex]), Checb_ZeraBase.Checked, mlInclusao, lblProcesso, gagProcesso, aProtocolo);
 
         if aRetorno then
           aRetorno := dmESocial.EventoEnviado_eSocial(egIniciais, cmbAnoMes.Text, lblProcesso, gagProcesso, aProtocolo);

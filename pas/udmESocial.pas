@@ -122,7 +122,8 @@ type
       aS1207 ,
       aS1210 ,
       aS1295 ,
-      aS1298 : Boolean;
+      aS1298 ,
+      aS1299 : Boolean;
 
       procedure SetNumeroInscricao(Value : String);
       procedure SetVersao(Value : String);
@@ -167,6 +168,7 @@ type
       property S1210 : Boolean read aS1210 write aS1210;
       property S1295 : Boolean read aS1295 write aS1295;
       property S1298 : Boolean read aS1298 write aS1298;
+      property S1299 : Boolean read aS1299 write aS1299;
 
       constructor Create(Value : String); overload;
       destructor Destroy; override;
@@ -218,6 +220,37 @@ type
     setLogEvento: TSQLStoredProc;
     spLogEvento: TSQLStoredProc;
     setProcessoEvento: TSQLStoredProc;
+    dspFechamento: TDataSetProvider;
+    cdsFechamento: TClientDataSet;
+    qryFechamento: TSQLQuery;
+    qryFechamentoEVENTO: TStringField;
+    qryFechamentoCOMPETENCIA: TStringField;
+    qryFechamentoFECHADO: TStringField;
+    qryFechamentoDATA_ENVIO: TDateField;
+    qryFechamentoPROTOCOLO: TStringField;
+    qryFechamentoPOSSUI_REMUNERACAO: TStringField;
+    qryFechamentoPOSSUI_PAGTOS_1210: TStringField;
+    qryFechamentoPOSSUI_AQUISICAO_PRODUTO_1250: TStringField;
+    qryFechamentoPOSSUI_PRODUCAO_1260: TStringField;
+    qryFechamentoPOSSUI_CONTRATO_AVULSO_1270: TStringField;
+    qryFechamentoPOSSUI_DESONERACAO_1280: TStringField;
+    qryFechamentoSEM_MOVIMENTO: TStringField;
+    qryFechamentoCOM_MOVIMENTO: TStringField;
+    cdsFechamentoEVENTO: TStringField;
+    cdsFechamentoCOMPETENCIA: TStringField;
+    cdsFechamentoFECHADO: TStringField;
+    cdsFechamentoDATA_ENVIO: TDateField;
+    cdsFechamentoPROTOCOLO: TStringField;
+    cdsFechamentoPOSSUI_REMUNERACAO: TStringField;
+    cdsFechamentoPOSSUI_PAGTOS_1210: TStringField;
+    cdsFechamentoPOSSUI_AQUISICAO_PRODUTO_1250: TStringField;
+    cdsFechamentoPOSSUI_PRODUCAO_1260: TStringField;
+    cdsFechamentoPOSSUI_CONTRATO_AVULSO_1270: TStringField;
+    cdsFechamentoPOSSUI_DESONERACAO_1280: TStringField;
+    cdsFechamentoSEM_MOVIMENTO: TStringField;
+    cdsFechamentoCOM_MOVIMENTO: TStringField;
+    qryFechamentoUSUARIO_ENVIO: TStringField;
+    cdsFechamentoUSUARIO_ENVIO: TStringField;
     procedure DataModuleCreate(Sender: TObject);
     procedure DataModuleDestroy(Sender: TObject);
     procedure btnSalvar(Sender: TObject);
@@ -271,7 +304,8 @@ type
     flOperacao_eS1207 ,
     flOperacao_eS1210 ,
     flOperacao_eS1295 ,
-    flOperacao_eS1298 : TextFile;
+    flOperacao_eS1298 ,
+    flOperacao_eS1299 : TextFile;
 
     property MensagemRetorno : TStringList read GetMensagemRetorno;
 
@@ -380,7 +414,10 @@ type
       var aProtocolo : TProtocoloESocial) : Boolean;
     function Gerar_eSocial1298(aCompetencia : TCompetencia; aZerarBase : Boolean;
       aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge;
-      var aProtocolo : TProtocoloESocial) : Boolean; virtual; abstract;
+      var aProtocolo : TProtocoloESocial) : Boolean;
+    function Gerar_eSocial1299(aCompetencia : TCompetencia; aZerarBase : Boolean;
+      aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge;
+      var aProtocolo : TProtocoloESocial) : Boolean;
 
     function ConfigurarCertificado(const AOwner : TComponent) : Boolean;
     function EventoEnviado_eSocial(aGrupo : TeSocialGrupo; aCompetencia : String;
@@ -584,6 +621,8 @@ begin
       ProcessarFileLOG('.\log\eS1295.txt', flOperacao_eS1295);
     if aProtocolo.S1298 then
       ProcessarFileLOG('.\log\eS1298.txt', flOperacao_eS1298);
+    if aProtocolo.S1299 then
+      ProcessarFileLOG('.\log\eS1299.txt', flOperacao_eS1299);
   finally
     // Processar LOGs
     spLogEvento.Close;
@@ -3742,6 +3781,380 @@ begin
   end;
 end;
 
+function TdmESocial.Gerar_eSocial1298(aCompetencia: TCompetencia; aZerarBase: Boolean;
+  aModoLancamento: TModoLancamento; aLabel: TLabel; aProcesso: TGauge;
+  var aProtocolo: TProtocoloESocial): Boolean;
+var
+  aRetorno : Boolean;
+  aSQL : TStringList;
+  ok   : Boolean;
+  aEventoID     : Integer;
+  aMainTable    ,
+  aFileProcesso : String;
+begin
+  aMainTable    := 'CONFIG_ESOCIAL';
+  aFileProcesso := '.\log\eS1298.txt';
+  AssignFile(flOperacao_eS1298, aFileProcesso);
+  Rewrite(flOperacao_eS1298);
+
+  aRetorno := False;
+  aSQL := TStringList.Create;
+  ok   := True;
+  try
+    aSQL.BeginUpdate;
+    aSQL.Clear;
+    aSQL.Add('Select');
+    aSQL.Add('    c.*');
+    aSQL.Add('  , e.*');
+    aSQL.Add('  , u.RAZAO_SOCIAL as ENTE_FERERATIVO');
+    aSQL.Add('  , u.cnpj as ENTE_CNPJ');
+    aSQL.Add('  , null   as DEC_TERC_SALARIO');
+    aSQL.Add('from CONFIG_ORGAO c');
+    aSQL.Add('  inner join CONFIG_ESOCIAL e on (e.ID_CONFIG_ORGAO = c.ID)');
+    aSQL.Add('  inner join UNID_GESTORA   u on (u.ID = e.ID_UNID_GESTORA)');
+    aSQL.Add('where c.id = 1');
+    aSQL.EndUpdate;
+    SetSQL(aSQL);
+
+    if cdsTabela.IsEmpty then
+      raise Exception.Create('Dados de configuração de eSocial ainda não foram informado!');
+
+    aSQL.BeginUpdate;
+
+    aSQL.EndUpdate;
+    aSQL.SaveToFile('.\log\eS1298.sql');
+    SetSQL(aSQL);
+
+    aProcesso.MaxValue := cdsTabela.RecordCount;
+    aProcesso.Progress := 0;
+    Application.ProcessMessages;
+
+    if not cdsTabela.IsEmpty then
+      aEventoID := StrToInt(IncrementGenerator('GEN_ESOCIAL_EVENTO_S1298', 1));
+
+    ACBrESocial.Eventos.Periodicos.S1298.Clear;
+
+    cdsTabela.First;
+    while not cdsTabela.Eof do
+    begin
+      with ACBrESocial.Eventos.Periodicos.S1298.Add, EvtReabreEvPer do
+      begin
+        if AmbienteWebServiceProducao then
+          IdeEvento.TpAmb := TpTpAmb(0) //taProducao
+        else
+          IdeEvento.TpAmb := taProducaoRestrita;
+
+        IdeEvento.ProcEmi := peAplicEmpregador;
+        IdeEvento.VerProc := Versao_Executavel(ParamStr(0));
+
+        if (Trim(cdsTabela.FieldByName('dec_terc_salario').AsString) = 'S') then
+          IdeEvento.IndApuracao := tpIndApuracao(ipaAnual)
+        else
+          IdeEvento.IndApuracao := tpIndApuracao(iapuMensal);
+
+        IdeEvento.perApur := aCompetencia.Codigo;
+
+        IdeEmpregador.TpInsc := tiCNPJ;
+        IdeEmpregador.NrInsc := Criptografa(Pesquisa('CONFIG_ORGAO', 'ID', '1', 'CNPJ', ''),'2', 14); //Criptografa(cdsTabela.FieldByName('CNPJ').AsString, '2', 14);
+
+        with ACBrESocial.Configuracoes do
+          Geral.IdEmpregador := EvtReabreEvPer.IdeEmpregador.NrInsc;
+      end;
+
+      aLabel.Caption     := Trim(cdsTabela.FieldByName('ENTE_FERERATIVO').AsString);
+      aProcesso.Progress := aProcesso.MaxValue;
+      Application.ProcessMessages;
+
+      Writeln(flOperacao_eS1298, 'S1298|' + aMainTable + '|' + MODO_OPERACAO[Ord(aModoLancamento)] + '|' + FormatFloat('0000000000', cdsTabela.FieldByName('ID_CONFIG_ORGAO').AsInteger) + '|ID_CONFIG_ORGAO');
+      cdsTabela.Next;
+    end;
+
+    aRetorno := True;
+    aProtocolo.s1298 := (cdsTabela.RecordCount > 0);
+  finally
+    CloseFile(flOperacao_eS1298);
+    if not aProtocolo.s1298 then
+      DeleteFile(aFileProcesso)
+    else
+      SetEventoESocial('S1298'
+        , aProtocolo.CompetenciaID
+        , aProtocolo.Numero
+        , gUsuarioLogin
+        , Now
+        , True
+        , False
+        , False);
+
+    aSQL.Free;
+    Result := aRetorno;
+  end;
+end;
+
+function TdmESocial.Gerar_eSocial1299(aCompetencia: TCompetencia; aZerarBase: Boolean;
+  aModoLancamento: TModoLancamento; aLabel: TLabel; aProcesso: TGauge;
+  var aProtocolo: TProtocoloESocial): Boolean;
+var
+  aRetorno : Boolean;
+  aSQL : TStringList;
+  ok   : Boolean;
+  aEventoID     : Integer;
+  aMainTable    ,
+  aFileProcesso ,
+  aEvento       : String;
+  // Perguntas
+  ExisteRemuneracao           ,
+  ExistePagtoS1210            ,
+  ExisteAquisicaoProdutoRural1250,
+  ExisteProducaoComercial1260 ,
+  ExisteContratoAvulso1270    ,
+  ExisteDesoneracao1280       : tpSimNao;
+  CompetenciaSemMovto         : String;
+begin
+  aMainTable    := 'CONFIG_ESOCIAL';
+  aFileProcesso := '.\log\eS1299.txt';
+  AssignFile(flOperacao_eS1299, aFileProcesso);
+  Rewrite(flOperacao_eS1299);
+
+  aRetorno := False;
+  aSQL := TStringList.Create;
+  ok   := True;
+  try
+    ExisteRemuneracao           := tpSimNao.tpNao;
+    ExistePagtoS1210            := tpSimNao.tpNao;
+    ExisteAquisicaoProdutoRural1250 := tpSimNao.tpNao;
+    ExisteProducaoComercial1260 := tpSimNao.tpNao;
+    ExisteContratoAvulso1270    := tpSimNao.tpNao;
+    ExisteDesoneracao1280       := tpSimNao.tpNao;
+    CompetenciaSemMovto         := EmptyStr;
+
+    if (Pesquisa('ESOCIAL_EVENTO'
+      , 'EVENTO;COMPETENCIA;PROCESSADO;ENVIADO'
+      , 'S1200;' + IntToStr(aCompetencia.ID) + ';S;S'
+      , 'PROCESSO_VALIDO', EmptyStr) = FLAG_SIM)
+    or (Pesquisa('ESOCIAL_EVENTO'
+      , 'EVENTO;COMPETENCIA;PROCESSADO;ENVIADO'
+      , 'S2299;' + IntToStr(aCompetencia.ID) + ';S;S'
+      , 'PROCESSO_VALIDO', EmptyStr) = FLAG_SIM)
+    or (Pesquisa('ESOCIAL_EVENTO'
+      , 'EVENTO;COMPETENCIA;PROCESSADO;ENVIADO'
+      , 'S2399;' + IntToStr(aCompetencia.ID) + ';S;S'
+      , 'PROCESSO_VALIDO', EmptyStr) = FLAG_SIM) then
+      ExisteRemuneracao := tpSimNao.tpSim;
+
+    if (Pesquisa('ESOCIAL_EVENTO'
+      , 'EVENTO;COMPETENCIA;PROCESSADO;ENVIADO'
+      , 'S1210;' + IntToStr(aCompetencia.ID) + ';S;S'
+      , 'PROCESSO_VALIDO', EmptyStr) = FLAG_SIM) then
+      ExistePagtoS1210 := tpSimNao.tpSim;
+
+    if (Pesquisa('ESOCIAL_EVENTO'
+      , 'EVENTO;COMPETENCIA;PROCESSADO;ENVIADO'
+      , 'S1250;' + IntToStr(aCompetencia.ID) + ';S;S'
+      , 'PROCESSO_VALIDO', EmptyStr) = FLAG_SIM) then
+      ExisteAquisicaoProdutoRural1250 := tpSimNao.tpSim;
+
+    if (Pesquisa('ESOCIAL_EVENTO'
+      , 'EVENTO;COMPETENCIA;PROCESSADO;ENVIADO'
+      , 'S1260;' + IntToStr(aCompetencia.ID) + ';S;S'
+      , 'PROCESSO_VALIDO', EmptyStr) = FLAG_SIM) then
+      ExisteProducaoComercial1260 := tpSimNao.tpSim;
+
+    if (Pesquisa('ESOCIAL_EVENTO'
+      , 'EVENTO;COMPETENCIA;PROCESSADO;ENVIADO'
+      , 'S1270;' + IntToStr(aCompetencia.ID) + ';S;S'
+      , 'PROCESSO_VALIDO', EmptyStr) = FLAG_SIM) then
+      ExisteContratoAvulso1270 := tpSimNao.tpSim;
+
+    if (Pesquisa('ESOCIAL_EVENTO'
+      , 'EVENTO;COMPETENCIA;PROCESSADO;ENVIADO'
+      , 'S1280;' + IntToStr(aCompetencia.ID) + ';S;S'
+      , 'PROCESSO_VALIDO', EmptyStr) = FLAG_SIM) then
+      ExisteDesoneracao1280 := tpSimNao.tpSim;
+
+
+    aEvento := 'S1299';
+
+    if (ExisteRemuneracao = tpSimNao.tpNao) and
+       (ExistePagtoS1210  = tpSimNao.tpNao) and
+       (ExisteAquisicaoProdutoRural1250 = tpSimNao.tpNao) and
+       (ExisteProducaoComercial1260     = tpSimNao.tpNao) and
+       (ExisteContratoAvulso1270 = tpSimNao.tpNao) and
+       (ExisteDesoneracao1280    = tpSimNao.tpNao) then
+    begin
+      aSQL.BeginUpdate;
+      aSQL.Clear;
+      aSQL.Add('Select');
+      aSQL.Add('    min(f.competencia_id) as competencia');
+      aSQL.Add('from ESOCIAL_FECH_PERIODICO f');
+      aSQL.Add('  inner join (');
+      aSQL.Add('    Select');
+      aSQL.Add('      max(fch.competencia_id) as competencia_id');
+      aSQL.Add('    from ESOCIAL_FECH_PERIODICO fch');
+      aSQL.Add('      where (fch.evento         = ' + QuotedStr(aEvento)  + ')');
+      aSQL.Add('        and (fch.com_movimento  = ' + QuotedStr(FLAG_SIM) + ')');
+      aSQL.Add('        and (fch.competencia_id < ' + IntToStr(aCompetencia.ID) + ')');
+      aSQL.Add('    union');
+      aSQL.Add('    Select');
+      aSQL.Add('      min(fch.competencia_id) as competencia_id');
+      aSQL.Add('    from ESOCIAL_FECH_PERIODICO fch');
+      aSQL.Add('      where (fch.evento         = ' + QuotedStr(aEvento)  + ')');
+      aSQL.Add('        and (fch.sem_movimento  = ' + QuotedStr(FLAG_SIM) + ')');
+      aSQL.Add('        and (fch.competencia_id < ' + IntToStr(aCompetencia.ID) + ')');
+      aSQL.Add('  ) x on (f.competencia_id >= x.competencia_id)');
+      aSQL.Add('where (f.evento = ' + QuotedStr(aEvento) + ')');
+      aSQL.Add('  and (f.sem_movimento = ' + QuotedStr(FLAG_SIM) + ')');
+      aSQL.EndUpdate;
+      SetSQL(aSQL);
+
+      CompetenciaSemMovto := Trim(cdsTabela.FieldByName('competencia').AsString);
+      if (CompetenciaSemMovto <> EmptyStr) then
+        CompetenciaSemMovto := Copy(CompetenciaSemMovto, 1, 4) + '-' + Copy(CompetenciaSemMovto, 5, 2);
+    end;
+
+    aSQL.BeginUpdate;
+    aSQL.Clear;
+    aSQL.Add('Select');
+    aSQL.Add('    c.*');
+    aSQL.Add('  , e.*');
+    aSQL.Add('  , u.RAZAO_SOCIAL as ENTE_FERERATIVO');
+    aSQL.Add('  , u.cnpj as ENTE_CNPJ');
+    aSQL.Add('  , null   as DEC_TERC_SALARIO');
+    aSQL.Add('from CONFIG_ORGAO c');
+    aSQL.Add('  inner join CONFIG_ESOCIAL e on (e.ID_CONFIG_ORGAO = c.ID)');
+    aSQL.Add('  inner join UNID_GESTORA   u on (u.ID = e.ID_UNID_GESTORA)');
+    aSQL.Add('where c.id = 1');
+    aSQL.EndUpdate;
+    SetSQL(aSQL);
+
+    if cdsTabela.IsEmpty then
+      raise Exception.Create('Dados de configuração de eSocial ainda não foram informado!');
+
+    aSQL.BeginUpdate;
+
+    aSQL.EndUpdate;
+    aSQL.SaveToFile('.\log\eS1299.sql');
+    SetSQL(aSQL);
+
+    aProcesso.MaxValue := cdsTabela.RecordCount;
+    aProcesso.Progress := 0;
+    Application.ProcessMessages;
+
+    if not cdsTabela.IsEmpty then
+      aEventoID := StrToInt(IncrementGenerator('GEN_ESOCIAL_EVENTO_S1299', 1));
+
+    ACBrESocial.Eventos.Periodicos.S1299.Clear;
+
+    cdsTabela.First;
+    while not cdsTabela.Eof do
+    begin
+      with ACBrESocial.Eventos.Periodicos.S1299.Add, EvtFechaEvPer do
+      begin
+        if AmbienteWebServiceProducao then
+          IdeEvento.TpAmb := TpTpAmb(0) //taProducao
+        else
+          IdeEvento.TpAmb := taProducaoRestrita;
+
+        IdeEvento.ProcEmi := peAplicEmpregador;
+        IdeEvento.VerProc := Versao_Executavel(ParamStr(0));
+
+        if (Trim(cdsTabela.FieldByName('dec_terc_salario').AsString) = 'S') then
+          IdeEvento.IndApuracao := tpIndApuracao(ipaAnual)
+        else
+          IdeEvento.IndApuracao := tpIndApuracao(iapuMensal);
+
+        IdeEvento.perApur := aCompetencia.Codigo;
+
+        IdeEmpregador.TpInsc := tiCNPJ;
+        IdeEmpregador.NrInsc := Criptografa(Pesquisa('CONFIG_ORGAO', 'ID', '1', 'CNPJ', ''),'2', 14); //Criptografa(cdsTabela.FieldByName('CNPJ').AsString, '2', 14);
+
+        with ACBrESocial.Configuracoes do
+          Geral.IdEmpregador := EvtFechaEvPer.IdeEmpregador.NrInsc;
+
+        with IdeRespInf do
+        begin
+          nmResp   := Trim(cdsTabela.FieldByName('RESPONSAVEL_NOME').AsString);
+          cpfResp  := OnlyNumber(Trim(cdsTabela.FieldByName('RESPONSAVEL_CPF').AsString));
+          Telefone := OnlyNumber(IfThen(Trim(cdsTabela.FieldByName('RESPONSAVEL_FONECELULAR').AsString) <> EmptyStr,
+            Trim(cdsTabela.FieldByName('RESPONSAVEL_FONECELULAR').AsString),
+            Trim(cdsTabela.FieldByName('RESPONSAVEL_FONEFIXO').AsString)));
+          email    := Trim(cdsTabela.FieldByName('RESPONSAVEL_EMAIL').AsString);
+        end;
+
+        with InfoFech do
+        begin
+          evtRemun        := ExisteRemuneracao;
+          EvtPgtos        := ExistePagtoS1210;
+          EvtAqProd       := ExisteAquisicaoProdutoRural1250;
+          EvtComProd      := ExisteProducaoComercial1260;
+          EvtContratAvNP  := ExisteContratoAvulso1270;
+          EvtInfoComplPer := ExisteDesoneracao1280;
+          compSemMovto    := CompetenciaSemMovto;
+        end;
+      end;
+
+      aLabel.Caption     := Trim(cdsTabela.FieldByName('ENTE_FERERATIVO').AsString);
+      aProcesso.Progress := aProcesso.MaxValue;
+      Application.ProcessMessages;
+
+      Writeln(flOperacao_eS1299, 'S1299|' + aMainTable + '|' + MODO_OPERACAO[Ord(aModoLancamento)] + '|' + FormatFloat('0000000000', cdsTabela.FieldByName('ID_CONFIG_ORGAO').AsInteger) + '|ID_CONFIG_ORGAO');
+      cdsTabela.Next;
+    end;
+
+    aRetorno := True;
+    aProtocolo.s1299 := (cdsTabela.RecordCount > 0);
+  finally
+    CloseFile(flOperacao_eS1299);
+    if not aProtocolo.s1299 then
+      DeleteFile(aFileProcesso)
+    else
+      SetEventoESocial('S1299'
+        , aProtocolo.CompetenciaID
+        , aProtocolo.Numero
+        , gUsuarioLogin
+        , Now
+        , True
+        , False
+        , False);
+
+    aSQL.Free;
+    Result := aRetorno;
+
+    if aRetorno then
+    begin
+      with cdsFechamento do
+      begin
+        Close;
+        ParamByName('evento').AsString      := 'S1299';
+        ParamByName('competencia').AsString := IntToStr(aCompetencia.ID);
+        OPen;
+
+        if IsEmpty then
+        begin
+          Append;
+          cdsFechamentoEVENTO.AsString      := 'S1299';
+          cdsFechamentoCOMPETENCIA.AsString := IntToStr(aCompetencia.ID);
+        end
+        else
+          Edit;
+
+        cdsFechamentoFECHADO.AsString                       := FLAG_NAO;
+        cdsFechamentoPOSSUI_REMUNERACAO.AsString            := IfThen(ExisteRemuneracao = tpSimNao.tpSim, FLAG_SIM, FLAG_NAO);
+        cdsFechamentoPOSSUI_PAGTOS_1210.AsString            := IfThen(ExistePagtoS1210 = tpSimNao.tpSim, FLAG_SIM, FLAG_NAO);
+        cdsFechamentoPOSSUI_AQUISICAO_PRODUTO_1250.AsString := IfThen(ExisteAquisicaoProdutoRural1250 = tpSimNao.tpSim, FLAG_SIM, FLAG_NAO);
+        cdsFechamentoPOSSUI_PRODUCAO_1260.AsString          := IfThen(ExisteProducaoComercial1260 = tpSimNao.tpSim, FLAG_SIM, FLAG_NAO);
+        cdsFechamentoPOSSUI_CONTRATO_AVULSO_1270.AsString   := IfThen(ExisteContratoAvulso1270 = tpSimNao.tpSim, FLAG_SIM, FLAG_NAO);
+        cdsFechamentoPOSSUI_DESONERACAO_1280.AsString       := IfThen(ExisteDesoneracao1280 = tpSimNao.tpSim, FLAG_SIM, FLAG_NAO);
+        cdsFechamentoDATA_ENVIO.Clear;
+        cdsFechamentoUSUARIO_ENVIO.Clear;
+        cdsFechamentoPROTOCOLO.Clear;
+
+        Post;
+        ApplyUpdates(0);
+      end;
+    end;
+  end;
+end;
+
 function TdmESocial.Gerar_eSocial2200(aCompetencia: TCompetencia; aZerarBase: Boolean; aModoLancamento: TModoLancamento;
   aLabel: TLabel; aProcesso: TGauge; var aProtocolo: TProtocoloESocial): Boolean;
 var
@@ -6031,6 +6444,28 @@ begin
       ApplyUpdates(0);
     end;
   end;
+
+  if aProtocolo.S1298 or aProtocolo.S1299 then
+    with cdsFechamento do
+    begin
+      Close;
+      ParamByName('evento').AsString      := 'S1299';
+      ParamByName('competencia').AsString := aProtocolo.aCompetenciaID;
+      OPen;
+
+      if (RecordCount > 0) then
+      begin
+        Edit;
+
+        cdsFechamentoFECHADO.AsString       := IfThen(aProtocolo.S1298, FLAG_NAO, FLAG_SIM);
+        cdsFechamentoDATA_ENVIO.AsDateTime  := aProtocolo.DataHora;
+        cdsFechamentoUSUARIO_ENVIO.AsString := gUsuarioLogin;
+        cdsFechamentoPROTOCOLO.AsString     := aProtocolo.Numero;
+
+        Post;
+        ApplyUpdates(0);
+      end;
+    end;
 end;
 
 procedure TdmESocial.LerConfiguracao;
@@ -6480,6 +6915,7 @@ begin
   aS1210 := False;
   aS1295 := False;
   aS1298 := False;
+  aS1299 := False;
 end;
 
 procedure TProtocoloESocial.SetNumeroInscricao(Value: String);

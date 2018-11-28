@@ -1,6 +1,7 @@
 inherited frmEnvioEventoPeriodico: TfrmEnvioEventoPeriodico
   Caption = 'eSocial - Enviar Eventos Peri'#243'dicos'
   OnCreate = FormCreate
+  OnShow = FormShow
   PixelsPerInch = 96
   TextHeight = 13
   inherited pnlControle: TPanel

@@ -17,7 +17,6 @@ object dmPrincipal: TdmPrincipal
         'unk\db\REMUN_PMSJA_USO_ESOCIAL.FDB'
       'ServerCharSet=WIN1252')
     BeforeConnect = SConPrincipalBeforeConnect
-    Connected = True
     Left = 56
     Top = 40
   end
