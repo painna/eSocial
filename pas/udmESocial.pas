@@ -1380,6 +1380,7 @@ var
   ok   : Boolean;
   aEventoID,
   I    : Integer;
+  aCnpj  ,
   aInicio,
   aFim   : String;
   aMainTable    ,
@@ -1398,11 +1399,10 @@ begin
     aSQL.Clear;
     aSQL.Add('Select');
     aSQL.Add('    e.*');
-    aSQL.Add('  , (Select CNPJ from CONFIG_ORGAO c where c.id = 1) as CNPJ ');
     aSQL.Add('  , x.ano_mes_min');
     aSQL.Add('  , x.ano_mes_max');
-    aSQL.Add('  , ' + QuotedStr(FLAG_NAO) + ' as INCIDE_FGTS');
-    aSQL.Add('  , ' + QuotedStr(FLAG_NAO) + ' as INCIDE_SIND');
+//    aSQL.Add('  , ' + QuotedStr(FLAG_NAO) + ' as INCIDE_FGTS'); // Campo já presentes na tabela EVENTOS
+//    aSQL.Add('  , ' + QuotedStr(FLAG_NAO) + ' as INCIDE_SIND'); // Campo já presentes na tabela EVENTOS
     aSQL.Add('from EVENTO e');
     aSQL.Add('  left join (');
     aSQL.Add('    Select');
@@ -1434,6 +1434,8 @@ begin
 //    if not cdsTabela.IsEmpty then
 //      aEventoID := StrToInt(IncrementGenerator('GEN_ESOCIAL_EVENTO_S1010', 1));
 
+    aCnpj := Criptografa(Pesquisa('CONFIG_ORGAO', 'ID', '1', 'CNPJ', ''),'2', 14);
+
     cdsTabela.First;
     while not cdsTabela.Eof do
     begin
@@ -1451,7 +1453,7 @@ begin
         evtTabRubrica.IdeEvento.VerProc := Versao_Executavel(ParamStr(0));
 
         evtTabRubrica.IdeEmpregador.TpInsc := tiCNPJ;
-        evtTabRubrica.IdeEmpregador.NrInsc := Criptografa(cdsTabela.FieldByName('CNPJ').AsString, '2', 14);
+        evtTabRubrica.IdeEmpregador.NrInsc := aCnpj;
 
         with ACBrESocial.Configuracoes do
           Geral.IdEmpregador := evtTabRubrica.IdeEmpregador.NrInsc;
