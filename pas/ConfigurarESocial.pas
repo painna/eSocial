@@ -115,11 +115,14 @@ type
     procedure cds1NewRecord(DataSet: TDataSet);
     procedure FormShow(Sender: TObject);
     procedure cds1BeforePost(DataSet: TDataSet);
+    procedure btnGravarClick(Sender: TObject);
   private
     { Private declarations }
   public
     { Public declarations }
   end;
+
+  // http://www.contaspublicas.gov.br/AtuLinks2.asp?cod=3207317 (Buscar Código SIAFI)
 
 var
   frmConfigurarESocial: TfrmConfigurarESocial;
@@ -129,6 +132,16 @@ implementation
 {$R *.dfm}
 
 uses udmESocial, udmPrincipal, gsLib, UtilsDb;
+
+procedure TfrmConfigurarESocial.btnGravarClick(Sender: TObject);
+begin
+  if cds1.State = dsInsert then
+    cds1TIPO_OPERACAO.AsString := FLAG_OPERACAO_INSERIR
+  else
+    cds1TIPO_OPERACAO.AsString := FLAG_OPERACAO_ALTERAR;
+
+  inherited;
+end;
 
 procedure TfrmConfigurarESocial.cds1BeforePost(DataSet: TDataSet);
 begin
@@ -143,12 +156,12 @@ begin
   begin
     Mensagem('CPF do Contador é Inválido!', 'Alerta', MB_ICONWARNING);
     Abort;
-  end
+  end;
+
+  if cds1.State = dsInsert then
+    cds1TIPO_OPERACAO.AsString := FLAG_OPERACAO_INSERIR
   else
-    if cds1.State = dsInsert then
-      cds1TIPO_OPERACAO.AsString := FLAG_OPERACAO_INSERIR
-    else
-      cds1TIPO_OPERACAO.AsString := FLAG_OPERACAO_ALTERAR;
+    cds1TIPO_OPERACAO.AsString := FLAG_OPERACAO_ALTERAR;
 end;
 
 procedure TfrmConfigurarESocial.cds1NewRecord(DataSet: TDataSet);

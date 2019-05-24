@@ -590,3 +590,42 @@ end^
 
 SET TERM ; ^
 
+
+
+/*------ 24/05/2019 14:31:06 --------*/
+
+CREATE OR ALTER VIEW VW_TIPO_SUBTETO(
+    CODIGO,
+    DESCRICAO)
+AS
+Select '1' as Codigo, 'Executivo' as Descricao from rdb$database Union
+Select '2' as Codigo, 'Judiciário' as Descricao from rdb$database Union
+Select '3' as Codigo, 'Legislativo' as Descricao from rdb$database Union
+Select '9' as Codigo, 'Todos os poderes' as Descricao from rdb$database;
+
+/*------ 24/05/2019 14:31:06 --------*/
+
+GRANT ALL ON VW_TIPO_SUBTETO TO "GERASYS.TI" WITH GRANT OPTION;
+
+/*------ 24/05/2019 14:31:06 --------*/
+
+GRANT ALL ON VW_TIPO_SUBTETO TO PUBLIC;
+
+/*------ 24/05/2019 14:36:50 --------*/
+
+CREATE OR ALTER VIEW VW_TIPO_SUBTETO(
+    CODIGO,
+    DESCRICAO)
+AS
+Select '1' as Codigo, 'Executivo' as Descricao from rdb$database Union
+Select '2' as Codigo, 'Judiciário' as Descricao from rdb$database Union
+Select '3' as Codigo, 'Legislativo' as Descricao from rdb$database Union
+Select '9' as Codigo, 'Todos os poderes' as Descricao from rdb$database;
+
+/*------ 24/05/2019 14:36:50 --------*/
+
+GRANT ALL ON VW_TIPO_SUBTETO TO "GERASYS.TI" WITH GRANT OPTION;
+
+/*------ 24/05/2019 14:36:50 --------*/
+
+GRANT ALL ON VW_TIPO_SUBTETO TO PUBLIC;

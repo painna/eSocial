@@ -884,7 +884,7 @@ begin
 
             while aDataHoraTemp <= aDataHoraFinal do
             begin
-              sArquivo := StringReplace(sPath + '\' + FormatDateTime('yyyymmddhhmmss', aDataHoraTemp), '\\', '\', [rfReplaceAll]);
+              sArquivo := StringReplace(sPath + '\' + FormatDateTime('yymmddhhmmss', aDataHoraTemp), '\\', '\', [rfReplaceAll]);
 
               // Pegar Arquivo de Envio
               if FileExists(sArquivo + '-env-lot.xml') then
@@ -1165,7 +1165,7 @@ begin
       Application.ProcessMessages;
       Inc(I);
 
-      Writeln(flOperacao_eS1000, 'S1000|' + aMainTable + '|' + MODO_OPERACAO[Ord(aModoLancamento)] + '|' + FormatFloat('0000000000', cdsTabela.FieldByName('ID').AsInteger) + '|ID');
+      Writeln(flOperacao_eS1000, 'S1000|' + aMainTable + '|' + MODO_OPERACAO[Ord(aModoLancamento)] + '|' + FormatFloat('0000000000', cdsTabela.FieldByName('ID').AsInteger) + '|ID_CONFIG_ORGAO');
       cdsTabela.Next;
     end;
 
@@ -1812,7 +1812,7 @@ begin
   try
     aSQL.BeginUpdate;
     aSQL.Clear;
-    aSQL.Add('Select '); // first 1
+    aSQL.Add('Select ' + IfThen(not AmbienteWebServiceProducao, 'First 10', '') );
     aSQL.Add('    f.*');
     aSQL.Add('  , c.codigo as cbo ');
     aSQL.Add('  , e.cod_rais as escolaridade ');
@@ -2273,15 +2273,17 @@ begin
 
         with infoAmbiente.dadosAmbiente do
         begin
-          dscAmb   := Trim(cdsTabela.FieldByName('descricao').AsString);
-          localAmb := eSStrToLocalAmb(ok, Trim(cdsTabela.FieldByName('local_tipo').AsString));
+          dscAmb     := Trim(cdsTabela.FieldByName('descricao').AsString);
+          localAmb   := eSStrToLocalAmb(ok, Trim(cdsTabela.FieldByName('local_tipo').AsString));
+          CodLotacao := EmptyStr;
 
           if (localAmb = laEstabProprioEmpregador) then
           begin
-            TpInsc := atCNPJ;
+            TpInsc := tpTpInsc.tiCNPJ;
             NrInsc := Criptografa(cdsTabela.FieldByName('CNPJ').AsString, '2', 14);
           end;
 
+          (* REMOVIDO FATOR DE RISCO DOS DEPARTAMENTOS
           fatorRisco.Clear;
 
           aSQL.BeginUpdate;
@@ -2308,7 +2310,7 @@ begin
           else
             with fatorRisco.Add do
               codFatRis := '0901001'; // Ausência de Fator de Risco
-
+          *)
           cdsDetalhe.Close;
         end;
 
@@ -5547,92 +5549,82 @@ begin
 
         with infoExpRisco do
         begin
-          if (aModoLancamento in [mlInclusao, mlAlteracao]) then
-            with iniExpRisco do
+          dtIniCondicao := Date;
+
+          InfoAmb.Clear;
+
+          with InfoAmb.Add do
+          begin
+            codAmb              := Trim(cdsTabela.FieldByName('id_depto').AsString);
+            InfoAtiv.dscAtivDes := Trim(cdsTabela.FieldByName('fun_descricao').AsString);
+
+            FatRisco.Clear;
+
+            aSQL.BeginUpdate;
+            aSQL.Clear;
+            aSQL.Add('Select ');
+            aSQL.Add('    f.id_fator_risco as codigo ');
+            aSQL.Add('from DEPTO_FATOR_RISCO f ');
+            aSQL.Add('where (f.id_depto = ' + Trim(cdsTabela.FieldByName('id').AsString) + ') ');
+
+            aSQL.EndUpdate;
+            SetSQL_Detalhe(aSQL);
+
+            cdsDetalhe.First;
+            if (cdsDetalhe.RecordCount > 0) then
             begin
-              dtCondicao := Date;
 
-              InfoAmb.Clear;
-
-              with InfoAmb.Add do
+              while not cdsDetalhe.Eof do
               begin
-                codAmb              := Trim(cdsTabela.FieldByName('id_depto').AsString);
-                InfoAtiv.dscAtivDes := Trim(cdsTabela.FieldByName('fun_descricao').AsString);
-
-                FatRisco.Clear;
-
-                aSQL.BeginUpdate;
-                aSQL.Clear;
-                aSQL.Add('Select ');
-                aSQL.Add('    f.id_fator_risco as codigo ');
-                aSQL.Add('from DEPTO_FATOR_RISCO f ');
-                aSQL.Add('where (f.id_depto = ' + Trim(cdsTabela.FieldByName('id').AsString) + ') ');
-
-                aSQL.EndUpdate;
-                SetSQL_Detalhe(aSQL);
-
-                cdsDetalhe.First;
-                if (cdsDetalhe.RecordCount > 0) then
+                with FatRisco.Add do
                 begin
+                  codFatRis  := Trim(cdsDetalhe.FieldByName('codigo').AsString);
+                  intConc    := 0;
+                  limTol     := 0;
+                  unMed      := 0;
+                  tecMedicao := EmptyStr;
 
-                  while not cdsDetalhe.Eof do
+                  with epcEpi do
                   begin
-                    with FatRisco.Add do
-                    begin
-                      codFatRis  := Trim(cdsDetalhe.FieldByName('codigo').AsString);
-                      intConc    := 'N/A';
-                      tecMedicao := EmptyStr;
+                    utilizEPC := uEPCNaoAplica;
+                    utilizEPI := uEPINaoAplica;
 
-                      with epcEpi do
-                      begin
-                        utilizEPC := uEPCNaoAplica;
-                        utilizEPI := uEPINaoAplica;
-
-                        epc.Clear;
-      //
-      //                  with epc.Add do
-      //                  begin
-      //                    dscEpc  := 'Descrição do EPC 1';
-      //                    eficEpc := tpSim;
-      //                  end;
-
-                        epi.Clear;
-      //
-      //                  with epi.Add do
-      //                  begin
-      //                    caEPI         := '321654';
-      //                    eficEpi       := tpSim;
-      //                    medProtecao   := tpSim;
-      //                    condFuncto    := tpSim;
-      //                    przValid      := tpSim;
-      //                    periodicTroca := tpSim;
-      //                    higienizacao  := tpSim;
-      //                  end;
-                      end;
-                    end;
-
-                    cdsDetalhe.Next;
+                    epi.Clear;
+  //
+  //                  with epi.Add do
+  //                  begin
+  //                    caEPI         := '321654';
+  //                    eficEpi       := tpSim;
+  //                    medProtecao   := tpSim;
+  //                    condFuncto    := tpSim;
+  //                    przValid      := tpSim;
+  //                    periodicTroca := tpSim;
+  //                    higienizacao  := tpSim;
+  //                  end;
                   end;
+                end;
 
-                end
-                else
-                  with FatRisco.Add do
-                  begin
-                    codFatRis := '0901001'; // Ausência de Fator de Risco
-                    with epcEpi do
-                    begin
-                      utilizEPC := uEPCNaoAplica;
-                      utilizEPI := uEPINaoAplica;
-
-                      epc.Clear;
-                      epi.Clear;
-                    end;
-                  end;
-
-                cdsDetalhe.Close;
+                cdsDetalhe.Next;
               end;
-            end;
 
+            end
+            else
+              with FatRisco.Add do
+              begin
+                codFatRis := '0901001'; // Ausência de Fator de Risco
+                with epcEpi do
+                begin
+                  utilizEPC := uEPCNaoAplica;
+                  utilizEPI := uEPINaoAplica;
+
+                  epi.Clear;
+                end;
+              end;
+
+            cdsDetalhe.Close;
+          end;
+
+          (*
           // Alteração das informações de condições de ambiente de trabalho, opcional
           if (aModoLancamento = mlAlteracao) then
             with altExpRisco do
@@ -5711,7 +5703,6 @@ begin
                       utilizEPC := uEPCNaoAplica;
                       utilizEPI := uEPINaoAplica;
 
-                      epc.Clear;
                       epi.Clear;
                     end;
                   end;
@@ -5731,15 +5722,14 @@ begin
               with InfoAmb.Add do
                 codAmb := Trim(cdsTabela.FieldByName('id_depto').AsString);
             end;
-
+          *)
           respReg.Clear;
 
           // Informações relativas ao responsável pelos registros ambientais
           with respReg.Add, aResponsavel do
           begin
-            dtIni   := Conselho.Emissao;
-            dtFim   := Conselho.Validade;
             NisResp := NIS;
+            ideOC   := tpIdeOC.idOutros;
             NrOc    := Conselho.Numero;
             ufOC    := eSStrTouf(ok, Conselho.UF);
           end;
@@ -5790,6 +5780,9 @@ var
   aMainTable    ,
   aFileProcesso : String;
 begin
+  Exit;
+
+  (* EVENTO 2241 REMOVIDO
   aMainTable    := 'SERVIDOR';
   aFileProcesso := '.\log\eS2241.txt';
   AssignFile(flOperacao_eS2241, aFileProcesso);
@@ -6110,6 +6103,7 @@ begin
     aSQL.Free;
     Result := aRetorno;
   end;
+  *)
 end;
 
 function TdmESocial.Gerar_eSocial2400(aCompetencia: TCompetencia; aZerarBase: Boolean;
@@ -6486,14 +6480,10 @@ begin
   try
     with aForm do
     begin
-//      cbSSLLib.ItemIndex     := Ini.ReadInteger('Certificado', 'SSLLib',     Ord(libCustom));
-//      cbCryptLib.ItemIndex   := Ini.ReadInteger('Certificado', 'CryptLib',   Ord(cryWinCrypt));
-//      cbHttpLib.ItemIndex    := Ini.ReadInteger('Certificado', 'HttpLib',    Ord(httpWinHttp));
-//      cbXmlSignLib.ItemIndex := Ini.ReadInteger('Certificado', 'XmlSignLib', Ord(xsLibXml2));
-      cbSSLLib.ItemIndex     := Ini.ReadInteger('Certificado', 'SSLLib',     Ord(libOpenSSL));
-      cbCryptLib.ItemIndex   := Ini.ReadInteger('Certificado', 'CryptLib',   Ord(cryOpenSSL));
-      cbHttpLib.ItemIndex    := Ini.ReadInteger('Certificado', 'HttpLib',    Ord(httpOpenSSL));
-      cbXmlSignLib.ItemIndex := Ini.ReadInteger('Certificado', 'XmlSignLib', Ord(xsXmlSec));
+      cbSSLLib.ItemIndex     := Ini.ReadInteger('Certificado', 'SSLLib',     Ord(libCustom));
+      cbCryptLib.ItemIndex   := Ini.ReadInteger('Certificado', 'CryptLib',   Ord(cryWinCrypt));
+      cbHttpLib.ItemIndex    := Ini.ReadInteger('Certificado', 'HttpLib',    Ord(httpWinHttp));
+      cbXmlSignLib.ItemIndex := Ini.ReadInteger('Certificado', 'XmlSignLib', Ord(xsLibXml2));
       edtCaminho.Text        := Ini.ReadString ('Certificado', 'Caminho',  '');
       edtSenha.Text          := Ini.ReadString ('Certificado', 'Senha',    '');
       edtNumSerie.Text       := Ini.ReadString ('Certificado', 'NumSerie', '');

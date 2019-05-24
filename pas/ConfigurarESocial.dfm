@@ -46,7 +46,6 @@ inherited frmConfigurarESocial: TfrmConfigurarESocial
       Properties.CustomButtons.Buttons = <>
       Properties.Options = [pcoAlwaysShowGoDialogButton, pcoGradient, pcoGradientClientArea, pcoRedrawOnResize, pcoSort]
       Properties.Style = 9
-      ExplicitLeft = -2
       ClientRectBottom = 364
       ClientRectRight = 668
       ClientRectTop = 23

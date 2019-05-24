@@ -94,7 +94,7 @@ begin
   if cbS2220.Checked then Inc(I);
   if cbS2240.Checked then Inc(I);
   if cbS2230.Checked then Inc(I);
-  if cbS2241.Checked then Inc(I);
+  //if cbS2241.Checked then Inc(I);
   if cbS2250.Checked then Inc(I);
   if cbs2260.Checked then Inc(I);
   if cbS2298.Checked then Inc(I);
@@ -170,8 +170,8 @@ begin
           aRetorno := dmESocial.Gerar_eSocial2230(TCompetencia(cmbAnoMes.Items.Objects[cmbAnoMes.ItemIndex]), Checb_ZeraBase.Checked, mlInclusao, lblProcesso, gagProcesso, aProtocolo);
         if aRetorno and cbS2240.Checked  then
           aRetorno := dmESocial.Gerar_eSocial2240(TCompetencia(cmbAnoMes.Items.Objects[cmbAnoMes.ItemIndex]), Checb_ZeraBase.Checked, aModoLancamento, lblProcesso, gagProcesso, aProtocolo);
-        if aRetorno and cbS2241.Checked  then
-          aRetorno := dmESocial.Gerar_eSocial2241(TCompetencia(cmbAnoMes.Items.Objects[cmbAnoMes.ItemIndex]), Checb_ZeraBase.Checked, aModoLancamento, lblProcesso, gagProcesso, aProtocolo);
+//        if aRetorno and cbS2241.Checked  then
+//          aRetorno := dmESocial.Gerar_eSocial2241(TCompetencia(cmbAnoMes.Items.Objects[cmbAnoMes.ItemIndex]), Checb_ZeraBase.Checked, aModoLancamento, lblProcesso, gagProcesso, aProtocolo);
         if aRetorno and cbS2250.Checked  then
           aRetorno := dmESocial.Gerar_eSocial2250(TCompetencia(cmbAnoMes.Items.Objects[cmbAnoMes.ItemIndex]), Checb_ZeraBase.Checked, aModoLancamento, lblProcesso, gagProcesso, aProtocolo);
         if aRetorno and cbS2260.Checked  then
@@ -234,7 +234,7 @@ begin
   cbS2220.Enabled := (gpbOperacao.ItemIndex = 0);
   cbS2230.Enabled := (gpbOperacao.ItemIndex = 0);
   cbS2240.Enabled := (gpbOperacao.ItemIndex = 0) or (gpbOperacao.ItemIndex = 1);
-  cbS2241.Enabled := (gpbOperacao.ItemIndex = 0) or (gpbOperacao.ItemIndex = 1);
+//  cbS2241.Enabled := (gpbOperacao.ItemIndex = 0) or (gpbOperacao.ItemIndex = 1);
 //  cbS2298.Enabled := (gpbOperacao.ItemIndex = 1);
 //  cbS2299.Enabled := (gpbOperacao.ItemIndex = 1);
 
@@ -245,7 +245,7 @@ begin
   if not cbS2220.Enabled then cbS2220.Checked := False;
   if not cbS2230.Enabled then cbS2230.Checked := False;
   if not cbS2240.Enabled then cbS2240.Checked := False;
-  if not cbS2241.Enabled then cbS2241.Checked := False;
+//  if not cbS2241.Enabled then cbS2241.Checked := False;
 //  if not cbS2298.Enabled then cbS2299.Checked := False;
 //  if not cbS2299.Enabled then cbS2299.Checked := False;
 end;
