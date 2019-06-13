@@ -154,7 +154,6 @@ inherited frmEnvioEventoNaoPeriodico: TfrmEnvioEventoNaoPeriodico
       Height = 17
       Caption = 'S-2200 -  Evento Admiss'#227'o'
       Ctl3D = False
-      Enabled = False
       ParentCtl3D = False
       TabOrder = 2
     end

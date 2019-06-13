@@ -453,21 +453,6 @@ GRANT ALL ON ESOCIAL_TIPO_LOGRADOURO TO PUBLIC;
 
 GRANT ALL ON ESOCIAL_TIPO_LOGRADOURO TO PUBLIC WITH GRANT OPTION;
 
-
-
-/*------ GERASYS.TI 13/06/2019 12:12:06 --------*/
-
-/*!!! Error occured !!!
-Column does not belong to referenced table.
-Dynamic SQL Error.
-SQL error code = -206.
-Column unknown.
-P.ENDER_TIPO.
-At line 60, column 9.
-
-*/
-
-
 /*------ GERASYS.TI 13/06/2019 12:13:07 --------*/
 
 ALTER TABLE PESSOA_FISICA
@@ -476,3 +461,383 @@ ALTER TABLE PESSOA_FISICA
 COMMENT ON COLUMN PESSOA_FISICA.ID_NATURAL_CIDADE IS
 'eSocial - Codigo do Municipio de nascimento conforme a tabela do IBGE.';
 
+/*------ GERASYS.TI 13/06/2019 13:19:12 --------*/
+
+ALTER TABLE PESSOA_FISICA
+    ADD CNH_DT_EMISSAO "DATE",
+    ADD ENDER_TIPO "VARCHAR(5)" DEFAULT 'IND',
+    ADD ID_ENDER_CIDADE "INTEGER",
+    ADD DEFICIENTE_FISICO SIM_NAO,
+    ADD DEFICIENTE_VISUAL SIM_NAO,
+    ADD DEFICIENTE_AUDITIVO SIM_NAO,
+    ADD DEFICIENTE_MENTAL SIM_NAO,
+    ADD DEFICIENTE_INTELECTUAL SIM_NAO,
+    ADD DEFICIENTE_READAPTADO SIM_NAO,
+    ADD DEFICIENTE_COTA SIM_NAO,
+    ADD DEFICIENTE_OBS "VARCHAR(250)",
+    ADD TIPO_OPERACAO ESOCIAL_OPERACAO,
+    ADD DATA_OPERACAO ESOCIAL_DATA;
+
+COMMENT ON COLUMN PESSOA_FISICA.CNH_DT_EMISSAO IS
+'eSocial - Data de emissao da CNH';
+
+COMMENT ON COLUMN PESSOA_FISICA.ENDER_TIPO IS
+'eSocial - Tipo do Logradouro:
+Anexo I dos Leiautes do eSocial versao 2.4 - Tabela 20';
+
+COMMENT ON COLUMN PESSOA_FISICA.ID_ENDER_CIDADE IS
+'eSocial - Codigo do Municipio de residencia conforme a tabela do IBGE.';
+
+COMMENT ON COLUMN PESSOA_FISICA.DEFICIENTE_FISICO IS
+'eSocial - Deficiente Fisico:
+N - Nao
+S - Sim';
+
+COMMENT ON COLUMN PESSOA_FISICA.DEFICIENTE_VISUAL IS
+'eSocial - Deficiente Visual:
+N - Nao
+S - Sim';
+
+COMMENT ON COLUMN PESSOA_FISICA.DEFICIENTE_AUDITIVO IS
+' eSocial - Deficiente Auditivo:
+N - Nao
+S - Sim';
+
+COMMENT ON COLUMN PESSOA_FISICA.DEFICIENTE_MENTAL IS
+'eSocial - Deficiencia Mental:
+N - Nao
+S - Sim';
+
+COMMENT ON COLUMN PESSOA_FISICA.DEFICIENTE_INTELECTUAL IS
+'eSocial - Deficiente Intelectual:
+N - Nao
+S - Sim';
+
+COMMENT ON COLUMN PESSOA_FISICA.DEFICIENTE_READAPTADO IS
+'eSocial - Deficiente Reabilitado:
+N - Nao
+S - Sim
+
+Readaptado: O servidor esta investido em cargo de atribuicoes e responsabilidades
+compativeis com a limitacao que tenha sofrido em sua capacidade fisica ou mental
+verificada em inspecao medica.';
+
+COMMENT ON COLUMN PESSOA_FISICA.DEFICIENTE_COTA IS
+'eSocial - Deficiente com uso de Cota:
+N - Nao
+S - Sim';
+
+COMMENT ON COLUMN PESSOA_FISICA.DEFICIENTE_OBS IS
+'eSocial - Deficiente (Observacoes)';
+
+COMMENT ON COLUMN PESSOA_FISICA.TIPO_OPERACAO IS
+'eSocial - Operacao do registro:
+I - Inclusao
+A - Alteracao
+E - Exclusao
+P - Processado/Enviado';
+
+COMMENT ON COLUMN PESSOA_FISICA.DATA_OPERACAO IS
+'eSocial - Data da operacao de insercao ou edicao do registro';
+
+alter table PESSOA_FISICA
+alter ID position 1;
+
+alter table PESSOA_FISICA
+alter NOME position 2;
+
+alter table PESSOA_FISICA
+alter APELIDO position 3;
+
+alter table PESSOA_FISICA
+alter SEXO position 4;
+
+alter table PESSOA_FISICA
+alter ID_RACA_COR position 5;
+
+alter table PESSOA_FISICA
+alter DT_NASCIMENTO position 6;
+
+alter table PESSOA_FISICA
+alter NATURAL_CIDADE position 7;
+
+alter table PESSOA_FISICA
+alter NATURAL_UF position 8;
+
+alter table PESSOA_FISICA
+alter ID_NATURAL_CIDADE position 9;
+
+alter table PESSOA_FISICA
+alter RG_NUM position 10;
+
+alter table PESSOA_FISICA
+alter RG_ORGAO_EMISSOR position 11;
+
+alter table PESSOA_FISICA
+alter RG_UF position 12;
+
+alter table PESSOA_FISICA
+alter RG_DT_EMISSAO position 13;
+
+alter table PESSOA_FISICA
+alter CPF position 14;
+
+alter table PESSOA_FISICA
+alter PIS_PASEP position 15;
+
+alter table PESSOA_FISICA
+alter CNH_NUM position 16;
+
+alter table PESSOA_FISICA
+alter CNH_DT_EMISSAO position 17;
+
+alter table PESSOA_FISICA
+alter CNH_DT_VENCTO position 18;
+
+alter table PESSOA_FISICA
+alter TIT_ELEITOR_NUM position 19;
+
+alter table PESSOA_FISICA
+alter TIT_ELEITOR_ZONA position 20;
+
+alter table PESSOA_FISICA
+alter TIT_ELEITOR_SECAO position 21;
+
+alter table PESSOA_FISICA
+alter RESERVISTA position 22;
+
+alter table PESSOA_FISICA
+alter ID_ESTADO_CIVIL position 23;
+
+alter table PESSOA_FISICA
+alter CONJUGE_NOME position 24;
+
+alter table PESSOA_FISICA
+alter CONJUGE_CPF position 25;
+
+alter table PESSOA_FISICA
+alter FILIACAO_PAI position 26;
+
+alter table PESSOA_FISICA
+alter FILIACAO_MAE position 27;
+
+alter table PESSOA_FISICA
+alter ENDER_TIPO position 28;
+
+alter table PESSOA_FISICA
+alter ENDER_LOGRAD position 29;
+
+alter table PESSOA_FISICA
+alter ENDER_NUM position 30;
+
+alter table PESSOA_FISICA
+alter ENDER_BAIRRO position 31;
+
+alter table PESSOA_FISICA
+alter ENDER_CIDADE position 32;
+
+alter table PESSOA_FISICA
+alter ENDER_CEP position 33;
+
+alter table PESSOA_FISICA
+alter ENDER_UF position 34;
+
+alter table PESSOA_FISICA
+alter ID_ENDER_CIDADE position 35;
+
+alter table PESSOA_FISICA
+alter TELEFONE position 36;
+
+alter table PESSOA_FISICA
+alter E_MAIL position 37;
+
+alter table PESSOA_FISICA
+alter FOTO position 38;
+
+alter table PESSOA_FISICA
+alter DESCR_ESTADO_CIVIL position 39;
+
+alter table PESSOA_FISICA
+alter CPF_FTDO position 40;
+
+alter table PESSOA_FISICA
+alter PIS_PASEP_FTDO position 41;
+
+alter table PESSOA_FISICA
+alter ENDER_COMPLEM position 42;
+
+alter table PESSOA_FISICA
+alter ANO_CHEGADA_BRASIL position 43;
+
+alter table PESSOA_FISICA
+alter ID_NACIONALIDADE position 44;
+
+alter table PESSOA_FISICA
+alter DESCR_NACIONALIDADE position 45;
+
+alter table PESSOA_FISICA
+alter CNH_CATEG position 46;
+
+alter table PESSOA_FISICA
+alter ID_ESCOLARIDADE position 47;
+
+alter table PESSOA_FISICA
+alter DESCR_ESCOLARIDADE position 48;
+
+alter table PESSOA_FISICA
+alter ANO_PRIM_EMPREGO position 49;
+
+alter table PESSOA_FISICA
+alter RG_COMPLETO position 50;
+
+alter table PESSOA_FISICA
+alter DEFICIENTE_FISICO position 51;
+
+alter table PESSOA_FISICA
+alter DEFICIENTE_VISUAL position 52;
+
+alter table PESSOA_FISICA
+alter DEFICIENTE_AUDITIVO position 53;
+
+alter table PESSOA_FISICA
+alter DEFICIENTE_MENTAL position 54;
+
+alter table PESSOA_FISICA
+alter DEFICIENTE_INTELECTUAL position 55;
+
+alter table PESSOA_FISICA
+alter DEFICIENTE_READAPTADO position 56;
+
+alter table PESSOA_FISICA
+alter DEFICIENTE_COTA position 57;
+
+alter table PESSOA_FISICA
+alter DEFICIENTE_OBS position 58;
+
+alter table PESSOA_FISICA
+alter TIPO_OPERACAO position 59;
+
+alter table PESSOA_FISICA
+alter DATA_OPERACAO position 60;
+
+/*------ GERASYS.TI 13/06/2019 13:19:39 --------*/
+
+UPDATE PESSOA_FISICA
+SET DEFICIENTE_FISICO = 'N',
+    DEFICIENTE_VISUAL = 'N',
+    DEFICIENTE_AUDITIVO = 'N',
+    DEFICIENTE_MENTAL = 'N',
+    DEFICIENTE_INTELECTUAL = 'N',
+    DEFICIENTE_READAPTADO = 'N',
+    DEFICIENTE_COTA = 'N',
+    TIPO_OPERACAO = 'I';
+
+/*------ GERASYS.TI 13/06/2019 13:20:18 --------*/
+
+ALTER TABLE PESSOA_FISICA
+ADD CONSTRAINT FK_PESSOA_FISICA_TIPO_LOG
+FOREIGN KEY (ENDER_TIPO)
+REFERENCES ESOCIAL_TIPO_LOGRADOURO(CODIGO);
+
+/*------ GERASYS.TI 13/06/2019 13:38:01 --------*/
+
+ALTER TABLE TAB_HORARIO
+    ADD TIPO_OPERACAO ESOCIAL_OPERACAO,
+    ADD PERMITE_FLEXIBILIDADE SIM_NAO,
+    ADD TIPO_INTERVALO ESOCIAL_TIPO_2,
+    ADD DURACAO_JORNADA "CHAR(4)",
+    ADD DURACAO_INTERVALO "CHAR(4)",
+    ADD INTERVALO_INICIO "CHAR(4)",
+    ADD INTERVALO_FINAL "CHAR(4)";
+
+COMMENT ON COLUMN TAB_HORARIO.TIPO_OPERACAO IS
+'eSocial - Operacao do registro:
+I - Inclusao
+A - Alteracao
+E - Exclusao
+P - Processado/Enviado';
+
+COMMENT ON COLUMN TAB_HORARIO.PERMITE_FLEXIBILIDADE IS
+'eSocial - Permite flexibilidade:
+N - Nao
+S - Sim';
+
+COMMENT ON COLUMN TAB_HORARIO.TIPO_INTERVALO IS
+'eSocial - Tipo de intervalo:
+1 - Intervalor me horario fixo
+2 - Intervalor me horario variado';
+
+COMMENT ON COLUMN TAB_HORARIO.DURACAO_JORNADA IS
+'eSocial - Duracao da jornada em minutos';
+
+COMMENT ON COLUMN TAB_HORARIO.DURACAO_INTERVALO IS
+'eSocial - Duracao do intervalo em minutos';
+
+COMMENT ON COLUMN TAB_HORARIO.INTERVALO_INICIO IS
+'eSocial - Hora inicial do intervalo';
+
+COMMENT ON COLUMN TAB_HORARIO.INTERVALO_FINAL IS
+'eSocial - Hora final do intervalor';
+
+
+
+/*------ GERASYS.TI 13/06/2019 13:40:41 --------*/
+
+SET TERM ^ ;
+
+CREATE trigger tg_pessoa_fisica_esocial_oper for pessoa_fisica
+active before insert or update position 0
+AS
+begin
+  if (inserting) then
+    -- Inserir registro no eSocial
+    new.tipo_operacao = 'I';
+    if (new.data_operacao is null) then
+      new.data_operacao = current_date;
+  else
+  if (updating) then
+  begin
+    -- Atualizar registro no eSocial, caso sua insercao ou edicao anterior ja tenham sidos processados
+    if (coalesce(old.tipo_operacao, 'P') = 'P') then
+      new.tipo_operacao = 'A';
+    if ((old.data_operacao is null) and (new.data_operacao is null)) then
+      new.data_operacao = current_date;
+  end
+end^
+
+SET TERM ; ^
+
+
+
+
+/*------ GERASYS.TI 13/06/2019 13:41:20 --------*/
+
+SET TERM ^ ;
+
+CREATE trigger tg_horario_esocial_oper for tab_horario
+active before insert or update position 0
+AS
+begin
+  if (inserting) then
+    -- Inserir registro no eSocial
+    new.tipo_operacao = 'I';
+  else
+  if (updating) then
+  begin
+    -- Atualizar registro no eSocial, caso sua insercao ou edicao anterior ja tenham sidos processados
+    if (coalesce(old.tipo_operacao, 'P') = 'P') then
+      new.tipo_operacao = 'A';
+  end
+end^
+
+SET TERM ; ^
+
+/*------ GERASYS.TI 13/06/2019 13:46:53 --------*/
+
+Update PESSOA_FISICA p Set
+  p.data_operacao = (Select min(s.dt_admissao) from SERVIDOR s where s.id_pessoa_fisica = p.id and s.dt_admissao is not null)
+where p.data_operacao is not null;
+
+/*------ GERASYS.TI 13/06/2019 13:46:57 --------*/
+
+COMMIT WORK;

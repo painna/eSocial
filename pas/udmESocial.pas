@@ -327,33 +327,43 @@ type
     function Gerar_eSocial1000(aCompetencia : String; aZerarBase : Boolean;
       aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge;
       var aProtocolo : TProtocoloESocial) : Boolean;
+
     function Gerar_eSocial1005(aCompetencia : String; aZerarBase : Boolean;
       aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge;
       var aProtocolo : TProtocoloESocial) : Boolean;
+
     function Gerar_eSocial1010(aCompetencia : String; aZerarBase : Boolean;
       aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge;
       var aProtocolo : TProtocoloESocial) : Boolean;
+
     function Gerar_eSocial1020(aCompetencia : String; aZerarBase : Boolean;
       aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge;
       var aProtocolo : TProtocoloESocial) : Boolean;
+
     function Gerar_eSocial1030(aCompetencia : String; aZerarBase : Boolean;
       aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge;
       var aProtocolo : TProtocoloESocial) : Boolean;
+
     function Gerar_eSocial1035(aCompetencia : String; aZerarBase : Boolean;
       aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge;
       var aProtocolo : TProtocoloESocial) : Boolean;
+
     function Gerar_eSocial1040(aCompetencia : String; aZerarBase : Boolean;
       aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge;
       var aProtocolo : TProtocoloESocial) : Boolean;
+
     function Gerar_eSocial1050(aCompetencia : String; aZerarBase : Boolean;
       aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge;
       var aProtocolo : TProtocoloESocial) : Boolean;
+
     function Gerar_eSocial1060(aCompetencia : String; aZerarBase : Boolean;
       aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge;
       var aProtocolo : TProtocoloESocial) : Boolean;
+
     function Gerar_eSocial1070(aCompetencia : String; aZerarBase : Boolean;
       aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge;
       var aProtocolo : TProtocoloESocial) : Boolean;                         virtual; abstract;
+
     function Gerar_eSocial1080(aCompetencia : String; aZerarBase : Boolean;
       aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge;
       var aProtocolo : TProtocoloESocial) : Boolean;                         virtual; abstract;
@@ -362,36 +372,47 @@ type
     function Gerar_eSocial2190(aCompetencia : TCompetencia; aZerarBase : Boolean;
       aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge;
       var aProtocolo : TProtocoloESocial) : Boolean;                         virtual; abstract;
+
     function Gerar_eSocial2200(aCompetencia : TCompetencia; aZerarBase : Boolean;
       aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge;
       var aProtocolo : TProtocoloESocial) : Boolean;
+
     function Gerar_eSocial2205(aCompetencia : TCompetencia; aZerarBase : Boolean;
       aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge;
       var aProtocolo : TProtocoloESocial) : Boolean;
+
     function Gerar_eSocial2206(aCompetencia : TCompetencia; aZerarBase : Boolean;
       aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge;
       var aProtocolo : TProtocoloESocial) : Boolean;
+
     function Gerar_eSocial2210(aCompetencia : TCompetencia; aZerarBase : Boolean;
       aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge;
       var aProtocolo : TProtocoloESocial) : Boolean;                         virtual; abstract;
+
     function Gerar_eSocial2220(aCompetencia : TCompetencia; aZerarBase : Boolean;
       aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge;
       var aProtocolo : TProtocoloESocial) : Boolean;                         virtual; abstract;
+
     function Gerar_eSocial2230(aCompetencia : TCompetencia; aZerarBase : Boolean;
       aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge;
       var aProtocolo : TProtocoloESocial) : Boolean;                         virtual; abstract;
+
     function Gerar_eSocial2240(aCompetencia : TCompetencia; aZerarBase : Boolean;
       aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge;
       var aProtocolo : TProtocoloESocial) : Boolean;
+
     function Gerar_eSocial2241(aCompetencia : TCompetencia; aZerarBase : Boolean;
       aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge;
       var aProtocolo : TProtocoloESocial) : Boolean;
+
     function Gerar_eSocial2250(aCompetencia : TCompetencia; aZerarBase : Boolean;
       aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge;
       var aProtocolo : TProtocoloESocial) : Boolean;                         virtual; abstract;
+
     function Gerar_eSocial2260(aCompetencia : TCompetencia; aZerarBase : Boolean;
       aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge;
       var aProtocolo : TProtocoloESocial) : Boolean;                         virtual; abstract;
+
     function Gerar_eSocial2400(aCompetencia : TCompetencia; aZerarBase : Boolean;
       aModoLancamento : TModoLancamento; aLabel : TLabel; aProcesso : TGauge;
       var aProtocolo : TProtocoloESocial) : Boolean;
@@ -964,6 +985,13 @@ begin
     aSQL.Add('  , e.*');
     aSQL.Add('  , u.RAZAO_SOCIAL as ENTE_FERERATIVO');
     aSQL.Add('  , u.cnpj as ENTE_CNPJ');
+    aSQL.Add('  , coalesce(e.nat_juridica, Case c.tipo_orgao');
+    aSQL.Add('      when 1 then ''103-1'' ');
+    aSQL.Add('      when 2 then ''103-1'' ');
+    aSQL.Add('      when 3 then ''106-6'' ');
+    aSQL.Add('      else');
+    aSQL.Add('        ''112-0'' ');
+    aSQL.Add('    end) as natureza_juridica');
     aSQL.Add('from CONFIG_ORGAO c');
     aSQL.Add('  inner join CONFIG_ESOCIAL e on (e.ID_CONFIG_ORGAO = c.ID)');
     aSQL.Add('  inner join UNID_GESTORA   u on (u.ID = e.ID_UNID_GESTORA)');
@@ -1100,7 +1128,7 @@ begin
             ClassTrib := ct00;
           End;
 
-          NatJurid         := Trim(ReplaceStr(cdsTabela.FieldByName('NAT_JURIDICA').AsString, '-', ''));
+          NatJurid         := Trim(ReplaceStr(cdsTabela.FieldByName('NATUREZA_JURIDICA').AsString, '-', ''));
           IndCoop          := icCooperativadeTrabalho;
           IndConstr        := iconNaoeConstrutora;
           IndDesFolha      := idfNaoAplicavel;
@@ -1972,7 +2000,7 @@ begin
   try
     aSQL.BeginUpdate;
     aSQL.Clear;
-    aSQL.Add('Select '); // first 1
+    aSQL.Add('Select ' + IfThen(not AmbienteWebServiceProducao, 'First 10', '') );
     aSQL.Add('    f.*');
     aSQL.Add('  , c.codigo as cbo ');
     aSQL.Add('  , Case when coalesce(f.dt_extinsao, current_date) > cast(' + QuotedStr(aCompetencia + '-01') + ' as date) then 0 else 1 end extinto');
@@ -4186,7 +4214,7 @@ begin
   try
     aSQL.BeginUpdate;
     aSQL.Clear;
-    aSQL.Add('Select ');
+    aSQL.Add('Select ' + IfThen(not AmbienteWebServiceProducao, 'First 20', '') );
     aSQL.Add('    p.* ');
     aSQL.Add('  , s.id as id_servidor ');
     aSQL.Add('  , coalesce(p.cnh_categ, ''B'') as cnh_categoria');
