@@ -25,7 +25,7 @@ object frmConfigurarCertificado: TfrmConfigurarCertificado
     Top = 3
     Width = 281
     Height = 470
-    ActivePage = tbsGeral
+    ActivePage = tbsWebService
     Align = alClient
     MultiLine = True
     TabOrder = 0

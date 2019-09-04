@@ -1100,11 +1100,6 @@ begin
       begin
         evtInfoEmpregador.Sequencial := aEventoID;
 
-        if AmbienteWebServiceProducao then
-          evtInfoEmpregador.IdeEvento.TpAmb := TpTpAmb(0) //taProducao
-        else
-          evtInfoEmpregador.IdeEvento.TpAmb := taProducaoRestrita;
-
         evtInfoEmpregador.IdeEvento.ProcEmi := peAplicEmpregador;
         evtInfoEmpregador.IdeEvento.VerProc := Versao_Executavel(ParamStr(0));
 
@@ -1296,11 +1291,6 @@ begin
           Sequencial     := StrToInt(IncrementGenerator('GEN_ESOCIAL_EVENTO_S1005', 1));
           ModoLancamento := aModoLancamento;
 
-          if AmbienteWebServiceProducao then
-            IdeEvento.TpAmb := TpTpAmb(0) //taProducao
-          else
-            IdeEvento.TpAmb := taProducaoRestrita;
-
           IdeEvento.ProcEmi := peAplicEmpregador;
           IdeEvento.VerProc := Versao_Executavel(ParamStr(0));
 
@@ -1471,11 +1461,6 @@ begin
       begin
         aEventoID := StrToInt(IncrementGenerator('GEN_ESOCIAL_EVENTO_S1010', 1));
         evtTabRubrica.Sequencial := aEventoID;
-
-        if AmbienteWebServiceProducao then
-          evtTabRubrica.IdeEvento.TpAmb := TpTpAmb(0) //taProducao
-        else
-          evtTabRubrica.IdeEvento.TpAmb := taProducaoRestrita;
 
         evtTabRubrica.IdeEvento.ProcEmi := peAplicEmpregador;
         evtTabRubrica.IdeEvento.VerProc := Versao_Executavel(ParamStr(0));
@@ -1665,11 +1650,6 @@ begin
         begin
           Sequencial := aEventoID;
 
-          if AmbienteWebServiceProducao then
-            IdeEvento.TpAmb := TpTpAmb(0) //taProducao
-          else
-            IdeEvento.TpAmb := taProducaoRestrita;
-
           IdeEvento.ProcEmi := peAplicEmpregador;
           IdeEvento.VerProc := Versao_Executavel(ParamStr(0));
 
@@ -1744,7 +1724,6 @@ begin
       Sequencial := 0;
       ModoLancamento := GetTipoOperacao;
 
-      IdeEvento.TpAmb := taProducaoRestrita;
       IdeEvento.ProcEmi := TpProcEmi(0);
       IdeEvento.VerProc := '1.0';
 
@@ -1877,11 +1856,6 @@ begin
       begin
         aEventoID := StrToInt(IncrementGenerator('GEN_ESOCIAL_EVENTO_S1030', 1));
         evtTabCargo.Sequencial := aEventoID;
-
-        if AmbienteWebServiceProducao then
-          evtTabCargo.IdeEvento.TpAmb := TpTpAmb(0) //taProducao
-        else
-          evtTabCargo.IdeEvento.TpAmb := taProducaoRestrita;
 
         evtTabCargo.IdeEvento.ProcEmi := peAplicEmpregador;
         evtTabCargo.IdeEvento.VerProc := Versao_Executavel(ParamStr(0));
@@ -2034,11 +2008,6 @@ begin
         aEventoID := StrToInt(IncrementGenerator('GEN_ESOCIAL_EVENTO_S1040', 1));
         EvtTabFuncao.Sequencial := aEventoID;
 
-        if AmbienteWebServiceProducao then
-          IdeEvento.TpAmb := TpTpAmb(0) //taProducao
-        else
-          IdeEvento.TpAmb := taProducaoRestrita;
-
         IdeEvento.ProcEmi := peAplicEmpregador;
         IdeEvento.VerProc := Versao_Executavel(ParamStr(0));
 
@@ -2151,11 +2120,6 @@ begin
       begin
         aEventoID := StrToInt(IncrementGenerator('GEN_ESOCIAL_EVENTO_S1050', 1));
         Sequencial:= aEventoID;
-
-        if AmbienteWebServiceProducao then
-          IdeEvento.TpAmb := TpTpAmb(0) //taProducao
-        else
-          IdeEvento.TpAmb := taProducaoRestrita;
 
         IdeEvento.ProcEmi := peAplicEmpregador;
         IdeEvento.VerProc := Versao_Executavel(ParamStr(0));
@@ -2278,11 +2242,6 @@ begin
       begin
         aEventoID := StrToInt(IncrementGenerator('GEN_ESOCIAL_EVENTO_S1060', 1));
         Sequencial:= aEventoID;
-
-        if AmbienteWebServiceProducao then
-          IdeEvento.TpAmb := TpTpAmb(0) //taProducao
-        else
-          IdeEvento.TpAmb := taProducaoRestrita;
 
         IdeEvento.ProcEmi := peAplicEmpregador;
         IdeEvento.VerProc := Versao_Executavel(ParamStr(0));
@@ -2471,11 +2430,6 @@ begin
         begin
           aEventoID := StrToInt(IncrementGenerator('GEN_ESOCIAL_EVENTO_S1200', 1));
           Sequencial:= aEventoID;
-
-          if AmbienteWebServiceProducao then
-            IdeEvento.TpAmb := TpTpAmb(0) //taProducao
-          else
-            IdeEvento.TpAmb := taProducaoRestrita;
 
           IdeEvento.indRetif := ireOriginal; // (ireOriginal, ireRetificacao);
 
@@ -2839,11 +2793,6 @@ begin
           aEventoID := StrToInt(IncrementGenerator('GEN_ESOCIAL_EVENTO_S1200', 1));
           Sequencial:= aEventoID;
 
-          if AmbienteWebServiceProducao then
-            IdeEvento.TpAmb := TpTpAmb(0) //taProducao
-          else
-            IdeEvento.TpAmb := taProducaoRestrita;
-
           IdeEvento.indRetif := ireOriginal; // (ireOriginal, ireRetificacao);
 
           if (IdeEvento.indRetif = ireRetificacao) then
@@ -3157,11 +3106,6 @@ begin
           aEventoID := StrToInt(IncrementGenerator('GEN_ESOCIAL_EVENTO_S1207', 1));
           Sequencial:= aEventoID;
 
-          if AmbienteWebServiceProducao then
-            IdeEvento.TpAmb := TpTpAmb(0) //taProducao
-          else
-            IdeEvento.TpAmb := taProducaoRestrita;
-
           IdeEvento.indRetif := ireOriginal; // (ireOriginal, ireRetificacao);
 
           if (IdeEvento.indRetif = ireRetificacao) then
@@ -3360,11 +3304,6 @@ begin
         begin
           aEventoID := StrToInt(IncrementGenerator('GEN_ESOCIAL_EVENTO_S1210', 1));
           Sequencial:= aEventoID;
-
-          if AmbienteWebServiceProducao then
-            IdeEvento.TpAmb := TpTpAmb(0) //taProducao
-          else
-            IdeEvento.TpAmb := taProducaoRestrita;
 
           IdeEvento.indRetif := ireOriginal; // (ireOriginal, ireRetificacao);
 
@@ -3745,11 +3684,6 @@ begin
     begin
       with ACBrESocial.Eventos.Periodicos.S1295.Add, evtTotConting do
       begin
-        if AmbienteWebServiceProducao then
-          IdeEvento.TpAmb := TpTpAmb(0) //taProducao
-        else
-          IdeEvento.TpAmb := taProducaoRestrita;
-
         IdeEvento.indRetif := ireOriginal; // (ireOriginal, ireRetificacao);
 
         if (IdeEvento.indRetif = ireRetificacao) then
@@ -3871,11 +3805,6 @@ begin
     begin
       with ACBrESocial.Eventos.Periodicos.S1298.Add, EvtReabreEvPer do
       begin
-        if AmbienteWebServiceProducao then
-          IdeEvento.TpAmb := TpTpAmb(0) //taProducao
-        else
-          IdeEvento.TpAmb := taProducaoRestrita;
-
         IdeEvento.ProcEmi := peAplicEmpregador;
         IdeEvento.VerProc := Versao_Executavel(ParamStr(0));
 
@@ -4081,11 +4010,6 @@ begin
     begin
       with ACBrESocial.Eventos.Periodicos.S1299.Add, EvtFechaEvPer do
       begin
-        if AmbienteWebServiceProducao then
-          IdeEvento.TpAmb := TpTpAmb(0) //taProducao
-        else
-          IdeEvento.TpAmb := taProducaoRestrita;
-
         IdeEvento.ProcEmi := peAplicEmpregador;
         IdeEvento.VerProc := Versao_Executavel(ParamStr(0));
 
@@ -4315,11 +4239,6 @@ begin
       begin
         aEventoID := StrToInt(IncrementGenerator('GEN_ESOCIAL_EVENTO_S2200', 1));
         Sequencial:= aEventoID;
-
-        if AmbienteWebServiceProducao then
-          IdeEvento.TpAmb := TpTpAmb(0) //taProducao
-        else
-          IdeEvento.TpAmb := taProducaoRestrita;
 
         IdeEvento.indRetif := ireOriginal; // (ireOriginal, ireRetificacao);
 
@@ -4874,11 +4793,6 @@ begin
         Sequencial  := aEventoID;
         dtAlteracao := Now;
 
-        if AmbienteWebServiceProducao then
-          IdeEvento.TpAmb := TpTpAmb(0) //taProducao
-        else
-          IdeEvento.TpAmb := taProducaoRestrita;
-
         IdeEvento.indRetif := ireOriginal; // (ireOriginal, ireRetificacao);
 
         if (IdeEvento.indRetif = ireRetificacao) then
@@ -5234,11 +5148,6 @@ begin
         AltContratual.dtEf        := Now;
         AltContratual.dscAlt      := 'ALTERAÇÕES CONTRATUAIS DE ' + aCompetencia.Descricao;
 
-        if AmbienteWebServiceProducao then
-          IdeEvento.TpAmb := TpTpAmb(0) //taProducao
-        else
-          IdeEvento.TpAmb := taProducaoRestrita;
-
         IdeEvento.indRetif := ireOriginal; // (ireOriginal, ireRetificacao);
 
         if (IdeEvento.indRetif = ireRetificacao) then
@@ -5549,11 +5458,6 @@ begin
       begin
         aEventoID := StrToInt(IncrementGenerator('GEN_ESOCIAL_EVENTO_S2240', 1));
         Sequencial:= aEventoID;
-
-        if AmbienteWebServiceProducao then
-          IdeEvento.TpAmb := TpTpAmb(0) //taProducao
-        else
-          IdeEvento.TpAmb := taProducaoRestrita;
 
         IdeEvento.indRetif := ireOriginal; // (ireOriginal, ireRetificacao);
 
@@ -5890,11 +5794,6 @@ begin
       begin
         aEventoID := StrToInt(IncrementGenerator('GEN_ESOCIAL_EVENTO_S2241', 1));
         Sequencial:= aEventoID;
-
-        if AmbienteWebServiceProducao then
-          IdeEvento.TpAmb := TpTpAmb(0) //taProducao
-        else
-          IdeEvento.TpAmb := taProducaoRestrita;
 
         IdeEvento.indRetif := ireOriginal; // (ireOriginal, ireRetificacao);
 
@@ -6243,11 +6142,6 @@ begin
         aEventoID := StrToInt(IncrementGenerator('GEN_ESOCIAL_EVENTO_S2400', 1));
         Sequencial:= aEventoID;
 
-        if AmbienteWebServiceProducao then
-          IdeEvento.TpAmb := TpTpAmb(0) //taProducao
-        else
-          IdeEvento.TpAmb := taProducaoRestrita;
-
         IdeEvento.indRetif := ireOriginal; // (ireOriginal, ireRetificacao);
 
         if (IdeEvento.indRetif = ireRetificacao) then
@@ -6571,7 +6465,7 @@ begin
 
       with ACBrESocial.Configuracoes.WebServices do
       begin
-        Ambiente   := taHomologacao;
+        Ambiente   := TpcnTipoAmbiente(rgTipoAmb.ItemIndex);
         Visualizar := cbxVisualizar.Checked;
         Salvar     := cbxSalvarSOAP.Checked;
 
