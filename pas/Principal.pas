@@ -31,7 +31,7 @@ uses
   dxSkinSilver, dxSkinSpringTime, dxSkinStardust, dxSkinSummer2008,
   dxSkinTheAsphaltWorld, dxSkinValentine, dxSkinVisualStudio2013Blue,
   dxSkinVisualStudio2013Dark, dxSkinVisualStudio2013Light, dxSkinVS2010,
-  dxSkinWhiteprint, dxSkinXmas2008Blue, System.Actions, System.ImageList;
+  dxSkinWhiteprint, dxSkinXmas2008Blue, System.Actions, System.ImageList, cxImageList;
 
 type
   TfrmPrincipal = class(TForm)

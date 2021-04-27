@@ -133,7 +133,7 @@ object frmPrincipal: TfrmPrincipal
     Font.Style = []
     ParentBackground = False
     ParentFont = False
-    TabOrder = 6
+    TabOrder = 2
     object Bevel3: TBevel
       AlignWithMargins = True
       Left = 309
@@ -1196,11 +1196,7 @@ object frmPrincipal: TfrmPrincipal
     UseSystemFont = True
     Left = 496
     Top = 184
-    DockControlHeights = (
-      0
-      0
-      0
-      0)
+    PixelsPerInch = 96
   end
   object qryUsuario: TSQLQuery
     MaxBlobSize = -1
@@ -1407,6 +1403,7 @@ object frmPrincipal: TfrmPrincipal
     end
   end
   object imgList24: TcxImageList
+    SourceDPI = 96
     Height = 24
     Width = 24
     FormatVersion = 1
@@ -1725,6 +1722,7 @@ object frmPrincipal: TfrmPrincipal
       end>
   end
   object imgList16: TcxImageList
+    SourceDPI = 96
     FormatVersion = 1
     DesignInfo = 3670648
     ImageInfo = <
