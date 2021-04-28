@@ -2,124 +2,132 @@ inherited frmSobre: TfrmSobre
   Left = 219
   Top = 139
   Caption = 'SOBRE O SISTEMA ...'
-  ClientHeight = 550
+  ClientHeight = 560
   OnCreate = FormCreate
   OnShow = FormShow
-  ExplicitHeight = 579
+  ExplicitHeight = 589
   PixelsPerInch = 96
   TextHeight = 13
   object Panel1: TPanel
     Left = 0
     Top = 0
     Width = 680
-    Height = 550
+    Height = 560
     Align = alClient
+    BevelOuter = bvNone
     BevelWidth = 2
     BorderWidth = 2
     Color = clSilver
     TabOrder = 0
+    ExplicitHeight = 550
     object Panel2: TPanel
-      Left = 4
-      Top = 402
-      Width = 672
-      Height = 239
-      Align = alTop
+      Left = 2
+      Top = 415
+      Width = 676
+      Height = 143
+      Align = alBottom
+      BevelOuter = bvNone
       Color = 11528698
       TabOrder = 0
+      ExplicitLeft = 4
+      ExplicitTop = 402
+      ExplicitWidth = 672
       object Label1: TLabel
-        Left = 391
+        Left = 393
         Top = 8
-        Width = 276
-        Height = 24
+        Width = 274
+        Height = 23
         Alignment = taRightJustify
         Caption = 'Gerson Farias - Programador'
         Font.Charset = ANSI_CHARSET
         Font.Color = 4227200
-        Font.Height = -20
-        Font.Name = 'Arial'
+        Font.Height = -19
+        Font.Name = 'Tahoma'
         Font.Style = [fsBold, fsItalic]
         ParentFont = False
       end
       object lblCelular1: TLabel
-        Left = 558
+        Left = 564
         Top = 50
-        Width = 108
-        Height = 19
+        Width = 102
+        Height = 16
         Alignment = taRightJustify
         Caption = '(94) 8119-4915'
         Font.Charset = ANSI_CHARSET
         Font.Color = clMaroon
-        Font.Height = -16
-        Font.Name = 'Arial'
+        Font.Height = -13
+        Font.Name = 'Tahoma'
         Font.Style = [fsBold]
         ParentFont = False
       end
       object Label4: TLabel
         Left = 6
-        Top = 88
+        Top = 85
         Width = 661
         Height = 28
         Alignment = taCenter
         AutoSize = False
-        Caption = 'Copyright (c) 1997 a 2014 - Todos os direitos reservados.'
-        Font.Charset = DEFAULT_CHARSET
+        Caption = 
+          'Copyright '#169' 2021 GERASYS TECNOINFO. Todos os direitos reservados' +
+          '.'
+        Font.Charset = ANSI_CHARSET
         Font.Color = clBlack
-        Font.Height = -17
-        Font.Name = 'Arial'
+        Font.Height = -13
+        Font.Name = 'Tahoma'
         Font.Style = [fsBold]
         ParentFont = False
       end
       object Label5: TLabel
-        Left = 472
+        Left = 491
         Top = 34
-        Width = 80
-        Height = 19
+        Width = 67
+        Height = 16
         Caption = 'Telefones:'
         Font.Charset = ANSI_CHARSET
         Font.Color = clMaroon
-        Font.Height = -16
-        Font.Name = 'Arial'
+        Font.Height = -13
+        Font.Name = 'Tahoma'
         Font.Style = [fsBold]
         ParentFont = False
       end
       object lblCelular2: TLabel
-        Left = 558
+        Left = 564
         Top = 68
-        Width = 108
-        Height = 19
+        Width = 102
+        Height = 16
         Alignment = taRightJustify
         Caption = '(94) 9129-1158'
         Font.Charset = ANSI_CHARSET
         Font.Color = clMaroon
-        Font.Height = -16
-        Font.Name = 'Arial'
+        Font.Height = -13
+        Font.Name = 'Tahoma'
         Font.Style = [fsBold]
         ParentFont = False
       end
       object lblTelFixo: TLabel
-        Left = 557
+        Left = 564
         Top = 34
-        Width = 109
-        Height = 19
+        Width = 102
+        Height = 16
         Alignment = taRightJustify
         Caption = '(91) 3729-5766'
         Font.Charset = ANSI_CHARSET
         Font.Color = clMaroon
-        Font.Height = -16
-        Font.Name = 'Arial'
+        Font.Height = -13
+        Font.Name = 'Tahoma'
         Font.Style = [fsBold]
         ParentFont = False
       end
       object lblAguarde: TLabel
-        Left = 5
+        Left = 6
         Top = 113
-        Width = 231
-        Height = 19
+        Width = 186
+        Height = 16
         Caption = 'Gerson Farias - Programador'
         Font.Charset = ANSI_CHARSET
         Font.Color = clRed
-        Font.Height = -17
-        Font.Name = 'Arial'
+        Font.Height = -13
+        Font.Name = 'Tahoma'
         Font.Style = [fsBold]
         ParentFont = False
       end
@@ -142,87 +150,104 @@ inherited frmSobre: TfrmSobre
       end
     end
     object Panel3: TPanel
-      Left = 4
-      Top = 4
-      Width = 672
-      Height = 398
-      Align = alTop
+      Left = 2
+      Top = 2
+      Width = 676
+      Height = 413
+      Align = alClient
+      BevelOuter = bvNone
       Color = 14013866
       ParentBackground = False
       TabOrder = 1
+      ExplicitLeft = 4
+      ExplicitTop = 4
+      ExplicitWidth = 672
+      ExplicitHeight = 398
       object Image2: TImage
-        Left = 1
-        Top = 1
-        Width = 670
+        Left = 0
+        Top = 0
+        Width = 676
         Height = 176
         Align = alTop
         Stretch = True
         Transparent = True
+        ExplicitLeft = 1
+        ExplicitTop = 1
+        ExplicitWidth = 670
       end
       object Memo1: TMemo
-        Left = 1
-        Top = 177
-        Width = 670
+        Left = 0
+        Top = 176
+        Width = 676
         Height = 78
+        TabStop = False
         Align = alTop
         Alignment = taCenter
         BorderStyle = bsNone
         Ctl3D = False
-        Font.Charset = DEFAULT_CHARSET
+        Font.Charset = ANSI_CHARSET
         Font.Color = 16512
-        Font.Height = -20
-        Font.Name = 'Arial'
+        Font.Height = -19
+        Font.Name = 'Tahoma'
         Font.Style = [fsBold]
         Lines.Strings = (
           'Memo1')
         ParentColor = True
         ParentCtl3D = False
         ParentFont = False
+        ReadOnly = True
         TabOrder = 0
-        ExplicitTop = 188
+        ExplicitTop = 170
       end
       object Memo3: TMemo
-        Left = 1
-        Top = 339
-        Width = 670
-        Height = 54
-        Align = alTop
+        Left = 0
+        Top = 352
+        Width = 676
+        Height = 61
+        TabStop = False
+        Align = alBottom
         Alignment = taCenter
         BorderStyle = bsNone
         Ctl3D = False
-        Font.Charset = DEFAULT_CHARSET
+        Font.Charset = ANSI_CHARSET
         Font.Color = 8404992
-        Font.Height = -12
-        Font.Name = 'Arial'
+        Font.Height = -11
+        Font.Name = 'Tahoma'
         Font.Style = [fsBold]
         Lines.Strings = (
           'Memo2')
         ParentColor = True
         ParentCtl3D = False
         ParentFont = False
+        ReadOnly = True
         TabOrder = 1
       end
       object Memo2: TMemo
-        Left = 1
-        Top = 255
-        Width = 670
-        Height = 84
-        Align = alTop
+        Left = 0
+        Top = 254
+        Width = 676
+        Height = 98
+        TabStop = False
+        Align = alClient
         Alignment = taCenter
         BorderStyle = bsNone
         Ctl3D = False
-        Font.Charset = DEFAULT_CHARSET
+        Font.Charset = ANSI_CHARSET
         Font.Color = 8404992
-        Font.Height = -17
-        Font.Name = 'Arial'
+        Font.Height = -16
+        Font.Name = 'Tahoma'
         Font.Style = [fsBold]
         Lines.Strings = (
           'Memo2')
         ParentColor = True
         ParentCtl3D = False
         ParentFont = False
+        ReadOnly = True
         TabOrder = 2
-        ExplicitTop = 266
+        ExplicitLeft = 1
+        ExplicitTop = 255
+        ExplicitWidth = 670
+        ExplicitHeight = 84
       end
     end
   end

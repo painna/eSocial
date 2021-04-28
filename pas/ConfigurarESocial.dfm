@@ -42,7 +42,7 @@ inherited frmConfigurarESocial: TfrmConfigurarESocial
       ParentBackground = False
       ParentFont = False
       TabOrder = 1
-      Properties.ActivePage = tbsResponsavel
+      Properties.ActivePage = tbsUNG
       Properties.CustomButtons.Buttons = <>
       Properties.Options = [pcoAlwaysShowGoDialogButton, pcoGradient, pcoGradientClientArea, pcoRedrawOnResize, pcoSort]
       Properties.Style = 9

@@ -133,6 +133,7 @@ begin
   LimparPainelProcesso(False);
   cbS1202.Enabled := (Pesquisa('CONFIG_ESOCIAL', 'ID_CONFIG_ORGAO', '1', 'POSSUI_RPPS', '') = FLAG_SIM);
   cbS1207.Enabled := (Pesquisa('CONFIG_ESOCIAL', 'ID_CONFIG_ORGAO', '1', 'POSSUI_RPPS', '') = FLAG_SIM);
+  Checb_ZeraBase.Visible := dmESocial.AmbienteWebServiceHomologacao;
 end;
 
 procedure TfrmEnvioEventoPeriodico.FormShow(Sender: TObject);
