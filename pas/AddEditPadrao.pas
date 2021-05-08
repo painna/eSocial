@@ -128,8 +128,8 @@ begin
 end;
 
 procedure TfrmAddEditPadrao.FormShow(Sender: TObject);
-Var
-  i: Integer;
+//Var
+//  i : Integer;
 begin
   inherited;
   {

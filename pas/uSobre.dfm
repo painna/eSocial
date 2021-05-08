@@ -19,38 +19,47 @@ inherited frmSobre: TfrmSobre
     BorderWidth = 2
     Color = clSilver
     TabOrder = 0
-    ExplicitHeight = 550
     object Panel2: TPanel
       Left = 2
-      Top = 415
+      Top = 408
       Width = 676
-      Height = 143
+      Height = 150
       Align = alBottom
       BevelOuter = bvNone
       Color = 11528698
       TabOrder = 0
-      ExplicitLeft = 4
-      ExplicitTop = 402
-      ExplicitWidth = 672
+      ExplicitTop = 415
       object Label1: TLabel
-        Left = 393
-        Top = 8
-        Width = 274
+        AlignWithMargins = True
+        Left = 10
+        Top = 3
+        Width = 656
         Height = 23
+        Margins.Left = 10
+        Margins.Right = 10
+        Align = alTop
         Alignment = taRightJustify
         Caption = 'Gerson Farias - Programador'
         Font.Charset = ANSI_CHARSET
         Font.Color = 4227200
         Font.Height = -19
         Font.Name = 'Tahoma'
-        Font.Style = [fsBold, fsItalic]
+        Font.Style = [fsBold]
         ParentFont = False
+        ExplicitLeft = 392
+        ExplicitWidth = 274
       end
       object lblCelular1: TLabel
-        Left = 564
-        Top = 50
-        Width = 102
+        AlignWithMargins = True
+        Left = 10
+        Top = 45
+        Width = 656
         Height = 16
+        Margins.Left = 10
+        Margins.Top = 0
+        Margins.Right = 10
+        Margins.Bottom = 0
+        Align = alTop
         Alignment = taRightJustify
         Caption = '(94) 8119-4915'
         Font.Charset = ANSI_CHARSET
@@ -59,12 +68,21 @@ inherited frmSobre: TfrmSobre
         Font.Name = 'Tahoma'
         Font.Style = [fsBold]
         ParentFont = False
+        ExplicitLeft = 564
+        ExplicitTop = 50
+        ExplicitWidth = 102
       end
-      object Label4: TLabel
-        Left = 6
-        Top = 85
-        Width = 661
-        Height = 28
+      object lblCopyright: TLabel
+        AlignWithMargins = True
+        Left = 10
+        Top = 77
+        Width = 656
+        Height = 32
+        Margins.Left = 10
+        Margins.Top = 0
+        Margins.Right = 10
+        Margins.Bottom = 0
+        Align = alClient
         Alignment = taCenter
         AutoSize = False
         Caption = 
@@ -76,25 +94,21 @@ inherited frmSobre: TfrmSobre
         Font.Name = 'Tahoma'
         Font.Style = [fsBold]
         ParentFont = False
-      end
-      object Label5: TLabel
-        Left = 491
-        Top = 34
-        Width = 67
-        Height = 16
-        Caption = 'Telefones:'
-        Font.Charset = ANSI_CHARSET
-        Font.Color = clMaroon
-        Font.Height = -13
-        Font.Name = 'Tahoma'
-        Font.Style = [fsBold]
-        ParentFont = False
+        ExplicitLeft = 6
+        ExplicitTop = 85
+        ExplicitWidth = 661
       end
       object lblCelular2: TLabel
-        Left = 564
-        Top = 68
-        Width = 102
+        AlignWithMargins = True
+        Left = 10
+        Top = 61
+        Width = 656
         Height = 16
+        Margins.Left = 10
+        Margins.Top = 0
+        Margins.Right = 10
+        Margins.Bottom = 0
+        Align = alTop
         Alignment = taRightJustify
         Caption = '(94) 9129-1158'
         Font.Charset = ANSI_CHARSET
@@ -103,26 +117,42 @@ inherited frmSobre: TfrmSobre
         Font.Name = 'Tahoma'
         Font.Style = [fsBold]
         ParentFont = False
+        ExplicitLeft = 564
+        ExplicitTop = 67
+        ExplicitWidth = 102
       end
       object lblTelFixo: TLabel
-        Left = 564
-        Top = 34
-        Width = 102
+        AlignWithMargins = True
+        Left = 10
+        Top = 29
+        Width = 656
         Height = 16
+        Margins.Left = 10
+        Margins.Top = 0
+        Margins.Right = 10
+        Margins.Bottom = 0
+        Align = alTop
         Alignment = taRightJustify
-        Caption = '(91) 3729-5766'
+        Caption = 'Telefones: (91) 3729-5766'
         Font.Charset = ANSI_CHARSET
         Font.Color = clMaroon
         Font.Height = -13
         Font.Name = 'Tahoma'
         Font.Style = [fsBold]
         ParentFont = False
+        ExplicitLeft = 493
+        ExplicitTop = 34
+        ExplicitWidth = 173
       end
       object lblAguarde: TLabel
-        Left = 6
-        Top = 113
-        Width = 186
-        Height = 16
+        AlignWithMargins = True
+        Left = 10
+        Top = 112
+        Width = 656
+        Height = 35
+        Margins.Left = 10
+        Margins.Right = 10
+        Align = alBottom
         Caption = 'Gerson Farias - Programador'
         Font.Charset = ANSI_CHARSET
         Font.Color = clRed
@@ -130,10 +160,12 @@ inherited frmSobre: TfrmSobre
         Font.Name = 'Tahoma'
         Font.Style = [fsBold]
         ParentFont = False
+        ExplicitLeft = 3
+        ExplicitWidth = 670
       end
       object btnOk: TBitBtn
-        Left = 585
-        Top = 105
+        Left = 584
+        Top = 113
         Width = 82
         Height = 30
         Caption = '&Ok'
@@ -153,16 +185,13 @@ inherited frmSobre: TfrmSobre
       Left = 2
       Top = 2
       Width = 676
-      Height = 413
+      Height = 406
       Align = alClient
       BevelOuter = bvNone
       Color = 14013866
       ParentBackground = False
       TabOrder = 1
-      ExplicitLeft = 4
-      ExplicitTop = 4
-      ExplicitWidth = 672
-      ExplicitHeight = 398
+      ExplicitHeight = 413
       object Image2: TImage
         Left = 0
         Top = 0
@@ -197,11 +226,10 @@ inherited frmSobre: TfrmSobre
         ParentFont = False
         ReadOnly = True
         TabOrder = 0
-        ExplicitTop = 170
       end
       object Memo3: TMemo
         Left = 0
-        Top = 352
+        Top = 345
         Width = 676
         Height = 61
         TabStop = False
@@ -221,12 +249,13 @@ inherited frmSobre: TfrmSobre
         ParentFont = False
         ReadOnly = True
         TabOrder = 1
+        ExplicitTop = 352
       end
       object Memo2: TMemo
         Left = 0
         Top = 254
         Width = 676
-        Height = 98
+        Height = 91
         TabStop = False
         Align = alClient
         Alignment = taCenter
@@ -244,10 +273,7 @@ inherited frmSobre: TfrmSobre
         ParentFont = False
         ReadOnly = True
         TabOrder = 2
-        ExplicitLeft = 1
-        ExplicitTop = 255
-        ExplicitWidth = 670
-        ExplicitHeight = 84
+        ExplicitHeight = 98
       end
     end
   end

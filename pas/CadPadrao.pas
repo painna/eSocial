@@ -57,7 +57,7 @@ type
     { Private declarations }
     pv_iTop,
     pv_iLeft: integer;
-    procedure HintInPanel(Sender: TObject);
+//    procedure HintInPanel(Sender: TObject);
   public
     { Public declarations }
     pb_sNomeTab,
@@ -222,12 +222,12 @@ begin
   //cds1.Open;
 end;
 
-procedure TfrmCadPadrao.HintInPanel(Sender: TObject); //esse é procedimento genérico
-begin
-  //pnMsg.Caption := '';
-  //if cds1.State = dsBrowse then exit;
-  //pnMsg.Caption := TWinControl(Sender).Hint;
-end;
+//procedure TfrmCadPadrao.HintInPanel(Sender: TObject); //esse é procedimento genérico
+//begin
+//  //pnMsg.Caption := '';
+//  //if cds1.State = dsBrowse then exit;
+//  //pnMsg.Caption := TWinControl(Sender).Hint;
+//end;
 
 procedure TfrmCadPadrao.PermissoesUsuario(iIdUsuario: integer; sNomeTab: String);
 Var

@@ -122,7 +122,7 @@ end;
 
 Function TfrmAlteraSenha.Executa: Boolean;
 begin
-   ShowModal;
+  Result := (ShowModal = mrOK);
 end;
 
 procedure TfrmAlteraSenha.FormShow(Sender: TObject);

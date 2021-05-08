@@ -24,7 +24,8 @@ uses
   dxSkinSilver, dxSkinSpringTime, dxSkinStardust, dxSkinSummer2008,
   dxSkinTheAsphaltWorld, dxSkinValentine, dxSkinVisualStudio2013Blue,
   dxSkinVisualStudio2013Dark, dxSkinVisualStudio2013Light, dxSkinVS2010,
-  dxSkinWhiteprint, dxSkinXmas2008Blue, dxBarBuiltInMenu;
+  dxSkinWhiteprint, dxSkinXmas2008Blue, dxBarBuiltInMenu, dxDateRanges,
+  cxDataControllerConditionalFormattingRulesManagerDialog;
 
 type
   TfrmCadTabPadrao2 = class(TfrmPadrao1)
@@ -122,8 +123,8 @@ begin
 end;
 
 procedure TfrmCadTabPadrao2.FormCreate(Sender: TObject);
-Var
-   x: Extended;
+//Var
+//   x: Extended;
 begin
   inherited;
    {

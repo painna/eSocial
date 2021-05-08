@@ -14,7 +14,7 @@ Procedure Bairros(oEd1,oEd2: TCustomEdit);
 Procedure LocaisDePagto(oEd1,oEd2: TCustomEdit);
 Function Pesquisa(sTabela, sCampoPesq, sTextPesq, sCampoRet, sMensagem: String): String;
 Function PesquisaData(sTabela, sCampoPesq, sTextPesq, sCampoRet, sMensagem: String): TDateTime;
-Procedure AtualizaUltSequencial(sTabela: String; iUltSequencial: Integer);
+//Procedure AtualizaUltSequencial(sTabela: String; iUltSequencial: Integer);
 Procedure MostraDados(sTabela,sCampoId,sCampoDisp1,sCampoDisp2,sTextoPesq: String; oEdit1,oEdit2: TCustomEdit; sMsg: String);
 Procedure CancelaTransacao(oTab: TClientDataSet; sNomeTab: String);
 Function ProximoNumero(sTabela,sCampoPesq: String; bDigVerificador: Boolean; iTam: Integer): String;
@@ -221,44 +221,44 @@ Begin
    End;
 End;
 
-Procedure AtualizaUltSequencial(sTabela: String; iUltSequencial: Integer);
-Var
-   oQry1: TSQLQuery;
-Begin
-{
-   sTabela := UpperCase(sTabela);
-   oQry1 := TSQLQuery.Create(Nil);
-   oQry1.SQLConnection := dmPrincipal.SConPrincipal;
-
-   oQry1.SQL.Add('SELECT ULTIMO_SEQUENCIAL, NOME_DA_TABELA FROM CONTROLE_DE_SEQUENCIAL WHERE NOME_DA_TABELA = :sTab');
-   oQry1.ParamByName('sTab').Value := sTabela;
-   Try
-      oQry1.Open;
-      If oQry1.FieldByName('NOME_DA_TABELA').Value = Null Then
-      Begin
-         oQry1.Close;
-         oQry1.SQL.Clear;
-         oQry1.SQL.Add('INSERT INTO CONTROLE_DE_SEQUENCIAL (ID_CONTROL_SEQUENCIAL,NOME_DA_TABELA,ULTIMO_SEQUENCIAL');
-         oQry1.SQL.Add('VALUES (:iIdControlSeq,:sNomeTab,:iUltSeq)');
-         oQry1.ParamByName('iIdControlSeq').Value:= UltimoSequencial('CONTROLE_DE_SEQUENCIAL')+1;
-         oQry1.ParamByName('sNomeTab').Value     := sTabela;
-         oQry1.ParamByName('iUltSeq').Value      := iUltSequencial;
-         oQry1.ExecSQL;
-      End Else
-      Begin
-         oQry1.Close;
-         oQry1.SQL.Clear;
-         oQry1.SQL.Add('UPDATE CONTROLE_DE_SEQUENCIAL SET ULTIMO_SEQUENCIAL = :iUltSeq WHERE NOME_DA_TABELA = :sTab');
-         oQry1.ParamByName('iUltSeq').Value := iUltSequencial;
-         oQry1.ParamByName('sTab').Value    := sTabela;
-         oQry1.ExecSQL;
-      End;
-   Finally
-      oQry1.Close;
-      oQry1.Free;
-   End;
-}
-End;
+//Procedure AtualizaUltSequencial(sTabela: String; iUltSequencial: Integer);
+//Var
+//   oQry1: TSQLQuery;
+//Begin
+//{
+//   sTabela := UpperCase(sTabela);
+//   oQry1 := TSQLQuery.Create(Nil);
+//   oQry1.SQLConnection := dmPrincipal.SConPrincipal;
+//
+//   oQry1.SQL.Add('SELECT ULTIMO_SEQUENCIAL, NOME_DA_TABELA FROM CONTROLE_DE_SEQUENCIAL WHERE NOME_DA_TABELA = :sTab');
+//   oQry1.ParamByName('sTab').Value := sTabela;
+//   Try
+//      oQry1.Open;
+//      If oQry1.FieldByName('NOME_DA_TABELA').Value = Null Then
+//      Begin
+//         oQry1.Close;
+//         oQry1.SQL.Clear;
+//         oQry1.SQL.Add('INSERT INTO CONTROLE_DE_SEQUENCIAL (ID_CONTROL_SEQUENCIAL,NOME_DA_TABELA,ULTIMO_SEQUENCIAL');
+//         oQry1.SQL.Add('VALUES (:iIdControlSeq,:sNomeTab,:iUltSeq)');
+//         oQry1.ParamByName('iIdControlSeq').Value:= UltimoSequencial('CONTROLE_DE_SEQUENCIAL')+1;
+//         oQry1.ParamByName('sNomeTab').Value     := sTabela;
+//         oQry1.ParamByName('iUltSeq').Value      := iUltSequencial;
+//         oQry1.ExecSQL;
+//      End Else
+//      Begin
+//         oQry1.Close;
+//         oQry1.SQL.Clear;
+//         oQry1.SQL.Add('UPDATE CONTROLE_DE_SEQUENCIAL SET ULTIMO_SEQUENCIAL = :iUltSeq WHERE NOME_DA_TABELA = :sTab');
+//         oQry1.ParamByName('iUltSeq').Value := iUltSequencial;
+//         oQry1.ParamByName('sTab').Value    := sTabela;
+//         oQry1.ExecSQL;
+//      End;
+//   Finally
+//      oQry1.Close;
+//      oQry1.Free;
+//   End;
+//}
+//End;
 
 Procedure MostraDados(sTabela,sCampoId,sCampoDisp1,sCampoDisp2,sTextoPesq: String;
    oEdit1,oEdit2: TCustomEdit; sMsg: String);

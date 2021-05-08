@@ -703,7 +703,11 @@ end;
 function TdmESocial.CertificadoValido: Boolean;
 begin
   if Assigned(ACBrESocial.Configuracoes.Certificados) then
-    Result := ACBrESocial.Configuracoes.Certificados.VerificarValidade
+  begin
+    Result := ACBrESocial.Configuracoes.Certificados.VerificarValidade;
+    if Result then
+      Result := (ACBrESocial.SSL.CertDataVenc >= Date);
+  end
   else
     Result := False;
 end;
@@ -1096,7 +1100,7 @@ begin
     cdsTabela.First;
     while not cdsTabela.Eof do
     begin
-      with ACBrESocial.Eventos.Iniciais.S1000.Add do
+      with ACBrESocial.Eventos.Iniciais.S1000.New do
       begin
         evtInfoEmpregador.Sequencial := aEventoID;
 
@@ -1169,7 +1173,7 @@ begin
 
         evtInfoEmpregador.InfoEmpregador.InfoCadastro.SoftwareHouse.Clear;
 
-        with evtInfoEmpregador.InfoEmpregador.InfoCadastro.SoftwareHouse.Add do
+        with evtInfoEmpregador.InfoEmpregador.InfoCadastro.SoftwareHouse.New do
         begin
           CnpjSoftHouse := '11122050000168';
           NmRazao  := 'GERASYS TECNOINFO LTDA - ME';
@@ -1289,7 +1293,7 @@ begin
     cdsTabela.First;
     while not cdsTabela.Eof do
     begin
-      with ACBrESocial.Eventos.Iniciais.S1005.Add do
+      with ACBrESocial.Eventos.Iniciais.S1005.New do
       begin
         with evtTabEstab do
         begin
@@ -1354,7 +1358,7 @@ begin
 //
 //                  contEntEd := tpSim;
 //                  infoEntEduc.Clear;
-//                  with infoEntEduc.Add do
+//                  with infoEntEduc.New do
 //                    NrInsc := '0123456789';
                 end;
 
@@ -1467,7 +1471,7 @@ begin
     cdsTabela.First;
     while not cdsTabela.Eof do
     begin
-      with ACBrESocial.Eventos.Tabelas.S1010.Add do
+      with ACBrESocial.Eventos.Tabelas.S1010.New do
       begin
         aEventoID := StrToInt(IncrementGenerator('GEN_ESOCIAL_EVENTO_S1010', 1));
         evtTabRubrica.Sequencial := aEventoID;
@@ -1526,7 +1530,7 @@ begin
 
         evtTabRubrica.infoRubrica.DadosRubrica.IdeProcessoCP.Clear;
         if (StrToIntDef(eSCodIncCPToStr(evtTabRubrica.infoRubrica.DadosRubrica.codIncCP), 0) >= 91) then
-          with evtTabRubrica.infoRubrica.DadosRubrica.IdeProcessoCP.Add do
+          with evtTabRubrica.infoRubrica.DadosRubrica.IdeProcessoCP.New do
           begin
             nrProc     := EmptyStr;
             ExtDecisao := edContribPatronaisSegurados;
@@ -1535,7 +1539,7 @@ begin
 
         evtTabRubrica.infoRubrica.DadosRubrica.IdeProcessoIRRF.Clear;
         if (StrToIntDef(eSCodIncIRRFToStr(evtTabRubrica.infoRubrica.DadosRubrica.codIncIRRF), 0) >= 91) then
-          with evtTabRubrica.infoRubrica.DadosRubrica.IdeProcessoIRRF.Add do
+          with evtTabRubrica.infoRubrica.DadosRubrica.IdeProcessoIRRF.New do
           begin
             nrProc  := EmptyStr;
             codSusp := '2';
@@ -1543,14 +1547,14 @@ begin
 
         evtTabRubrica.infoRubrica.DadosRubrica.IdeProcessoFGTS.Clear;
         if (StrToIntDef(eSCodIncFGTSToStr(evtTabRubrica.infoRubrica.DadosRubrica.codIncFGTS), 0) = 91) then
-          with evtTabRubrica.infoRubrica.DadosRubrica.IdeProcessoFGTS.Add do
+          with evtTabRubrica.infoRubrica.DadosRubrica.IdeProcessoFGTS.New do
           begin
             nrProc := EmptyStr;
           end;
 
         evtTabRubrica.infoRubrica.DadosRubrica.IdeProcessoSIND.Clear;
         if (StrToIntDef(eSCodIncSINDToStr(evtTabRubrica.infoRubrica.DadosRubrica.codIncSIND), 0) = 91) then
-          with evtTabRubrica.infoRubrica.DadosRubrica.IdeProcessoSIND.Add do
+          with evtTabRubrica.infoRubrica.DadosRubrica.IdeProcessoSIND.New do
           begin
             nrProc := EmptyStr;
           end;
@@ -1659,7 +1663,7 @@ begin
     cdsTabela.First;
     while not cdsTabela.Eof do
     begin
-      with ACBrESocial.Eventos.Tabelas.S1020.Add do
+      with ACBrESocial.Eventos.Tabelas.S1020.New do
       begin
         with EvtTabLotacao do
         begin
@@ -1704,7 +1708,7 @@ begin
 //                begin
 //                  procJudTerceiro.Clear;
 //
-//                  with procJudTerceiro.Add do
+//                  with procJudTerceiro.New do
 //                  begin
 //                    codTerc   := '1111';
 //                    nrProcJud := '1234567891239-1345';
@@ -1737,7 +1741,7 @@ begin
       cdsTabela.Next;
     end;
 (*
-  with ACBreSocial1.Eventos.Tabelas.S1020.Add do
+  with ACBreSocial1.Eventos.Tabelas.S1020.New do
   begin
     with EvtTabLotacao do
     begin
@@ -1772,7 +1776,7 @@ begin
             begin
               procJudTerceiro.Clear;
 
-              with procJudTerceiro.Add do
+              with procJudTerceiro.New do
               begin
                 codTerc := '1111';
                 nrProcJud := '1234567891239-1345';
@@ -1872,7 +1876,7 @@ begin
     cdsTabela.First;
     while not cdsTabela.Eof do
     begin
-      with ACBrESocial.Eventos.Tabelas.S1030.Add do
+      with ACBrESocial.Eventos.Tabelas.S1030.New do
       begin
         aEventoID := StrToInt(IncrementGenerator('GEN_ESOCIAL_EVENTO_S1030', 1));
         evtTabCargo.Sequencial := aEventoID;
@@ -2028,7 +2032,7 @@ begin
     cdsTabela.First;
     while not cdsTabela.Eof do
     begin
-      with ACBrESocial.Eventos.Tabelas.S1040.Add, EvtTabFuncao do
+      with ACBrESocial.Eventos.Tabelas.S1040.New, EvtTabFuncao do
       begin
         aEventoID := StrToInt(IncrementGenerator('GEN_ESOCIAL_EVENTO_S1040', 1));
         EvtTabFuncao.Sequencial := aEventoID;
@@ -2146,7 +2150,7 @@ begin
     cdsTabela.First;
     while not cdsTabela.Eof do
     begin
-      with ACBrESocial.Eventos.Tabelas.S1050.Add, EvtTabHorContratual do
+      with ACBrESocial.Eventos.Tabelas.S1050.New, EvtTabHorContratual do
       begin
         aEventoID := StrToInt(IncrementGenerator('GEN_ESOCIAL_EVENTO_S1050', 1));
         Sequencial:= aEventoID;
@@ -2181,7 +2185,7 @@ begin
           horarioIntervalo.Clear;
 
           if (StrToIntDef(Trim(cdsTabela.FieldByName('duracao_intervalo').AsString), 0) > 0) then
-            with horarioIntervalo.Add do
+            with horarioIntervalo.New do
             begin
               tpInterv   := eSStrToTpIntervalo(ok, Trim(cdsTabela.FieldByName('tipo_intervalo').AsString));
               durInterv  := StrToIntDef(Trim(cdsTabela.FieldByName('duracao_intervalo').AsString), 0);
@@ -2273,7 +2277,7 @@ begin
     cdsTabela.First;
     while not cdsTabela.Eof do
     begin
-      with ACBrESocial.Eventos.Tabelas.S1060.Add, EvtTabAmbiente do
+      with ACBrESocial.Eventos.Tabelas.S1060.New, EvtTabAmbiente do
       begin
         aEventoID := StrToInt(IncrementGenerator('GEN_ESOCIAL_EVENTO_S1060', 1));
         Sequencial:= aEventoID;
@@ -2328,14 +2332,14 @@ begin
           begin
             while not cdsDetalhe.Eof do
             begin
-              with fatorRisco.Add do
+              with fatorRisco.New do
                 codFatRis := Trim(cdsDetalhe.FieldByName('codigo').AsString);
 
               cdsDetalhe.Next;
             end;
           end
           else
-            with fatorRisco.Add do
+            with fatorRisco.New do
               codFatRis := '0901001'; // Ausência de Fator de Risco
           *)
           cdsDetalhe.Close;
@@ -2464,7 +2468,7 @@ begin
     cdsTabela.First;
     while not cdsTabela.Eof do
     begin
-      with ACBrESocial.Eventos.Periodicos.S1200.Add do
+      with ACBrESocial.Eventos.Periodicos.S1200.New do
       begin
         with EvtRemun do
         begin
@@ -2512,7 +2516,7 @@ begin
 //                O grupo abaixocorresponde a funcionários que tenham dois empregos em empresas diferentes }
 //              remunOutrEmpr.Clear;
 //
-//              with remunOutrEmpr.Add do
+//              with remunOutrEmpr.New do
 //              begin
 //                TpInsc     := tiCNPJ;
 //                NrInsc     := '01234567890123';
@@ -2544,7 +2548,7 @@ begin
 //            // contribuições
 //            procJudTrab.Clear;
 //
-//            with procJudTrab.Add do
+//            with procJudTrab.New do
 //            begin
 //              tpTrib    := tptPrevidenciaria;
 //              nrProcJud := '95135703320156150258';
@@ -2554,14 +2558,14 @@ begin
 
           dmDev.Clear;
 
-          with dmDev.Add do
+          with dmDev.New do
           begin
             ideDmDev := FormatFloat('#', StrToIntDef(Trim(cdsTabela.FieldByName('parcela').AsString), 0) + 1);
             CodCateg := StrToIntDef(Trim(cdsTabela.FieldByName('categoria').AsString), COD_CATEGORIA_AGENTE_PUBLICO); // Agente Público - Outros
 
             infoPerApur.ideEstabLot.Clear;
 
-            with infoPerApur.ideEstabLot.Add do
+            with infoPerApur.ideEstabLot.New do
             begin
               TpInsc     := IdeEmpregador.TpInsc;
               NrInsc     := IdeEmpregador.NrInsc;
@@ -2572,7 +2576,7 @@ begin
 
               remunPerAnt.Clear;
 
-              with remunPerApur.Add do
+              with remunPerApur.New do
               begin
                 Matricula  := Trim(cdsTabela.FieldByName('matricula').AsString);
                 indSimples := idsIntegralmente;
@@ -2598,7 +2602,7 @@ begin
                 begin
                   while not cdsDetalhe.Eof do
                   begin
-                    with itensRemun.Add do
+                    with itensRemun.New do
                     begin
                       if (Pos('%', Trim(cdsDetalhe.FieldByName('observacao').AsString)) = 0) then
                         aFatorRubrica := 0.0
@@ -2627,7 +2631,7 @@ begin
                 infoSaudeColet.detOper.Clear; // Plano Privado Coletivo de Assistência à Saúde
 
 //                if aNatRubrica_9219 then
-//                  with infoSaudeColet.detOper.Add do
+//                  with infoSaudeColet.detOper.New do
 //                  begin
 //                    cnpjOper := '01234567898765';
 //                    regANS   := 'A1B2C3';
@@ -2635,7 +2639,7 @@ begin
 //
 //                    detPlano.Clear;
 //
-//                    with detPlano.Add do
+//                    with detPlano.New do
 //                    begin
 //                      tpDep    := tdConjuge;
 //                      cpfDep   := '01234567898';
@@ -2651,7 +2655,7 @@ begin
 
             infoPerAnt.ideADC.Clear; // Remuneração relativa a diferenças salariais
 
-//            with infoPerAnt.ideADC.Add do  // Instrumento ou situação ensejadora da remuneração em Períodos Anteriores (?)
+//            with infoPerAnt.ideADC.New do  // Instrumento ou situação ensejadora da remuneração em Períodos Anteriores (?)
 //            begin
 //              dtAcConv   := Now;
 //              tpAcConv   := tacLegislacaoFederalEstadualMunicipalDistrital;
@@ -2661,13 +2665,13 @@ begin
 //
 //              idePeriodo.Clear;
 //
-//              with IdePeriodo.Add do
+//              with IdePeriodo.New do
 //              begin
 //                perRef := '201504';
 //
 //                ideEstabLot.Clear;
 //
-//                with ideEstabLot.Add do
+//                with ideEstabLot.New do
 //                begin
 //                  TpInsc     := IdeEmpregador.TpInsc;
 //                  NrInsc     := IdeEmpregador.NrInsc;
@@ -2675,14 +2679,14 @@ begin
 //
 //                  remunPerAnt.Clear;
 //
-//                  with remunPerAnt.Add do
+//                  with remunPerAnt.New do
 //                  begin
 //                    Matricula  := Trim(cdsTabela.FieldByName('matricula').AsString);
 //                    indSimples := idsIntegralmente;
 //
 //                    itensRemun.Clear;
 //
-//                    with itensRemun.Add do
+//                    with itensRemun.New do
 //                    begin
 //                      CodRubr := '987654';
 //                      ideTabRubr := 'E380';
@@ -2700,7 +2704,7 @@ begin
 
             infoTrabInterm.Clear;
 //
-//            with infoTrabInterm.Add do
+//            with infoTrabInterm.New do
 //              codConv := '123456'; // Código de Convocação do TRabalhador Intermitente
           end;
         end;
@@ -2831,7 +2835,7 @@ begin
     cdsTabela.First;
     while not cdsTabela.Eof do
     begin
-      with ACBrESocial.Eventos.Periodicos.S1202.Add do
+      with ACBrESocial.Eventos.Periodicos.S1202.New do
       begin
         with evtRmnRPPS do
         begin
@@ -2876,7 +2880,7 @@ begin
             // e houver decisão que incida sobre as  contribuições
             procJudTrab.Clear;
 
-//            with procJudTrab.Add do
+//            with procJudTrab.New do
 //            begin
 //              tpTrib    := tptPrevidenciaria;
 //              nrProcJud := '95135703320156150258';
@@ -2886,13 +2890,13 @@ begin
 
           dmDev.Clear;
 
-          with dmDev.Add do
+          with dmDev.New do
           begin
             ideDmDev := FormatFloat('#', StrToIntDef(Trim(cdsTabela.FieldByName('parcela').AsString), 0) + 1);
 
             infoPerApur.ideEstab.Clear;
 
-            with infoPerApur.ideEstab.Add do
+            with infoPerApur.ideEstab.New do
             begin
               TpInsc     := IdeEmpregador.TpInsc;
               NrInsc     := IdeEmpregador.NrInsc;
@@ -2901,7 +2905,7 @@ begin
 
               remunPerAnt.Clear;
 
-              with remunPerApur.Add do
+              with remunPerApur.New do
               begin
                 Matricula := Trim(cdsTabela.FieldByName('matricula').AsString);
                 CodCateg  := StrToIntDef(Trim(cdsTabela.FieldByName('categoria').AsString), COD_CATEGORIA_AGENTE_PUBLICO); // Agente Público - Outros
@@ -2927,7 +2931,7 @@ begin
                 begin
                   while not cdsDetalhe.Eof do
                   begin
-                    with itensRemun.Add do
+                    with itensRemun.New do
                     begin
                       if (Pos('%', Trim(cdsDetalhe.FieldByName('observacao').AsString)) = 0) then
                         aFatorRubrica := 0.0
@@ -2956,7 +2960,7 @@ begin
                 infoSaudeColet.detOper.Clear; // Plano Privado Coletivo de Assistência à Saúde
 
 //                if aNatRubrica_9219 then
-//                  with infoSaudeColet.detOper.Add do
+//                  with infoSaudeColet.detOper.New do
 //                  begin
 //                    cnpjOper := '01234567898765';
 //                    regANS   := 'A1B2C3';
@@ -2964,7 +2968,7 @@ begin
 //
 //                    detPlano.Clear;
 //
-//                    with detPlano.Add do
+//                    with detPlano.New do
 //                    begin
 //                      tpDep    := tdConjuge;
 //                      cpfDep   := '01234567898';
@@ -2978,7 +2982,7 @@ begin
 
             infoPerAnt.ideADC.Clear; // Remuneração relativa a diferenças salariais
 
-//            with infoPerAnt.ideADC.Add do  // Instrumento ou situação ensejadora da remuneração em Períodos Anteriores (?)
+//            with infoPerAnt.ideADC.New do  // Instrumento ou situação ensejadora da remuneração em Períodos Anteriores (?)
 //            begin
 //              dtLei := Now;
 //              nrLei := '321321/2017';
@@ -2986,27 +2990,27 @@ begin
 //
 //              idePeriodo.Clear;
 //
-//              with IdePeriodo.Add do
+//              with IdePeriodo.New do
 //              begin
 //                perRef := '201504';
 //
 //                ideEstab.Clear;
 //
-//                with IdeEstab.Add do
+//                with IdeEstab.New do
 //                begin
 //                  TpInsc := tiCNPJ;
 //                  NrInsc := '01234567898765';
 //
 //                  remunPerAnt.Clear;
 //
-//                  with remunPerAnt.Add do
+//                  with remunPerAnt.New do
 //                  begin
 //                    Matricula := 'A1234';
 //                    CodCateg := 101;
 //
 //                    itensRemun.Clear;
 //
-//                    with itensRemun.Add do
+//                    with itensRemun.New do
 //                    begin
 //                      CodRubr    := '987654';
 //                      ideTabRubr := 'E380';
@@ -3149,7 +3153,7 @@ begin
     cdsTabela.First;
     while not cdsTabela.Eof do
     begin
-      with ACBrESocial.Eventos.Periodicos.S1207.Add do
+      with ACBrESocial.Eventos.Periodicos.S1207.New do
       begin
         with evtBenPrRP do
         begin
@@ -3188,7 +3192,7 @@ begin
 
           dmDev.Clear;
 
-          with dmDev.Add do
+          with dmDev.New do
           begin
             tpBenef   := 99; // Tabela 25 - Outros Benefícios previdenciários concedidos antes do início de vigência do eSocial
             nrBenefic := Copy(OnlyNumber(Trim(cdsTabela.FieldByName('cpf').AsString)) + Trim(cdsTabela.FieldByName('matricula').AsString), 1, 20);
@@ -3215,7 +3219,7 @@ begin
             begin
               while not cdsDetalhe.Eof do
               begin
-                with itens.Add do
+                with itens.New do
                 begin
                   CodRubr    := Trim(cdsDetalhe.FieldByName('cd_evento').AsString);
                   ideTabRubr := Trim(cdsDetalhe.FieldByName('id_evento').AsString);
@@ -3353,7 +3357,7 @@ begin
     cdsTabela.First;
     while not cdsTabela.Eof do
     begin
-      with ACBrESocial.Eventos.Periodicos.S1210.Add do
+      with ACBrESocial.Eventos.Periodicos.S1210.New do
       begin
         with evtPgtos do
         begin
@@ -3395,7 +3399,7 @@ begin
 
             InfoPgto.Clear;
 
-            with InfoPgto.Add do
+            with InfoPgto.New do
             begin
               DtPgto   := cdsTabela.FieldByName('dt_pagto').AsDateTime;
               tpPgto   := tpPgtoRemun1200;
@@ -3426,7 +3430,7 @@ begin
               SetSQL_Detalhe(aSQL);
 
               if (tpPgto in [tpPgtoRemun1200, tpPgtoRemun1202, tpPgtoResc2299, tpPgtoResc2399]) then
-                with detPgtoFl.Add do
+                with detPgtoFl.New do
                 begin
                   perRef     := aCompetencia.Codigo;
                   ideDmDev   := FormatFloat('#', StrToIntDef(Trim(cdsTabela.FieldByName('parcela').AsString), 0) + 1);
@@ -3445,7 +3449,7 @@ begin
                     begin
                       if (indPagtoTt = tpSim) then
                       begin
-                        with retPagtoTot.Add do
+                        with retPagtoTot.New do
                         begin
                           if (Pos('%', Trim(cdsDetalhe.FieldByName('observacao').AsString)) = 0) then
                             aFatorRubrica := 0.0
@@ -3465,7 +3469,7 @@ begin
                           penAlim.Clear;
 
                           if (Trim(cdsDetalhe.FieldByName('cpf_benefic').AsString) <> EmptyStr) then
-                            with penAlim.Add do
+                            with penAlim.New do
                             begin
                               cpfBenef      := OnlyNumber(Trim(cdsDetalhe.FieldByName('cpf_benefic').AsString));
                               dtNasctoBenef := cdsDetalhe.FieldByName('dt_nascimento').AsDateTime;
@@ -3477,7 +3481,7 @@ begin
                       else
                       if (indPagtoTt = tpNao) then
                       begin
-                        with infoPgtoParc.Add do
+                        with infoPgtoParc.New do
                         begin
                           if (Pos('%', Trim(cdsDetalhe.FieldByName('observacao').AsString)) = 0) then
                             aFatorRubrica := 0.0
@@ -3521,7 +3525,7 @@ begin
                     begin
                       if (indPgtoTt = tpSim) then
                       begin
-                        with retPgtoTot.Add do
+                        with retPgtoTot.New do
                         begin
                           if (Pos('%', Trim(cdsDetalhe.FieldByName('observacao').AsString)) = 0) then
                             aFatorRubrica := 0.0
@@ -3542,7 +3546,7 @@ begin
                       else
                       if (indPgtoTt = tpNao) then
                       begin
-                        with infoPgtoParc.Add do
+                        with infoPgtoParc.New do
                         begin
                           if (Pos('%', Trim(cdsDetalhe.FieldByName('observacao').AsString)) = 0) then
                             aFatorRubrica := 0.0
@@ -3570,7 +3574,7 @@ begin
               detPgtoFer.Clear;
 
               if (tpPgto = tpPgtoFerias) then
-                with detPgtoFer.Add do // Detalhamento dos pagamentos de férias
+                with detPgtoFer.New do // Detalhamento dos pagamentos de férias
                 begin
                   CodCateg  := StrToIntDef(Trim(cdsTabela.FieldByName('categoria').AsString), COD_CATEGORIA_AGENTE_PUBLICO); // Agente Público - Outros;
                   matricula := Trim(cdsTabela.FieldByName('matricula').AsString);
@@ -3585,7 +3589,7 @@ begin
                   begin
                     while not cdsDetalhe.Eof do
                     begin
-                      with detRubrFer.Add do
+                      with detRubrFer.New do
                       begin
                         if (Pos('%', Trim(cdsDetalhe.FieldByName('observacao').AsString)) = 0) then
                           aFatorRubrica := 0.0
@@ -3605,7 +3609,7 @@ begin
                         penAlim.Clear;
 
                         if (Trim(cdsDetalhe.FieldByName('cpf_benefic').AsString) <> EmptyStr) then
-                          with penAlim.Add do
+                          with penAlim.New do
                           begin
                             cpfBenef      := OnlyNumber(Trim(cdsDetalhe.FieldByName('cpf_benefic').AsString));
                             dtNasctoBenef := cdsDetalhe.FieldByName('dt_nascimento').AsDateTime;
@@ -3622,13 +3626,13 @@ begin
 
               detPgtoAnt.Clear;
 
-//              with detPgtoAnt.Add do
+//              with detPgtoAnt.New do
 //              begin
 //                CodCateg := 111;
 //
 //                infoPgtoAnt.Clear;
 //
-//                with infoPgtoAnt.Add do
+//                with infoPgtoAnt.New do
 //                begin
 //                  tpBcIRRF := tpCodIncIRRF(0);
 //                  vrBcIRRF := 2500.32;
@@ -3742,7 +3746,7 @@ begin
     cdsTabela.First;
     while not cdsTabela.Eof do
     begin
-      with ACBrESocial.Eventos.Periodicos.S1295.Add, evtTotConting do
+      with ACBrESocial.Eventos.Periodicos.S1295.New, evtTotConting do
       begin
 //        if AmbienteWebServiceProducao then
 //          IdeEvento.TpAmb := TpTpAmb(0) //taProducao
@@ -3868,7 +3872,7 @@ begin
     cdsTabela.First;
     while not cdsTabela.Eof do
     begin
-      with ACBrESocial.Eventos.Periodicos.S1298.Add, EvtReabreEvPer do
+      with ACBrESocial.Eventos.Periodicos.S1298.New, EvtReabreEvPer do
       begin
 //        if AmbienteWebServiceProducao then
 //          IdeEvento.TpAmb := TpTpAmb(0) //taProducao
@@ -4078,7 +4082,7 @@ begin
     cdsTabela.First;
     while not cdsTabela.Eof do
     begin
-      with ACBrESocial.Eventos.Periodicos.S1299.Add, EvtFechaEvPer do
+      with ACBrESocial.Eventos.Periodicos.S1299.New, EvtFechaEvPer do
       begin
 //        if AmbienteWebServiceProducao then
 //          IdeEvento.TpAmb := TpTpAmb(0) //taProducao
@@ -4310,7 +4314,7 @@ begin
     cdsTabela.First;
     while not cdsTabela.Eof do
     begin
-      with ACBrESocial.Eventos.NaoPeriodicos.S2200.Add, EvtAdmissao do
+      with ACBrESocial.Eventos.NaoPeriodicos.S2200.New, EvtAdmissao do
       begin
         aEventoID := StrToInt(IncrementGenerator('GEN_ESOCIAL_EVENTO_S2200', 1));
         Sequencial:= aEventoID;
@@ -4490,7 +4494,7 @@ begin
           begin
             while not cdsDetalhe.Eof do
             begin
-              with Dependente.Add do
+              with Dependente.New do
               begin
                 tpDep    := eSStrToTpDep(ok, Trim(cdsDetalhe.FieldByName('tipo_dependente').AsString));
                 nmDep    := Trim(cdsDetalhe.FieldByName('nome').AsString);
@@ -4565,7 +4569,7 @@ begin
 //
 //                IdeTrabSubstituido.Clear;
 //
-//                with IdeTrabSubstituido.Add do
+//                with IdeTrabSubstituido.New do
 //                  CpfTrabSubst := '12345678912';
 //              end;
 //
@@ -4637,31 +4641,31 @@ begin
 
                 horario.Clear;
 
-                with horario.Add do
+                with horario.New do
                 begin
                   Dia := tpTpDia(diSegundaFeira);
                   codHorContrat := cdsTabela.FieldByName('id_horario').AsString;
                 end;
 
-                with horario.Add do
+                with horario.New do
                 begin
                   Dia := tpTpDia(diTercaFeira);
                   codHorContrat := cdsTabela.FieldByName('id_horario').AsString;
                 end;
 
-                with horario.Add do
+                with horario.New do
                 begin
                   Dia := tpTpDia(diQuartaFeira);
                   codHorContrat := cdsTabela.FieldByName('id_horario').AsString;
                 end;
 
-                with horario.Add do
+                with horario.New do
                 begin
                   Dia := tpTpDia(diQuintaFeira);
                   codHorContrat := cdsTabela.FieldByName('id_horario').AsString;
                 end;
 
-                with horario.Add do
+                with horario.New do
                 begin
                   Dia := tpTpDia(diSextaFeira);
                   codHorContrat := cdsTabela.FieldByName('id_horario').AsString;
@@ -4688,7 +4692,7 @@ begin
             observacoes.Clear;
 //
 //            if (Trim(cdsTabela.FieldByName('observacao').AsString) <> EmptyStr) then
-//              with observacoes.Add do
+//              with observacoes.New do
 //                observacao := cdsTabela.FieldByName('observacao').AsString;
           end;
 
@@ -4867,7 +4871,7 @@ begin
     cdsTabela.First;
     while not cdsTabela.Eof do
     begin
-      with ACBrESocial.Eventos.NaoPeriodicos.S2205.Add, EvtAltCadastral do
+      with ACBrESocial.Eventos.NaoPeriodicos.S2205.New, EvtAltCadastral do
       begin
         aEventoID   := StrToInt(IncrementGenerator('GEN_ESOCIAL_EVENTO_S2205', 1));
         Sequencial  := aEventoID;
@@ -5043,7 +5047,7 @@ begin
           begin
             while not cdsDetalhe.Eof do
             begin
-              with Dependente.Add do
+              with Dependente.New do
               begin
                 tpDep    := eSStrToTpDep(ok, Trim(cdsDetalhe.FieldByName('tipo_dependente').AsString));
                 nmDep    := Trim(cdsDetalhe.FieldByName('nome').AsString);
@@ -5224,7 +5228,7 @@ begin
     cdsTabela.First;
     while not cdsTabela.Eof do
     begin
-      with ACBrESocial.Eventos.NaoPeriodicos.S2206.Add, EvtAltContratual, AltContratual do
+      with ACBrESocial.Eventos.NaoPeriodicos.S2206.New, EvtAltContratual, AltContratual do
       begin
         aEventoID := StrToInt(IncrementGenerator('GEN_ESOCIAL_EVENTO_S2206', 1));
         Sequencial:= aEventoID;
@@ -5300,7 +5304,7 @@ begin
 //
 //                IdeTrabSubstituido.Clear;
 //
-//                with IdeTrabSubstituido.Add do
+//                with IdeTrabSubstituido.New do
 //                  CpfTrabSubst := '12345678912';
 //              end;
 //
@@ -5360,31 +5364,31 @@ begin
 
               horario.Clear;
 
-              with horario.Add do
+              with horario.New do
               begin
                 Dia := tpTpDia(diSegundaFeira);
                 codHorContrat := cdsTabela.FieldByName('id_horario').AsString;
               end;
 
-              with horario.Add do
+              with horario.New do
               begin
                 Dia := tpTpDia(diTercaFeira);
                 codHorContrat := cdsTabela.FieldByName('id_horario').AsString;
               end;
 
-              with horario.Add do
+              with horario.New do
               begin
                 Dia := tpTpDia(diQuartaFeira);
                 codHorContrat := cdsTabela.FieldByName('id_horario').AsString;
               end;
 
-              with horario.Add do
+              with horario.New do
               begin
                 Dia := tpTpDia(diQuintaFeira);
                 codHorContrat := cdsTabela.FieldByName('id_horario').AsString;
               end;
 
-              with horario.Add do
+              with horario.New do
               begin
                 Dia := tpTpDia(diSextaFeira);
                 codHorContrat := cdsTabela.FieldByName('id_horario').AsString;
@@ -5544,7 +5548,7 @@ begin
     cdsTabela.First;
     while not cdsTabela.Eof do
     begin
-      with ACBrESocial.Eventos.NaoPeriodicos.S2240.Add, EvtExpRisco do
+      with ACBrESocial.Eventos.NaoPeriodicos.S2240.New, EvtExpRisco do
       begin
         aEventoID := StrToInt(IncrementGenerator('GEN_ESOCIAL_EVENTO_S2240', 1));
         Sequencial:= aEventoID;
@@ -5580,7 +5584,7 @@ begin
 
           InfoAmb.Clear;
 
-          with InfoAmb.Add do
+          with InfoAmb.New do
           begin
             codAmb              := Trim(cdsTabela.FieldByName('id_depto').AsString);
             InfoAtiv.dscAtivDes := Trim(cdsTabela.FieldByName('fun_descricao').AsString);
@@ -5603,7 +5607,7 @@ begin
 
               while not cdsDetalhe.Eof do
               begin
-                with FatRisco.Add do
+                with FatRisco.New do
                 begin
                   codFatRis  := Trim(cdsDetalhe.FieldByName('codigo').AsString);
                   intConc    := 0;
@@ -5618,7 +5622,7 @@ begin
 
                     epi.Clear;
   //
-  //                  with epi.Add do
+  //                  with epi.New do
   //                  begin
   //                    caEPI         := '321654';
   //                    eficEpi       := tpSim;
@@ -5636,7 +5640,7 @@ begin
 
             end
             else
-              with FatRisco.Add do
+              with FatRisco.New do
               begin
                 codFatRis := '0901001'; // Ausência de Fator de Risco
                 with epcEpi do
@@ -5660,7 +5664,7 @@ begin
 
               InfoAmb.Clear;
 
-              with InfoAmb.Add do
+              with InfoAmb.New do
               begin
                 codAmb              := Trim(cdsTabela.FieldByName('id_depto').AsString);
                 InfoAtiv.dscAtivDes := Trim(cdsTabela.FieldByName('fun_descricao').AsString);
@@ -5683,7 +5687,7 @@ begin
 
                   while not cdsDetalhe.Eof do
                   begin
-                    with FatRisco.Add do
+                    with FatRisco.New do
                     begin
                       codFatRis  := Trim(cdsDetalhe.FieldByName('codigo').AsString);
                       intConc    := 'N/A';
@@ -5696,7 +5700,7 @@ begin
 
                         epc.Clear;
       //
-      //                  with epc.Add do
+      //                  with epc.New do
       //                  begin
       //                    dscEpc  := 'Descrição do EPC 1';
       //                    eficEpc := tpSim;
@@ -5704,7 +5708,7 @@ begin
 
                         epi.Clear;
       //
-      //                  with epi.Add do
+      //                  with epi.New do
       //                  begin
       //                    caEPI         := '321654';
       //                    eficEpi       := tpSim;
@@ -5722,7 +5726,7 @@ begin
 
                 end
                 else
-                  with FatRisco.Add do
+                  with FatRisco.New do
                   begin
                     codFatRis := '0901001'; // Ausência de Fator de Risco
                     with epcEpi do
@@ -5746,14 +5750,14 @@ begin
 
               infoAmb.Clear;
 
-              with InfoAmb.Add do
+              with InfoAmb.New do
                 codAmb := Trim(cdsTabela.FieldByName('id_depto').AsString);
             end;
           *)
           respReg.Clear;
 
           // Informações relativas ao responsável pelos registros ambientais
-          with respReg.Add, aResponsavel do
+          with respReg.New, aResponsavel do
           begin
             NisResp := NIS;
             ideOC   := tpIdeOC.idOutros;
@@ -5795,18 +5799,19 @@ end;
 
 function TdmESocial.Gerar_eSocial2241(aCompetencia: TCompetencia; aZerarBase: Boolean; aModoLancamento: TModoLancamento;
   aLabel: TLabel; aProcesso: TGauge; var aProtocolo: TProtocoloESocial): Boolean;
-var
-  aRetorno : Boolean;
-  aSQL : TStringList;
-  ok   : Boolean;
-  aEventoID,
-  I : Integer;
-  aDataInicial ,
-  aDataFinal   : TDateTime;
-  aResponsavel : TResponsavel;
-  aMainTable    ,
-  aFileProcesso : String;
+//var
+//  aRetorno : Boolean;
+//  aSQL : TStringList;
+//  ok   : Boolean;
+//  aEventoID,
+//  I : Integer;
+//  aDataInicial ,
+//  aDataFinal   : TDateTime;
+//  aResponsavel : TResponsavel;
+//  aMainTable    ,
+//  aFileProcesso : String;
 begin
+  Result := False;
   Exit;
 
   (* EVENTO 2241 REMOVIDO
@@ -5885,7 +5890,7 @@ begin
     cdsTabela.First;
     while not cdsTabela.Eof do
     begin
-      with ACBrESocial.Eventos.NaoPeriodicos.S2241.Add, EvtInsApo do
+      with ACBrESocial.Eventos.NaoPeriodicos.S2241.New, EvtInsApo do
       begin
         aEventoID := StrToInt(IncrementGenerator('GEN_ESOCIAL_EVENTO_S2241', 1));
         Sequencial:= aEventoID;
@@ -5920,7 +5925,7 @@ begin
 
               InfoAmb.Clear;
 
-              with InfoAmb.Add do
+              with InfoAmb.New do
               begin
                 codAmb              := Trim(cdsTabela.FieldByName('id_depto').AsString);
                 InfoAtiv.dscAtivDes := Trim(cdsTabela.FieldByName('fun_descricao').AsString);
@@ -5943,7 +5948,7 @@ begin
 
                   while not cdsDetalhe.Eof do
                   begin
-                    with FatRisco.Add do
+                    with FatRisco.New do
                     begin
                       codFatRis  := Trim(cdsDetalhe.FieldByName('codigo').AsString);
   //                    intConc    := 'N/A';
@@ -5955,7 +5960,7 @@ begin
 
                 end
                 else
-                  with FatRisco.Add do
+                  with FatRisco.New do
                   begin
                     codFatRis := '0901001'; // Ausência de Fator de Risco
                   end;
@@ -5973,7 +5978,7 @@ begin
 
               InfoAmb.Clear;
 
-              with InfoAmb.Add do
+              with InfoAmb.New do
               begin
                 codAmb              := Trim(cdsTabela.FieldByName('id_depto').AsString);
                 InfoAtiv.dscAtivDes := Trim(cdsTabela.FieldByName('fun_descricao').AsString);
@@ -5996,7 +6001,7 @@ begin
 
                   while not cdsDetalhe.Eof do
                   begin
-                    with FatRisco.Add do
+                    with FatRisco.New do
                     begin
                       codFatRis  := Trim(cdsDetalhe.FieldByName('codigo').AsString);
                       intConc    := 'N/A';
@@ -6008,7 +6013,7 @@ begin
 
                 end
                 else
-                  with FatRisco.Add do
+                  with FatRisco.New do
                   begin
                     codFatRis  := '0901001'; // Ausência de Fator de Risco
                     intConc    := 'N/A';
@@ -6029,7 +6034,7 @@ begin
               DtfimCondicao := Date;
 
               InfoAmb.Clear;
-              with InfoAmb.Add do
+              with InfoAmb.New do
                 codAmb := Trim(cdsTabela.FieldByName('id_depto').AsString);
             end;
         end;
@@ -6046,7 +6051,7 @@ begin
 //
 //            InfoAmb.Clear;
 //
-//            with InfoAmb.Add do
+//            with InfoAmb.New do
 //            begin
 //              codAmb := '654';
 //
@@ -6054,7 +6059,7 @@ begin
 //
 //              FatRisco.Clear;
 //
-//              with FatRisco.Add do
+//              with FatRisco.New do
 //                codFatRis := '1234567890';
 //            end;
 //          end;
@@ -6067,7 +6072,7 @@ begin
 //
 //            InfoAmb.Clear;
 //
-//            with InfoAmb.Add do
+//            with InfoAmb.New do
 //            begin
 //              codAmb := '456';
 //
@@ -6075,7 +6080,7 @@ begin
 //
 //              FatRisco.Clear;
 //
-//              with FatRisco.Add do
+//              with FatRisco.New do
 //              begin
 //                codFatRis  := '321';
 //                intConc    := 'N/A';
@@ -6091,7 +6096,7 @@ begin
 //
 //            InfoAmb.Clear;
 //
-//            with InfoAmb.Add do
+//            with InfoAmb.New do
 //              codAmb := '654321';
 //          end;
 //        end;
@@ -6232,7 +6237,7 @@ begin
     cdsTabela.First;
     while not cdsTabela.Eof do
     begin
-      with ACBrESocial.Eventos.NaoPeriodicos.S2400.Add, evtCdBenPrRP do
+      with ACBrESocial.Eventos.NaoPeriodicos.S2400.New, evtCdBenPrRP do
       begin
         aEventoID := StrToInt(IncrementGenerator('GEN_ESOCIAL_EVENTO_S2400', 1));
         Sequencial:= aEventoID;

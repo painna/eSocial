@@ -12,8 +12,7 @@ type
     Panel2: TPanel;
     Label1: TLabel;
     lblCelular1: TLabel;
-    Label4: TLabel;
-    Label5: TLabel;
+    lblCopyright: TLabel;
     lblCelular2: TLabel;
     lblTelFixo: TLabel;
     btnOk: TBitBtn;
@@ -109,6 +108,7 @@ begin
   Memo3.Lines.Add('');
   Memo3.Lines.Add('Data da Versão do Banco de Dados: '+sDtVerDb);
 
+  lblCopyright.Caption := 'Copyright © ' + FormatDateTime('yyyy', Date) + ' GERASYS TECNOINFO.'#13'Todos os direitos reservados.';
 end;
 
 procedure TfrmSobre.FormShow(Sender: TObject);
