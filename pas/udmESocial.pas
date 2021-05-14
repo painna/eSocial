@@ -315,7 +315,7 @@ type
     procedure LerConfiguracao;
     procedure GravarProtocoloRetorno(aProtocolo : TProtocoloESocial);
     procedure AtualizarOperacoes(aModoLancamento: TModoLancamento; aProtocolo: TProtocoloESocial; aCompetencia : TCompetencia);
-    procedure SetEventoESocial(aEvento, aCompetencia, aProtocolo, aUsuario : String;
+    procedure SetEventoESocial(aEvento, aCompetencia, aOperacao, aProtocolo, aUsuario : String;
       aDataProcesso : TDateTime; aProcessado, aEnviado, aValido : Boolean);
 
     function CertificadoInstalado : Boolean;
@@ -445,6 +445,11 @@ type
       aLabel : TLabel; aProcesso : TGauge; var aProtocolo : TProtocoloESocial) : Boolean;
   end;
 
+(*
+  Documentações:
+  1 - https://www.gov.br/esocial/pt-br/documentacao-tecnica
+*)
+
 var
   dmESocial: TdmESocial;
 
@@ -567,6 +572,7 @@ var
           SetEventoESocial(aRegistro[0]
             , IntToStr(aCompetencia.ID)
             , aProtocolo.Numero
+            , aRegistro[2] // Operação
             , gUsuarioLogin
             , aProtocolo.DataHora
             , True
@@ -1134,18 +1140,20 @@ begin
 
           NatJurid         := Trim(ReplaceStr(cdsTabela.FieldByName('NATUREZA_JURIDICA').AsString, '-', ''));
           IndCoop          := icCooperativadeTrabalho;
-          IndConstr        := iconNaoeConstrutora;
+          IndConstr        := TpIndConstr.iconNaoeConstrutora;
           IndDesFolha      := idfNaoAplicavel;
-          IndOptRegEletron := iorOptoupeloregistro;
-          IndEntEd         := snfNada;
-          IndEtt           := snfNada;
+          IndPorte         := tpSimNao.tpNao;
+          IndOpcCP         := TpIndOpcCP.icpNenhum;
+          IndOptRegEletron := TpIndOptRegEletron.iorNaooptou;
+          IndEntEd         := tpSimNaoFacultativo.snfNada;
+          IndEtt           := tpSimNaoFacultativo.snfNada;
           nrRegEtt         := EmptyStr;
 
           InfoOp.nrSiafi := Trim(cdsTabela.FieldByName('NRO_SIAFI').AsString);
 
           InfoOp.infoEnte.indRPPS   := IfThen(Criptografa(cdsTabela.FieldByName('CNPJ').AsString, '2', 14) = cdsTabela.FieldByName('ENTE_CNPJ').AsString, tpSim, tpNao);
           InfoOp.infoEnte.nmEnte    := Trim(cdsTabela.FieldByName('ENTE_FERERATIVO').AsString); // Nome do Entidade Federativa ao qual o órgão está vinculado
-          InfoOp.infoEnte.uf        := eSStrTouf(ok, Trim(cdsTabela.FieldByName('ENDER_UF').AsString));
+          InfoOp.infoEnte.uf        := Trim(cdsTabela.FieldByName('ENDER_UF').AsString);
           InfoOp.infoEnte.codMunic  := cdsTabela.FieldByName('COD_MUNICIPIO_RAIS').AsInteger;   // Conforme Tabela do IBGE
           InfoOp.infoEnte.indRPPS   := IfThen(AnsiUpperCase(Trim(cdsTabela.FieldByName('POSSUI_RPPS').AsString)) = FLAG_SIM, tpSim, tpNao);
           InfoOp.infoEnte.subteto   := eSStrToIdeSubteto(ok, Trim(cdsTabela.FieldByName('SUBTETO_VENCTO_TIPO').AsString));
@@ -1211,6 +1219,7 @@ begin
       SetEventoESocial('S1000'
         , aProtocolo.CompetenciaID
         , aProtocolo.Numero
+        , MODO_OPERACAO[Ord(aModoLancamento)]
         , gUsuarioLogin
         , Now
         , True
@@ -1228,6 +1237,7 @@ var
   aRetorno : Boolean;
   aSQL : TStringList;
   ok   : Boolean;
+  aEventoID,
   I    : Integer;
   aDataImplantacao : TDateTime;
   aMainTable    ,
@@ -1246,7 +1256,7 @@ begin
 
     aSQL.BeginUpdate;
     aSQL.Clear;
-    aSQL.Add('Select');
+    aSQL.Add('Select First 1');
     aSQL.Add('    ug.*');
     aSQL.Add('  , ' + QuotedStr(eSAliqRatToStr(arat2)) + ' as aliquota_rat ');
     aSQL.Add('  , coalesce(fp.valor, 0.0) as aliquota_fap ');
@@ -1293,11 +1303,13 @@ begin
     cdsTabela.First;
     while not cdsTabela.Eof do
     begin
+      aEventoID := StrToInt(IncrementGenerator('GEN_ESOCIAL_EVENTO_S1005', 1));
+
       with ACBrESocial.Eventos.Iniciais.S1005.New do
       begin
         with evtTabEstab do
         begin
-          Sequencial     := StrToInt(IncrementGenerator('GEN_ESOCIAL_EVENTO_S1005', 1));
+          Sequencial     := aEventoID;
           ModoLancamento := aModoLancamento;
 
 //          if AmbienteWebServiceProducao then
@@ -1393,6 +1405,7 @@ begin
       SetEventoESocial('S1005'
         , aProtocolo.CompetenciaID
         , aProtocolo.Numero
+        , MODO_OPERACAO[Ord(aModoLancamento)]
         , gUsuarioLogin
         , Now
         , True
@@ -1599,6 +1612,7 @@ begin
       SetEventoESocial('S1010'
         , aProtocolo.CompetenciaID
         , aProtocolo.Numero
+        , MODO_OPERACAO[Ord(aModoLancamento)]
         , gUsuarioLogin
         , Now
         , True
@@ -1639,6 +1653,7 @@ begin
     aSQL.Add('from CONFIG_ORGAO c');
     aSQL.Add('  inner join CONFIG_ESOCIAL e on (e.id_config_orgao = c.id)');
     aSQL.Add('  inner join UNID_GESTORA   u on (u.id = e.id_unid_gestora and u.id = 1)');
+    aSQL.Add('where c.id = 1');
 
     case aModoLancamento of
       mlInclusao  : aSQL.Add('  and c.tipo_operacao = ' + QuotedStr(FLAG_OPERACAO_INSERIR));
@@ -1810,6 +1825,7 @@ begin
       SetEventoESocial('S1020'
         , aProtocolo.CompetenciaID
         , aProtocolo.Numero
+        , MODO_OPERACAO[Ord(aModoLancamento)]
         , gUsuarioLogin
         , Now
         , True
@@ -1947,6 +1963,7 @@ begin
       SetEventoESocial('S1030'
         , aProtocolo.CompetenciaID
         , aProtocolo.Numero
+        , MODO_OPERACAO[Ord(aModoLancamento)]
         , gUsuarioLogin
         , Now
         , True
@@ -2083,6 +2100,7 @@ begin
       SetEventoESocial('S1040'
         , aProtocolo.CompetenciaID
         , aProtocolo.Numero
+        , MODO_OPERACAO[Ord(aModoLancamento)]
         , gUsuarioLogin
         , Now
         , True
@@ -2217,6 +2235,7 @@ begin
       SetEventoESocial('S1050'
         , aProtocolo.CompetenciaID
         , aProtocolo.Numero
+        , MODO_OPERACAO[Ord(aModoLancamento)]
         , gUsuarioLogin
         , Now
         , True
@@ -2368,6 +2387,7 @@ begin
       SetEventoESocial('S1060'
         , aProtocolo.CompetenciaID
         , aProtocolo.Numero
+        , MODO_OPERACAO[Ord(aModoLancamento)]
         , gUsuarioLogin
         , Now
         , True
@@ -2729,6 +2749,7 @@ begin
       SetEventoESocial('S1200'
         , aProtocolo.CompetenciaID
         , aProtocolo.Numero
+        , MODO_OPERACAO[Ord(aModoLancamento)]
         , gUsuarioLogin
         , Now
         , True
@@ -3046,6 +3067,7 @@ begin
       SetEventoESocial('S1202'
         , aProtocolo.CompetenciaID
         , aProtocolo.Numero
+        , MODO_OPERACAO[Ord(aModoLancamento)]
         , gUsuarioLogin
         , Now
         , True
@@ -3253,6 +3275,7 @@ begin
       SetEventoESocial('S1207'
         , aProtocolo.CompetenciaID
         , aProtocolo.Numero
+        , MODO_OPERACAO[Ord(aModoLancamento)]
         , gUsuarioLogin
         , Now
         , True
@@ -3679,6 +3702,7 @@ begin
       SetEventoESocial('S1210'
         , aProtocolo.CompetenciaID
         , aProtocolo.Numero
+        , MODO_OPERACAO[Ord(aModoLancamento)]
         , gUsuarioLogin
         , Now
         , True
@@ -3805,6 +3829,7 @@ begin
       SetEventoESocial('S1295'
         , aProtocolo.CompetenciaID
         , aProtocolo.Numero
+        , MODO_OPERACAO[Ord(aModoLancamento)]
         , gUsuarioLogin
         , Now
         , True
@@ -3914,6 +3939,7 @@ begin
       SetEventoESocial('S1298'
         , aProtocolo.CompetenciaID
         , aProtocolo.Numero
+        , MODO_OPERACAO[Ord(aModoLancamento)]
         , gUsuarioLogin
         , Now
         , True
@@ -3954,13 +3980,13 @@ begin
   aSQL := TStringList.Create;
   ok   := True;
   try
-    ExisteRemuneracao           := tpSimNao.tpNao;
-    ExistePagtoS1210            := tpSimNao.tpNao;
+    ExisteRemuneracao               := tpSimNao.tpNao;
+    ExistePagtoS1210                := tpSimNao.tpNao;
     ExisteAquisicaoProdutoRural1250 := tpSimNao.tpNao;
-    ExisteProducaoComercial1260 := tpSimNao.tpNao;
-    ExisteContratoAvulso1270    := tpSimNao.tpNao;
-    ExisteDesoneracao1280       := tpSimNao.tpNao;
-    CompetenciaSemMovto         := EmptyStr;
+    ExisteProducaoComercial1260     := tpSimNao.tpNao;
+    ExisteContratoAvulso1270        := tpSimNao.tpNao;
+    ExisteDesoneracao1280           := tpSimNao.tpNao;
+    CompetenciaSemMovto             := EmptyStr;
 
     if (Pesquisa('ESOCIAL_EVENTO'
       , 'EVENTO;COMPETENCIA;PROCESSADO;ENVIADO'
@@ -4145,6 +4171,7 @@ begin
       SetEventoESocial('S1299'
         , aProtocolo.CompetenciaID
         , aProtocolo.Numero
+        , MODO_OPERACAO[Ord(aModoLancamento)]
         , gUsuarioLogin
         , Now
         , True
@@ -4415,7 +4442,7 @@ begin
             begin
               CNH.nrRegCnh     := OnlyNumber(Trim(cdsTabela.FieldByName('cnh_num').AsString));
               CNH.DtExped      := cdsTabela.FieldByName('cnh_dt_emissao').AsDateTime;
-              CNH.ufCnh        := tpuf(ufPR);
+              CNH.ufCnh        := cdsTabela.FieldByName('cnh_uf').AsString;
               CNH.DtValid      := cdsTabela.FieldByName('cnh_dt_vencto').AsDateTime;
               CNH.categoriaCnh := eSStrToCnh(ok, Trim(cdsTabela.FieldByName('cnh_categoria').AsString));
               //CNH.dtPriHab     := date;
@@ -4433,7 +4460,7 @@ begin
               Bairro      := IfThen(Trim(cdsTabela.FieldByName('ender_bairro').AsString) = EmptyStr, 'NAO INFORMADO', Trim(cdsTabela.FieldByName('ender_bairro').AsString));
               Cep         := Copy(Trim(cdsTabela.FieldByName('ender_cep').AsString) + '000', 1, 8);
               codMunic    := cdsTabela.FieldByName('id_ender_cidade').AsInteger;
-              uf          := eSStrTouf(ok, Trim(cdsTabela.FieldByName('ender_uf').AsString));
+              uf          := Trim(cdsTabela.FieldByName('ender_uf').AsString);
             end;
 //
 //            with Exterior do
@@ -4584,11 +4611,11 @@ begin
 
               Case cdsTabela.FieldByName('id_situacao_tcm').AsInteger of
                 10:
-                  TpProv := tpNomeacaoCargoComissao;
+                  TpProv := tpTpProv.tpOutros;
                 20..35:
-                  TpProv := tpNomeacaoCargoEfetivo;
+                  TpProv := tpTpProv.tpNomeacaoCargoEfetivo;
                 else
-                  TpProv := tpTpProv(6); //tpOutros;
+                  TpProv := tpTpProv.tpOutros; //tpOutros;
               end;
 
               DtNomeacao  := cdsTabela.FieldByName('dt_nomeacao').AsDateTime;  // StrToDate(EMPTY_DATE);
@@ -4736,6 +4763,7 @@ begin
       SetEventoESocial('S2200'
         , aProtocolo.CompetenciaID
         , aProtocolo.Numero
+        , MODO_OPERACAO[Ord(aModoLancamento)]
         , gUsuarioLogin
         , Now
         , True
@@ -4968,7 +4996,7 @@ begin
             begin
               CNH.nrRegCnh     := OnlyNumber(Trim(cdsTabela.FieldByName('cnh_num').AsString));
               CNH.DtExped      := cdsTabela.FieldByName('cnh_dt_emissao').AsDateTime;
-              CNH.ufCnh        := tpuf(ufPR);
+              CNH.ufCnh        := Trim(cdsTabela.FieldByName('cnh_uf').AsString);
               CNH.DtValid      := cdsTabela.FieldByName('cnh_dt_vencto').AsDateTime;
               CNH.categoriaCnh := eSStrToCnh(ok, Trim(cdsTabela.FieldByName('cnh_categoria').AsString));
               //CNH.dtPriHab     := date;
@@ -4986,7 +5014,7 @@ begin
               Bairro      := IfThen(Trim(cdsTabela.FieldByName('ender_bairro').AsString) = EmptyStr, 'NAO INFORMADO', Trim(cdsTabela.FieldByName('ender_bairro').AsString));
               Cep         := Copy(Trim(cdsTabela.FieldByName('ender_cep').AsString) + '000', 1, 8);
               codMunic    := cdsTabela.FieldByName('id_ender_cidade').AsInteger;
-              uf          := eSStrTouf(ok, Trim(cdsTabela.FieldByName('ender_uf').AsString));
+              uf          := Trim(cdsTabela.FieldByName('ender_uf').AsString);
             end;
 //
 //            with Exterior do
@@ -5094,6 +5122,7 @@ begin
       SetEventoESocial('S2205'
         , aProtocolo.CompetenciaID
         , aProtocolo.Numero
+        , MODO_OPERACAO[Ord(aModoLancamento)]
         , gUsuarioLogin
         , Now
         , True
@@ -5319,11 +5348,11 @@ begin
 
             Case cdsTabela.FieldByName('id_situacao_tcm').AsInteger of
               10:
-                TpProv := tpNomeacaoCargoComissao;
+                TpProv := tpTpProv.tpOutros;
               20..35:
-                TpProv := tpNomeacaoCargoEfetivo;
+                TpProv := tpTpProv.tpNomeacaoCargoEfetivo;
               else
-                TpProv := tpTpProv(6); //tpOutros;
+                TpProv := tpTpProv.tpOutros; //tpOutros;
             end;
 
             DtNomeacao  := cdsTabela.FieldByName('dt_nomeacao').AsDateTime;  // StrToDate(EMPTY_DATE);
@@ -5436,6 +5465,7 @@ begin
       SetEventoESocial('S2206'
         , aProtocolo.CompetenciaID
         , aProtocolo.Numero
+        , MODO_OPERACAO[Ord(aModoLancamento)]
         , gUsuarioLogin
         , Now
         , True
@@ -5588,7 +5618,7 @@ begin
           begin
             codAmb              := Trim(cdsTabela.FieldByName('id_depto').AsString);
             InfoAtiv.dscAtivDes := Trim(cdsTabela.FieldByName('fun_descricao').AsString);
-
+            (*
             FatRisco.Clear;
 
             aSQL.BeginUpdate;
@@ -5653,6 +5683,7 @@ begin
               end;
 
             cdsDetalhe.Close;
+            *)
           end;
 
           (*
@@ -5762,7 +5793,7 @@ begin
             NisResp := NIS;
             ideOC   := tpIdeOC.idOutros;
             NrOc    := Conselho.Numero;
-            ufOC    := eSStrTouf(ok, Conselho.UF);
+            ufOC    := Trim(Conselho.UF);
           end;
         end;
       end;
@@ -5786,6 +5817,7 @@ begin
       SetEventoESocial('S2240'
         , aProtocolo.CompetenciaID
         , aProtocolo.Numero
+        , MODO_OPERACAO[Ord(aModoLancamento)]
         , gUsuarioLogin
         , Now
         , True
@@ -6121,6 +6153,7 @@ begin
       SetEventoESocial('S2241'
         , aProtocolo.CompetenciaID
         , aProtocolo.Numero
+        , MODO_OPERACAO[Ord(aModoLancamento)]
         , gUsuarioLogin
         , Now
         , True
@@ -6292,7 +6325,7 @@ begin
                 Bairro      := IfThen(Trim(cdsTabela.FieldByName('ender_bairro').AsString) = EmptyStr, 'NAO INFORMADO', Trim(cdsTabela.FieldByName('ender_bairro').AsString));
                 Cep         := Copy(Trim(cdsTabela.FieldByName('ender_cep').AsString) + '000', 1, 8);
                 codMunic    := cdsTabela.FieldByName('id_ender_cidade').AsInteger;
-                uf          := eSStrTouf(ok, Trim(cdsTabela.FieldByName('ender_uf').AsString));
+                uf          := Trim(cdsTabela.FieldByName('ender_uf').AsString);
               end;
 
 //              // Dados de trabalhador estrangeiro
@@ -6366,6 +6399,7 @@ begin
       SetEventoESocial('S2400'
         , aProtocolo.CompetenciaID
         , aProtocolo.Numero
+        , MODO_OPERACAO[Ord(aModoLancamento)]
         , gUsuarioLogin
         , Now
         , True
@@ -6812,16 +6846,18 @@ begin
   Result := aRetorno;
 end;
 
-procedure TdmESocial.SetEventoESocial(aEvento, aCompetencia, aProtocolo, aUsuario: String;
+procedure TdmESocial.SetEventoESocial(aEvento, aCompetencia, aOperacao, aProtocolo, aUsuario: String;
   aDataProcesso: TDateTime;
   aProcessado, aEnviado, aValido: Boolean);
 begin
   // Gravar Evento processado
+  // Executa a stored procedure SET_ESOCIAL_EVENTO
   with setProcessoEvento do
   begin
     Close;
-    ParamByName('EVENTO').AsString           := AnsiUpperCase(Trim(aEvento));
-    ParamByName('COMPETENCIA').AsString      := Trim(aCompetencia);
+    ParamByName('EVENTO').AsString      := AnsiUpperCase(Trim(aEvento));
+    ParamByName('COMPETENCIA').AsString := Trim(aCompetencia);
+    ParamByName('OPERACAO').AsString    := Trim(aOperacao);
 
     if (Trim(aProtocolo) <> EmptyStr) then
       ParamByName('PROTOCOLO').AsString := Trim(aProtocolo)

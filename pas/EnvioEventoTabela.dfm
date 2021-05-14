@@ -161,6 +161,7 @@ inherited frmEnvioEventoTabela: TfrmEnvioEventoTabela
       Height = 17
       Caption = 'S-1030 Tabela de Cargos'
       Ctl3D = False
+      Enabled = False
       ParentCtl3D = False
       TabOrder = 4
     end
@@ -180,6 +181,7 @@ inherited frmEnvioEventoTabela: TfrmEnvioEventoTabela
       Height = 17
       Caption = 'S-1040 Tabela de Fun'#231#245'es'
       Ctl3D = False
+      Enabled = False
       ParentCtl3D = False
       TabOrder = 6
       OnClick = cbS1040Click
@@ -191,6 +193,7 @@ inherited frmEnvioEventoTabela: TfrmEnvioEventoTabela
       Height = 17
       Caption = 'S-1050 Tabela de Hor'#225'rios/Turnos de Trabalho'
       Ctl3D = False
+      Enabled = False
       ParentCtl3D = False
       TabOrder = 7
     end
@@ -201,6 +204,7 @@ inherited frmEnvioEventoTabela: TfrmEnvioEventoTabela
       Height = 17
       Caption = 'S-1060 Tabela de Ambientes de Trabalho'
       Ctl3D = False
+      Enabled = False
       ParentCtl3D = False
       TabOrder = 8
     end
