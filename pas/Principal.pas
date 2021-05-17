@@ -35,23 +35,19 @@ uses
 
 type
   TfrmPrincipal = class(TForm)
-    StatusBar1: TdxStatusBar;
+    stbInforme: TdxStatusBar;
     MainMenu: TMainMenu;
     Tabelas1: TMenuItem;
     imSair1: TMenuItem;
     imFerramentas: TMenuItem;
     Ajuda1: TMenuItem;
     Sobre1: TMenuItem;
-    Janelas1: TMenuItem;
-    Tile1: TMenuItem;
-    Cascade1: TMenuItem;
     ActionManager: TActionManager;
     WindowCascade1: TWindowCascade;
     WindowClose1: TWindowClose;
     XPManifest1: TXPManifest;
     pnBarraFerramentas: TPanel;
     BrManager: TdxBarManager;
-    imEditComandSQL: TMenuItem;
     qryUsuario: TSQLQuery;
     qryUsuarioID: TIntegerField;
     qryUsuarioNOME_CURTO: TStringField;
@@ -125,7 +121,6 @@ type
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure imSair1Click(Sender: TObject);
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
-    procedure imEditComandSQLClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure Sobre1Click(Sender: TObject);
     procedure Label1MouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);
@@ -166,7 +161,12 @@ var
 implementation
 
 uses
-  udmPrincipal, VarGlobais, gsLib, UtilsDb, uEditComandosSQL, uLogin, uSobre,
+  udmPrincipal,
+  VarGlobais,
+  gsLib,
+  UtilsDb,
+  uLogin,
+  uSobre,
 
   udmESocial,
   ConfigurarESocial,
@@ -204,20 +204,6 @@ begin
    finally
      FreeAndNil(frmConfigurarESocial);
    end;
-end;
-
-procedure TfrmPrincipal.imEditComandSQLClick(Sender: TObject);
-begin
-   if (MDIChildCount>0) then
-   begin
-      Mensagem('Você precisa Fechar todas as Janelas deste Programa, '+#13+
-               'antes de Executar essa Operação ...',
-               'Aviso !!!',MB_OK+MB_ICONEXCLAMATION);
-      Exit;
-   end;
-   frmEditComandosSQL := TfrmEditComandosSQL.Create(Self);
-   frmEditComandosSQL.ShowModal;
-   FreeAndNil(frmEditComandosSQL);
 end;
 
 procedure TfrmPrincipal.imEventoNaoPeriodicoClick(Sender: TObject);
@@ -312,7 +298,7 @@ begin
   begin
     sNomeUsuario              := Pesquisa('USUARIO','ID',IntToStr(glb_iIdOperLogado),'NOME_CURTO','');
     sNomeUsuario              := Criptografa(sNomeUsuario,'2',20);
-    StatusBar1.Panels[2].Text := sNomeUsuario;
+    stbInforme.Panels[2].Text := sNomeUsuario;
     pv_lPrimeiraVez           := False;
     HabilitaItensMenu;
   end
@@ -481,10 +467,10 @@ begin
       glb_sDescrMesAnoTrab := 'DEZEMBRO / 1901';
    end;
 
-   StatusBar1.Panels[0].Text := Criptografa(Pesquisa('CONFIG_ORGAO','ID','1','RAZAO_SOCIAL',''),'2',60);
-   glb_sEmpresa              := StatusBar1.Panels[0].Text;
-   StatusBar1.Panels[1].Text  := glb_sDescrMesAnoTrab+' - '+glb_sDescrParcela+' ('+iIf(MovimEncerradoMesAno(glb_sAnoMesTrab,glb_sParcela),'ENCERRADO)','EM ABERTO)');
-   StatusBar1.Panels[3].Text := DateToStr(Date)+' ';
+   stbInforme.Panels[0].Text := Criptografa(Pesquisa('CONFIG_ORGAO','ID','1','RAZAO_SOCIAL',''),'2',60);
+   glb_sEmpresa              := stbInforme.Panels[0].Text;
+   stbInforme.Panels[1].Text := glb_sDescrMesAnoTrab+' - '+glb_sDescrParcela+' ('+iIf(MovimEncerradoMesAno(glb_sAnoMesTrab,glb_sParcela),'ENCERRADO)','EM ABERTO)');
+   stbInforme.Panels[3].Text := DateToStr(Date)+' ';
    sPathexe                  := ExtractFilePath(ParamStr(0));
 
    if FileExists(sPathEXE + '\Wallpaper_GeraSys.Ti_02.jpg') then

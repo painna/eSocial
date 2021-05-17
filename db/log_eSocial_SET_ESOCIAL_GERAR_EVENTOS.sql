@@ -4,7 +4,7 @@ create or alter procedure SET_ESOCIAL_GERAR_EVENTOS (
     EVENTO "VARCHAR(10)" not null,
     COMPETENCIA "CHAR(6)" not null,
     OPERACAO ESOCIAL_OPERACAO not null,
-    FLAG SIM_NAO not null,
+    FLAG SIM_NAO,
     INFORMACAO "VARCHAR(250)")
 as
 begin

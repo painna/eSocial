@@ -8,7 +8,6 @@ uses
   Padrao1 in '..\pas\Padrao1.pas' {frmPadrao1},
   CadTabPadrao2 in '..\pas\CadTabPadrao2.pas' {frmCadTabPadrao2},
   udmPrincipal in '..\pas\udmPrincipal.pas' {dmPrincipal: TDataModule},
-  uEditComandosSQL in '..\pas\uEditComandosSQL.pas' {frmEditComandosSQL},
   gsLib in '..\pas\gsLib.pas',
   uSobre in '..\pas\uSobre.pas' {frmSobre},
   uLogin in '..\pas\uLogin.pas' {frmLogin},
@@ -26,7 +25,14 @@ uses
   EnvioEventoTabela in '..\pas\EnvioEventoTabela.pas' {frmEnvioEventoTabela},
   ConfigurarESocial in '..\pas\ConfigurarESocial.pas' {frmConfigurarESocial},
   EnvioEventoNaoPeriodico in '..\pas\EnvioEventoNaoPeriodico.pas' {frmEnvioEventoNaoPeriodico},
-  EnvioEventoPeriodico in '..\pas\EnvioEventoPeriodico.pas' {frmEnvioEventoPeriodico};
+  EnvioEventoPeriodico in '..\pas\EnvioEventoPeriodico.pas' {frmEnvioEventoPeriodico},
+  eSocial.Models.Entities.Competencia in '..\pas\Models\Entities\eSocial.Models.Entities.Competencia.pas',
+  eSocial.Models.DAO.Interfaces in '..\pas\Models\DAO\eSocial.Models.DAO.Interfaces.pas',
+  eSocial.Models.ComplexTypes in '..\pas\Models\eSocial.Models.ComplexTypes.pas',
+  eSocial.Models.Components.Connections.Interfaces in '..\pas\Models\Components\Connections\eSocial.Models.Components.Connections.Interfaces.pas',
+  eSocial.Models.Components.Connections.DBExpress in '..\pas\Models\Components\Connections\eSocial.Models.Components.Connections.DBExpress.pas',
+  eSocial.Models.Components.Connections.Factory in '..\pas\Models\Components\Connections\eSocial.Models.Components.Connections.Factory.pas',
+  eSocial.Models.DAO.Competencia in '..\pas\Models\DAO\eSocial.Models.DAO.Competencia.pas';
 
 {$R *.res}
 
@@ -38,7 +44,6 @@ begin
   Application.CreateForm(TdmPrincipal, dmPrincipal);
   Application.CreateForm(TfrmPrincipal, frmPrincipal);
   Application.CreateForm(TfrmSobre, frmSobre);
-  Application.CreateForm(TfrmEditComandosSQL, frmEditComandosSQL);
   Application.CreateForm(TfrmSobre, frmSobre);
   Application.CreateForm(TfrmLogin, frmLogin);
   Application.CreateForm(TfrmAlteraSenha, frmAlteraSenha);

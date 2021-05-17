@@ -15,7 +15,6 @@ object frmPrincipal: TfrmPrincipal
   Menu = MainMenu
   OldCreateOrder = False
   Position = poDesigned
-  WindowMenu = Janelas1
   OnActivate = FormActivate
   OnClose = FormClose
   OnCloseQuery = FormCloseQuery
@@ -47,7 +46,7 @@ object frmPrincipal: TfrmPrincipal
     ExplicitLeft = 57
     ExplicitTop = 56
   end
-  object StatusBar1: TdxStatusBar
+  object stbInforme: TdxStatusBar
     Left = 0
     Top = 519
     Width = 1045
@@ -1121,10 +1120,6 @@ object frmPrincipal: TfrmPrincipal
         ImageIndex = 3
         OnClick = imConfigurarESocialClick
       end
-      object imEditComandSQL: TMenuItem
-        Caption = 'Editor de Comandos SQL'
-        OnClick = imEditComandSQLClick
-      end
       object N1: TMenuItem
         Caption = '-'
       end
@@ -1135,17 +1130,6 @@ object frmPrincipal: TfrmPrincipal
       object imTrocarUsuario: TMenuItem
         Tag = 6
         Caption = 'Trocar Usu'#225'rio ...'
-      end
-    end
-    object Janelas1: TMenuItem
-      Caption = '&Janelas'
-      object Tile1: TMenuItem
-        Tag = 1
-        Action = WindowCascade1
-      end
-      object Cascade1: TMenuItem
-        Tag = 2
-        Action = WindowClose1
       end
     end
     object Ajuda1: TMenuItem

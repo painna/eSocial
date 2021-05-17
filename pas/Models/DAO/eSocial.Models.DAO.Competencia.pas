@@ -1,0 +1,134 @@
+unit eSocial.Models.DAO.Competencia;
+
+interface
+
+uses
+  Data.DB,
+  eSocial.Models.DAO.Interfaces,
+  eSocial.Models.ComplexTypes,
+  eSocial.Models.Entities.Competencia,
+  eSocial.Models.Components.Connections.Interfaces;
+
+type
+  TModelDAOCompetencia = class(TInterfacedObject, iModelDAOEntity<TCompetencia>)
+    private
+      FConnection : iModelComponentConnection;
+      FDataSet : TDataSource;
+      FEntity  : TCompetencia;
+      procedure ReadFields;
+    public
+      constructor Create;
+      destructor Destroy; override;
+      class function New : iModelDAOEntity<TCompetencia>;
+
+      function DataSet(aValue : TDataSource) : iModelDAOEntity<TCompetencia>;
+      function Delete : iModelDAOEntity<TCompetencia>; virtual; abstract;
+      function Get    : iModelDAOEntity<TCompetencia>; overload;
+      function Get(aID : String)    : iModelDAOEntity<TCompetencia>; overload;
+      function Insert : iModelDAOEntity<TCompetencia>; virtual; abstract;
+      function This   : TCompetencia;
+      function Update : iModelDAOEntity<TCompetencia>; virtual; abstract;
+  end;
+
+implementation
+
+{ TModelDAOCompetencia }
+
+uses
+  System.SysUtils,
+  eSocial.Models.Components.Connections.Factory;
+
+constructor TModelDAOCompetencia.Create;
+begin
+  FConnection := TModelComponentConnectionFactory.Connection;
+  FDataSet    := TDataSource.Create(nil);
+  FEntity     := TCompetencia.Create(Self);
+end;
+
+destructor TModelDAOCompetencia.Destroy;
+begin
+  FEntity.DisposeOf;
+  inherited;
+end;
+
+function TModelDAOCompetencia.Get(aID: String): iModelDAOEntity<TCompetencia>;
+begin
+  Result := Self;
+  try
+    FConnection
+      .SQLClear
+      .SQL('Select')
+      .SQL('    c.competencia')
+      .SQL('  , c.ano')
+      .SQL('  , c.mes')
+      .SQL('  , c.descricao')
+      .SQL('  , c.encerrado')
+      .SQL('  , c.origem')
+      .SQL('from VW_ESOCIAL_COMPETENCIA c')
+      .SQL('where c.competencia = :id')
+      .AddParam('id', aID)
+    .Open;
+
+    ReadFields;
+  except
+    on E : Exception do
+      raise Exception.Create('Erro ao consultar a competência : ' + #13#13 + E.Message);
+  end;
+end;
+
+class function TModelDAOCompetencia.New: iModelDAOEntity<TCompetencia>;
+begin
+  Result := Self.Create;
+end;
+
+procedure TModelDAOCompetencia.ReadFields;
+begin
+  with FDataSet.DataSet do
+  begin
+    FEntity
+      .Ano( FieldByName('ano').AsString )
+      .Codigo( FieldByName('competencia').AsString )
+      .Descricao( FieldByName('descricao').AsString )
+      .Encerrado( FieldByName('encerrado').AsString )
+      .Mes( FieldByName('mes').AsString )
+      .Origem( TOrigemDados(FieldByName('origem').AsInteger) );
+  end;
+end;
+
+function TModelDAOCompetencia.Get: iModelDAOEntity<TCompetencia>;
+begin
+  Result := Self;
+  try
+    FConnection
+      .SQLClear
+      .SQL('Select')
+      .SQL('    c.competencia')
+      .SQL('  , c.ano')
+      .SQL('  , c.mes')
+      .SQL('  , c.descricao')
+      .SQL('  , c.encerrado')
+      .SQL('  , c.origem')
+      .SQL('from VW_ESOCIAL_COMPETENCIA c')
+      .SQL('  inner join GET_ESOCIAL_COMPETENCIA_ATIVA g on (g.competencia = c.competencia)')
+    .Open;
+
+    ReadFields;
+  except
+    on E : Exception do
+      raise Exception.Create('Erro ao consultar a competência : ' + #13#13 + E.Message);
+  end;
+end;
+
+function TModelDAOCompetencia.DataSet(aValue: TDataSource): iModelDAOEntity<TCompetencia>;
+begin
+  Result   := Self;
+  FDataSet := aValue;
+  FDataSet.DataSet := FConnection.DataSet;
+end;
+
+function TModelDAOCompetencia.This: TCompetencia;
+begin
+  Result := FEntity;
+end;
+
+end.

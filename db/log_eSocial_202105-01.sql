@@ -593,84 +593,6 @@ PRIMARY KEY (EVENTO,COMPETENCIA);
 
 
 
-/*------ GERASYS.TI 14/05/2021 11:58:02 --------*/
-
-SET TERM ^ ;
-
-create or alter procedure SET_ESOCIAL_GERAR_EVENTOS (
-    EVENTO varchar(10) not null,
-    COMPETENCIA char(6),
-    OPERACAO ESOCIAL_OPERACAO,
-    FLAG SIM_NAO,
-    informacao varchar(250))
-as
-begin
-  if (not exists(
-    Select
-      g.evento
-    from ESOCIAL_GERAR_EVENTOS g
-    where g.evento = :evento
-      and g.competencia = :competencia
-  )) then
-  begin
-    /* 1. Inserir registro, caso nao exista */
-    Insert Into ESOCIAL_GERAR_EVENTOS (
-        evento
-      , competencia
-      , insercao
-      , alteracao
-      , exclusao
-    ) values (
-        :evento
-      , :competencia
-      , 'N'
-      , 'N'
-      , 'N'
-    );
-  end
-
-  /* 2. Sinalizar a necessidade ou nao do evento de INSERCAO no eSocial */
-  if (:operacao = 'I') then
-  begin
-    Update ESOCIAL_GERAR_EVENTOS Set
-        insercao      = :flag
-    where evento      = :evento
-      and competencia = :competencia;
-  end
-  else
-  /* 3. Sinalizar a necessidade ou nao do evento de ALTERACAO no eSocial */
-  if (:operacao = 'A') then
-  begin
-    Update ESOCIAL_GERAR_EVENTOS Set
-        alteracao     = :flag
-    where evento      = :evento
-      and competencia = :competencia;
-  end
-  else
-  /* 4. Sinalizar a necessidade ou nao do evento de EXCLUSAO no eSocial */
-  if (:operacao = 'E') then
-  begin
-    Update ESOCIAL_GERAR_EVENTOS Set
-        exclusao      = :flag
-    where evento      = :evento
-      and competencia = :competencia;
-  end
-
-  /* 5. Adicionar LOG na tabela caso seja informado */
-  if (coalesce(nullif(trim(:informacao), ''), '') != '') then
-  begin
-    Update ESOCIAL_GERAR_EVENTOS Set
-        log_db        = log_db || ascii_char(13) || ascii_char(10) || trim(:informacao)
-    where evento      = :evento
-      and competencia = :competencia;
-  end
-end^
-
-SET TERM ; ^
-
-
-
-
 /*------ GERASYS.TI 14/05/2021 12:02:16 --------*/
 
 SET TERM ^ ;
@@ -786,104 +708,6 @@ Historico:
 
 
 
-/*------ GERASYS.TI 14/05/2021 12:05:06 --------*/
-
-SET TERM ^ ;
-
-CREATE OR ALTER procedure SET_ESOCIAL_GERAR_EVENTOS (
-    EVENTO varchar(10) not null,
-    COMPETENCIA char(6),
-    OPERACAO ESOCIAL_OPERACAO,
-    FLAG SIM_NAO,
-    INFORMACAO varchar(250))
-as
-begin
-  if (not exists(
-    Select
-      g.evento
-    from ESOCIAL_GERAR_EVENTOS g
-    where g.evento = :evento
-      and g.competencia = :competencia
-  )) then
-  begin
-    /* 1. Inserir registro, caso nao exista */
-    Insert Into ESOCIAL_GERAR_EVENTOS (
-        evento
-      , competencia
-      , insercao
-      , alteracao
-      , exclusao
-    ) values (
-        :evento
-      , :competencia
-      , 'N'
-      , 'N'
-      , 'N'
-    );
-  end
-
-  /* 2. Sinalizar a necessidade ou nao do evento de INSERCAO no eSocial */
-  if (:operacao = 'I') then
-  begin
-    Update ESOCIAL_GERAR_EVENTOS Set
-        insercao      = :flag
-    where evento      = :evento
-      and competencia = :competencia;
-  end
-  else
-  /* 3. Sinalizar a necessidade ou nao do evento de ALTERACAO no eSocial */
-  if (:operacao = 'A') then
-  begin
-    Update ESOCIAL_GERAR_EVENTOS Set
-        alteracao     = :flag
-    where evento      = :evento
-      and competencia = :competencia;
-  end
-  else
-  /* 4. Sinalizar a necessidade ou nao do evento de EXCLUSAO no eSocial */
-  if (:operacao = 'E') then
-  begin
-    Update ESOCIAL_GERAR_EVENTOS Set
-        exclusao      = :flag
-    where evento      = :evento
-      and competencia = :competencia;
-  end
-
-  /* 5. Adicionar LOG na tabela caso seja informado */
-  if (coalesce(nullif(trim(:informacao), ''), '') != '') then
-  begin
-    Update ESOCIAL_GERAR_EVENTOS Set
-        log_db        = log_db || ascii_char(13) || ascii_char(10) || trim(:informacao)
-    where evento      = :evento
-      and competencia = :competencia;
-  end
-end^
-
-SET TERM ; ^
-
-COMMENT ON PROCEDURE SET_ESOCIAL_GERAR_EVENTOS IS 'Procedure SET Gerar Eventos
-
-    Autor   :   Isaque Marinho Ribeiro
-    Data    :   14/05/2021
-
-Stored procedure responsavel por gravar os registros na tabela ESOCIAL_GERAR_EVENTOS
-sobre a necessidade de se processar eventos eventos do eSocial.
-
-
-Historico:
-
-    Legendas:
-        + Novo objeto de banco (Campos, Triggers)
-        - Remocao de objeto de banco
-        * Modificacao no objeto de banco
-
-    14/05/2021 - IMR :
-        + Criacao da store procedure na base de dados.';
-
-GRANT EXECUTE ON PROCEDURE SET_ESOCIAL_GERAR_EVENTOS TO "PUBLIC";
-
-
-
 /*------ GERASYS.TI 14/05/2021 12:10:23 --------*/
 
 SET TERM ^ ;
@@ -937,164 +761,6 @@ begin
 end^
 
 SET TERM ; ^
-
-
-
-
-/*------ GERASYS.TI 14/05/2021 12:11:56 --------*/
-
-SET TERM ^ ;
-
-CREATE OR ALTER procedure SET_ESOCIAL_GERAR_EVENTOS (
-    EVENTO "VARCHAR(10)" not null,
-    COMPETENCIA "CHAR(6)",
-    OPERACAO ESOCIAL_OPERACAO,
-    FLAG SIM_NAO,
-    INFORMACAO "VARCHAR(250)")
-as
-begin
-  if (not exists(
-    Select
-      g.evento
-    from ESOCIAL_GERAR_EVENTOS g
-    where g.evento = :evento
-      and g.competencia = :competencia
-  )) then
-  begin
-    /* 1. Inserir registro, caso nao exista */
-    Insert Into ESOCIAL_GERAR_EVENTOS (
-        evento
-      , competencia
-      , insercao
-      , alteracao
-      , exclusao
-    ) values (
-        :evento
-      , :competencia
-      , 'N'
-      , 'N'
-      , 'N'
-    );
-  end
-
-  /* 2. Sinalizar a necessidade ou nao do evento de INSERCAO no eSocial */
-  if (:operacao = 'I') then
-  begin
-    Update ESOCIAL_GERAR_EVENTOS Set
-        insercao      = :flag
-    where evento      = :evento
-      and competencia = :competencia;
-  end
-  else
-  /* 3. Sinalizar a necessidade ou nao do evento de ALTERACAO no eSocial */
-  if (:operacao = 'A') then
-  begin
-    Update ESOCIAL_GERAR_EVENTOS Set
-        alteracao     = :flag
-    where evento      = :evento
-      and competencia = :competencia;
-  end
-  else
-  /* 4. Sinalizar a necessidade ou nao do evento de EXCLUSAO no eSocial */
-  if (:operacao = 'E') then
-  begin
-    Update ESOCIAL_GERAR_EVENTOS Set
-        exclusao      = :flag
-    where evento      = :evento
-      and competencia = :competencia;
-  end
-
-  /* 5. Adicionar LOG na tabela caso seja informado */
-  if (coalesce(nullif(trim(:informacao), ''), '') != '') then
-  begin
-    Update ESOCIAL_GERAR_EVENTOS Set
-        log_db        = log_db || ascii_char(13) || ascii_char(10) || trim(:informacao)
-    where evento      = :evento
-      and competencia = :competencia;
-  end
-end^
-
-SET TERM ; ^
-
-
-
-
-/*------ GERASYS.TI 14/05/2021 12:12:31 --------*/
-
-SET TERM ^ ;
-
-CREATE OR ALTER procedure SET_ESOCIAL_GERAR_EVENTOS (
-    EVENTO "VARCHAR(10)" not null,
-    COMPETENCIA "CHAR(6)" not null,
-    OPERACAO ESOCIAL_OPERACAO not null,
-    FLAG SIM_NAO not null,
-    INFORMACAO "VARCHAR(250)")
-as
-begin
-  if (not exists(
-    Select
-      g.evento
-    from ESOCIAL_GERAR_EVENTOS g
-    where g.evento = :evento
-      and g.competencia = :competencia
-  )) then
-  begin
-    /* 1. Inserir registro, caso nao exista */
-    Insert Into ESOCIAL_GERAR_EVENTOS (
-        evento
-      , competencia
-      , insercao
-      , alteracao
-      , exclusao
-    ) values (
-        :evento
-      , :competencia
-      , 'N'
-      , 'N'
-      , 'N'
-    );
-  end
-
-  /* 2. Sinalizar a necessidade ou nao do evento de INSERCAO no eSocial */
-  if (:operacao = 'I') then
-  begin
-    Update ESOCIAL_GERAR_EVENTOS Set
-        insercao      = :flag
-    where evento      = :evento
-      and competencia = :competencia;
-  end
-  else
-  /* 3. Sinalizar a necessidade ou nao do evento de ALTERACAO no eSocial */
-  if (:operacao = 'A') then
-  begin
-    Update ESOCIAL_GERAR_EVENTOS Set
-        alteracao     = :flag
-    where evento      = :evento
-      and competencia = :competencia;
-  end
-  else
-  /* 4. Sinalizar a necessidade ou nao do evento de EXCLUSAO no eSocial */
-  if (:operacao = 'E') then
-  begin
-    Update ESOCIAL_GERAR_EVENTOS Set
-        exclusao      = :flag
-    where evento      = :evento
-      and competencia = :competencia;
-  end
-
-  /* 5. Adicionar LOG na tabela caso seja informado */
-  if (coalesce(nullif(trim(:informacao), ''), '') != '') then
-  begin
-    Update ESOCIAL_GERAR_EVENTOS Set
-        log_db        = log_db || ascii_char(13) || ascii_char(10) || trim(:informacao)
-    where evento      = :evento
-      and competencia = :competencia;
-  end
-end^
-
-SET TERM ; ^
-
-
 
 
 /*------ GERASYS.TI 14/05/2021 12:15:43 --------*/
@@ -1224,3 +890,448 @@ end^
 
 SET TERM ; ^
 
+
+
+
+/*------ GERASYS.TI 17/05/2021 12:54:04 --------*/
+
+COMMENT ON COLUMN CONFIG_ESOCIAL.TIPO_OPERACAO IS
+'eSocial - Operacao do registro:
+I - Inclusao
+A - Alteracao
+E - Exclusao
+P - Processado/Enviado';
+
+
+
+
+/*------ GERASYS.TI 17/05/2021 13:39:47 --------*/
+
+SET TERM ^ ;
+
+create or alter procedure GET_ESOCIAL_COMPETENCIA_ATIVA
+returns (
+    COMPETENCIA "VARCHAR(6)")
+as
+begin
+  Select first 1
+    c.ano_mes
+  from CTRL_PROCESS_GERAL c
+  where c.ano_mes      > '202100'
+    and c.parcela      = '0'
+    and c.inicializado = 'S'
+    and c.encerrado    = 'N'
+  order by
+    c.ano_mes desc
+  Into
+    competencia;
+
+  if (coalesce(nullif(trim(:competencia), ''), '') = '') then
+    competencia = extract(year from current_date) || right('00' || extract(month from current_date), 2);
+
+  suspend;
+end^
+
+SET TERM ; ^
+
+COMMENT ON PROCEDURE GET_ESOCIAL_COMPETENCIA_ATIVA IS 'Procedure GET Competencia
+
+    Autor   :   Isaque Marinho Ribeiro
+    Data    :   17/05/2021
+
+Stored procedure responsavel retorno a competencia ativa para a geracao de eventos
+no eSocial.
+
+
+Historico:
+
+    Legendas:
+        + Novo objeto de banco (Campos, Triggers)
+        - Remocao de objeto de banco
+        * Modificacao no objeto de banco
+
+    17/05/2021 - IMR :
+        + Criacao da store procedure na base de dados.';
+
+GRANT EXECUTE ON PROCEDURE GET_ESOCIAL_COMPETENCIA_ATIVA TO "PUBLIC";
+
+/*------ GERASYS.TI 17/05/2021 13:50:26 --------*/
+
+SET TERM ^ ;
+
+CREATE OR ALTER procedure SET_ESOCIAL_GERAR_EVENTOS (
+    EVENTO "VARCHAR(10)" not null,
+    COMPETENCIA "CHAR(6)" not null,
+    OPERACAO ESOCIAL_OPERACAO not null,
+    FLAG SIM_NAO,
+    INFORMACAO "VARCHAR(250)")
+as
+begin
+  if (not exists(
+    Select
+      g.evento
+    from ESOCIAL_GERAR_EVENTOS g
+    where g.evento = :evento
+      and g.competencia = :competencia
+  )) then
+  begin
+    /* 1. Inserir registro, caso nao exista */
+    Insert Into ESOCIAL_GERAR_EVENTOS (
+        evento
+      , competencia
+      , insercao
+      , alteracao
+      , exclusao
+    ) values (
+        :evento
+      , :competencia
+      , 'N'
+      , 'N'
+      , 'N'
+    );
+  end
+
+  /* 2. Sinalizar a necessidade ou nao do evento de INSERCAO no eSocial */
+  if (:operacao = 'I') then
+  begin
+    Update ESOCIAL_GERAR_EVENTOS Set
+        insercao      = :flag
+    where evento      = :evento
+      and competencia = :competencia;
+  end
+  else
+  /* 3. Sinalizar a necessidade ou nao do evento de ALTERACAO no eSocial */
+  if (:operacao = 'A') then
+  begin
+    Update ESOCIAL_GERAR_EVENTOS Set
+        alteracao     = :flag
+    where evento      = :evento
+      and competencia = :competencia;
+  end
+  else
+  /* 4. Sinalizar a necessidade ou nao do evento de EXCLUSAO no eSocial */
+  if (:operacao = 'E') then
+  begin
+    Update ESOCIAL_GERAR_EVENTOS Set
+        exclusao      = :flag
+    where evento      = :evento
+      and competencia = :competencia;
+  end
+
+  /* 5. Adicionar LOG na tabela caso seja informado */
+  if (coalesce(nullif(trim(:informacao), ''), '') != '') then
+  begin
+    Update ESOCIAL_GERAR_EVENTOS Set
+        log_db        = log_db || ascii_char(13) || ascii_char(10) || trim(:informacao)
+    where evento      = :evento
+      and competencia = :competencia;
+  end
+end^
+
+SET TERM ; ^
+
+
+COMMENT ON PROCEDURE SET_ESOCIAL_GERAR_EVENTOS IS 'Procedure SET Gerar Eventos
+
+    Autor   :   Isaque Marinho Ribeiro
+    Data    :   14/05/2021
+
+Stored procedure responsavel por gravar os registros na tabela ESOCIAL_GERAR_EVENTOS
+sobre a necessidade de se processar eventos eventos do eSocial.
+
+
+Historico:
+
+    Legendas:
+        + Novo objeto de banco (Campos, Triggers)
+        - Remocao de objeto de banco
+        * Modificacao no objeto de banco
+
+    14/05/2021 - IMR :
+        + Criacao da store procedure na base de dados.';
+
+GRANT EXECUTE ON PROCEDURE SET_ESOCIAL_GERAR_EVENTOS TO "PUBLIC";
+
+
+/*------ GERASYS.TI 17/05/2021 13:55:18 --------*/
+
+SET TERM ^ ;
+
+CREATE OR ALTER trigger tg_config_orgao_eventoesocial for config_orgao
+active after insert or update position 1
+AS
+  declare variable competencia "VARCHAR(6)";
+begin
+  Select first 1
+    c.competencia
+  from GET_ESOCIAL_COMPETENCIA_ATIVA c
+  Into
+    competencia;
+
+  execute procedure SET_ESOCIAL_GERAR_EVENTOS('S1000'
+    , :competencia
+    , new.tipo_operacao
+    , Case when new.tipo_operacao != 'P' then 'S' else 'N' end
+    , 'Cadastro das configuracoes do orgao'
+  );
+end^
+
+SET TERM ; ^
+
+COMMENT ON TRIGGER TG_CONFIG_ORGAO_EVENTOESOCIAL IS 'Trigger Gerar Evento S1000 (eSocial - Configuracao Orgao)
+
+    Autor   :   Isaque M. Ribeiro
+    Data    :   17/05/2021
+
+Trigger responsavel por gerar a necessidade de processamento do evento "S1000" no
+eSocial.
+
+
+Historico:
+
+    Legendas:
+        + Novo objeto de banco (Campos, Triggers)
+        - Remocao de objeto de banco
+        * Modificacao no objeto de banco
+
+    17/05/2021 - IMR :
+        + Criacao da trigger na base de dados.';
+
+
+
+
+/*------ GERASYS.TI 17/05/2021 14:46:42 --------*/
+
+SET TERM ^ ;
+
+CREATE OR ALTER procedure GET_ESOCIAL_COMPETENCIA_ATIVA
+returns (
+    COMPETENCIA "VARCHAR(6)")
+as
+begin
+  Select first 1
+    c.ano_mes
+  from CTRL_PROCESS_GERAL c
+  where (substring(c.ano_mes from 5 for 2) between '01' and '12')
+    and c.parcela      = '0'
+    and c.inicializado = 'S'
+    and c.encerrado    = 'N'
+  order by
+    c.ano_mes desc
+  Into
+    competencia;
+
+  if (coalesce(nullif(trim(:competencia), ''), '') = '') then
+    competencia = extract(year from current_date) || right('00' || extract(month from current_date), 2);
+
+  suspend;
+end^
+
+SET TERM ; ^
+
+/*------ GERASYS.TI 17/05/2021 14:49:14 --------*/
+
+CREATE OR ALTER VIEW vw_esocial_competencia (competencia, ano, mes, descricao, encerrado, origem)
+as
+Select
+    tmp.competencia
+  , substring(tmp.competencia from 1 for 4) as ano
+  , substring(tmp.competencia from 5 for 2) as mes
+  , Case substring(tmp.competencia from 5 for 2)
+      when '01' then 'JANEIRO'
+      when '02' then 'FEVEREIRO'
+      when '03' then 'MARCO'
+      when '04' then 'ABRIL'
+      when '05' then 'MAIO'
+      when '06' then 'JUNHO'
+      when '07' then 'JULHO'
+      when '08' then 'AGOSTO'
+      when '09' then 'SETEMBRO'
+      when '10' then 'OUTUBRO'
+      when '11' then 'NOVEMBRO'
+      when '12' then 'DEZEMBRO'
+    end as descricao
+  , tmp.encerrado
+  , tmp.origem
+from (
+  Select
+      e.competencia
+    , Case when (e.insercao = 'S') or (e.alteracao = 'S') or (e.exclusao = 'S')
+        then 'N'
+        else 'S'
+      end as encerrado
+    , 1 as origem -- eSocial
+  from ESOCIAL_GERAR_EVENTOS e
+    
+  union
+    
+  Select
+      c.ano_mes   as competencia
+    , c.encerrado as encerrado
+    , 0 as origem -- Reuneratus
+  from CTRL_PROCESS_GERAL c
+  where (c.ano_mes > '202100')
+    and (substring(c.ano_mes from 5 for 2) between '01' and '12')
+) tmp
+order by
+  tmp.competencia desc
+;
+
+GRANT ALL ON VW_ESOCIAL_COMPETENCIA TO "PUBLIC";
+
+/*------ GERASYS.TI 17/05/2021 14:50:20 --------*/
+
+SET TERM ^ ;
+
+CREATE OR ALTER procedure GET_ESOCIAL_COMPETENCIA_ATIVA
+returns (
+    COMPETENCIA "VARCHAR(6)")
+as
+begin
+  Select first 1
+    c.ano_mes
+  from CTRL_PROCESS_GERAL c
+  where c.ano_mes      > '202100'
+    and (substring(c.ano_mes from 5 for 2) between '01' and '12')
+    and c.parcela      = '0'
+    and c.inicializado = 'S'
+    and c.encerrado    = 'N'
+  order by
+    c.ano_mes desc
+  Into
+    competencia;
+
+  if (coalesce(nullif(trim(:competencia), ''), '') = '') then
+    competencia = extract(year from current_date) || right('00' || extract(month from current_date), 2);
+
+  suspend;
+end^
+
+SET TERM ; ^
+
+
+
+
+/*------ GERASYS.TI 17/05/2021 15:20:58 --------*/
+
+SET TERM ^ ;
+
+CREATE trigger tg_esocial_evento_encessar for esocial_evento
+active before update position 0
+AS
+begin
+  if ((old.processo_valido = 'N') and (new.processo_valido = 'S') and (new.protocolo_envio is not null)) then
+    execute procedure SET_ESOCIAL_GERAR_EVENTOS(
+        new.evento
+      , new.competencia
+      , new.operacao
+      , 'N'
+      , 'Evento ' || new.evento || ' gerado, processado e enviado com sucesso.'
+    );
+end^
+
+SET TERM ; ^
+
+
+
+
+/*------ GERASYS.TI 17/05/2021 15:23:46 --------*/
+
+SET TERM ^ ;
+
+CREATE OR ALTER trigger tg_esocial_evento_encessar for esocial_evento
+active before update position 0
+AS
+begin
+  if ((old.processo_valido = 'N') and (new.processo_valido = 'S') and (new.protocolo_envio is not null)) then
+    execute procedure SET_ESOCIAL_GERAR_EVENTOS(
+        new.evento
+      , new.competencia
+      , new.operacao
+      , 'N'
+      , 'Evento ' || new.evento || ' gerado, processado e enviado com sucesso.'
+    );
+end^
+
+SET TERM ; ^
+
+COMMENT ON TRIGGER TG_ESOCIAL_EVENTO_ENCESSAR IS 'Trigger Finalizar Eventos (eSocial)
+
+    Autor   :   Isaque M. Ribeiro
+    Data    :   17/05/2021
+
+Trigger responsavel por sinalizar que os eventos do eSocial foram gerados, processados
+e encerrados/finalizados com sucesso.
+
+
+Historico:
+
+    Legendas:
+        + Novo objeto de banco (Campos, Triggers)
+        - Remocao de objeto de banco
+        * Modificacao no objeto de banco
+
+    17/05/2021 - IMR :
+        + Criacao da trigger na base de dados.';
+
+
+
+
+/*------ GERASYS.TI 17/05/2021 15:24:17 --------*/
+
+DROP TRIGGER TG_CONFIG_ORGAO_EVENTOESOCIAL;
+
+SET TERM ^ ;
+
+CREATE OR ALTER trigger tg_esocial_config_orgao_evento for config_orgao
+active after insert or update position 1
+AS
+  declare variable competencia "VARCHAR(6)";
+begin
+  Select first 1
+    c.competencia
+  from GET_ESOCIAL_COMPETENCIA_ATIVA c
+  Into
+    competencia;
+
+  execute procedure SET_ESOCIAL_GERAR_EVENTOS('S1000'
+    , :competencia
+    , new.tipo_operacao
+    , Case when new.tipo_operacao != 'P' then 'S' else 'N' end
+    , 'Cadastro das configuracoes do orgao'
+  );
+end^
+
+SET TERM ; ^
+
+COMMENT ON TRIGGER TG_ESOCIAL_CONFIG_ORGAO_EVENTO IS 'Trigger Gerar Evento S1000 (eSocial - Configuracao Orgao)
+
+    Autor   :   Isaque M. Ribeiro
+    Data    :   17/05/2021
+
+Trigger responsavel por gerar a necessidade de processamento do evento "S1000" no
+eSocial.
+
+
+Historico:
+
+    Legendas:
+        + Novo objeto de banco (Campos, Triggers)
+        - Remocao de objeto de banco
+        * Modificacao no objeto de banco
+
+    17/05/2021 - IMR :
+        + Criacao da trigger na base de dados.';
+
+
+
+/*------ GERASYS.TI 17/05/2021 15:30:18 --------*/
+
+/*!!! Error occured !!!
+Invalid token.
+Dynamic SQL Error.
+SQL error code = -104.
+Token unknown - line 2, column 1.
+from.
+
+*/
