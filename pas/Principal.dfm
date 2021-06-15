@@ -36,7 +36,7 @@ object frmPrincipal: TfrmPrincipal
     Font.Style = [fsBold, fsItalic]
     ParentFont = False
   end
-  object Image1: TImage
+  object ImageBackGround: TImage
     Left = 51
     Top = 54
     Width = 994

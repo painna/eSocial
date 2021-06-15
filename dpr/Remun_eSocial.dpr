@@ -28,11 +28,15 @@ uses
   EnvioEventoPeriodico in '..\pas\EnvioEventoPeriodico.pas' {frmEnvioEventoPeriodico},
   eSocial.Models.Entities.Competencia in '..\pas\Models\Entities\eSocial.Models.Entities.Competencia.pas',
   eSocial.Models.DAO.Interfaces in '..\pas\Models\DAO\eSocial.Models.DAO.Interfaces.pas',
+  eSocial.Models.DAO.Competencia in '..\pas\Models\DAO\eSocial.Models.DAO.Competencia.pas',
+  eSocial.Models.DAO.Factory in '..\pas\Models\DAO\eSocial.Models.DAO.Factory.pas',
   eSocial.Models.ComplexTypes in '..\pas\Models\eSocial.Models.ComplexTypes.pas',
   eSocial.Models.Components.Connections.Interfaces in '..\pas\Models\Components\Connections\eSocial.Models.Components.Connections.Interfaces.pas',
   eSocial.Models.Components.Connections.DBExpress in '..\pas\Models\Components\Connections\eSocial.Models.Components.Connections.DBExpress.pas',
   eSocial.Models.Components.Connections.Factory in '..\pas\Models\Components\Connections\eSocial.Models.Components.Connections.Factory.pas',
-  eSocial.Models.DAO.Competencia in '..\pas\Models\DAO\eSocial.Models.DAO.Competencia.pas';
+  eSocial.Controllers.Competencia in '..\pas\Controllers\eSocial.Controllers.Competencia.pas',
+  eSocial.Controllers.Interfaces in '..\pas\Controllers\eSocial.Controllers.Interfaces.pas',
+  eSocial.Controllers.Factory in '..\pas\Controllers\eSocial.Controllers.Factory.pas';
 
 {$R *.res}
 

@@ -117,9 +117,9 @@ inherited frmEnvioEventoTabela: TfrmEnvioEventoTabela
     object cbS1000: TCheckBox
       Left = 12
       Top = 20
-      Width = 196
+      Width = 329
       Height = 17
-      Caption = 'S-1000 Informa'#231#245'es do Empregador'
+      Caption = 'S-1000 Informa'#231#245'es do Empregador (Unidade Gestora Principal)'
       Ctl3D = False
       ParentCtl3D = False
       TabOrder = 0

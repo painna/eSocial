@@ -3,12 +3,24 @@ unit EnvioEventoTabela;
 interface
 
 uses
-  udmESocial,
-  ACBreSocial,
+  Winapi.Windows,
+  Winapi.Messages,
+  System.SysUtils,
+  System.Variants,
+  System.Classes,
+  Vcl.Graphics,
+  Vcl.Controls,
+  Vcl.Forms,
+  Vcl.Dialogs,
+  Vcl.StdCtrls,
+  Vcl.Buttons,
+  Vcl.ExtCtrls,
+  Vcl.Samples.Gauges,
 
-  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, DialogoPadrao, Vcl.StdCtrls,
-  Vcl.Buttons, Vcl.ExtCtrls, Vcl.Samples.Gauges;
+  DialogoPadrao,
+  ACBreSocial,
+  udmESocial,
+  eSocial.Controllers.Interfaces;
 
 type
   TfrmEnvioEventoTabela = class(TfrmDialogoPadrao)
@@ -37,6 +49,7 @@ type
     procedure cbS1040Click(Sender: TObject);
   private
     { Private declarations }
+    ICompetencia : IControllerCompetencia;
     procedure LimparPainelProcesso(aVisualizar : Boolean);
 
     function GetESocial : TACBreSocial;
@@ -58,7 +71,8 @@ uses
   gsLib,
   UtilsDb,
   udmPrincipal,
-  pcesConversaoeSocial;
+  pcesConversaoeSocial,
+  eSocial.Controllers.Factory;
 
 procedure TfrmEnvioEventoTabela.btnOkClick(Sender: TObject);
 begin
@@ -107,6 +121,8 @@ end;
 procedure TfrmEnvioEventoTabela.FormCreate(Sender: TObject);
 begin
   inherited;
+  ICompetencia := TControllerFactory.Competencia;
+
   dmESocial.ListarCompetencias(cmbAnoMes);
   LimparPainelProcesso(False);
   cbS1035.Enabled := (Pesquisa('CONFIG_ESOCIAL', 'ID_CONFIG_ORGAO', '1', 'POSSUI_TABELA_CARREIRA', '') = FLAG_SIM);

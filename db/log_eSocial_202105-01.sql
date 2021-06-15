@@ -1323,15 +1323,3 @@ Historico:
     17/05/2021 - IMR :
         + Criacao da trigger na base de dados.';
 
-
-
-/*------ GERASYS.TI 17/05/2021 15:30:18 --------*/
-
-/*!!! Error occured !!!
-Invalid token.
-Dynamic SQL Error.
-SQL error code = -104.
-Token unknown - line 2, column 1.
-from.
-
-*/

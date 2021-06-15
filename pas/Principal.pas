@@ -97,7 +97,7 @@ type
     Image2: TImage;
     Label1: TLabel;
     lblWhatsApp: TLinkLabel;
-    Image1: TImage;
+    ImageBackGround: TImage;
     sbSair: TSpeedButton;
     Image5: TImage;
     lblAcessoRemoto: TLabel;
@@ -416,8 +416,8 @@ begin
    //glb_sAnoMesTrava := '201308';
    Self.Width         := Screen.Width;
    Self.Height        := Screen.Height;
-   glb_iHeight        := Image1.Height;
-   glb_iWidth         := Image1.Width;
+   glb_iHeight        := ImageBackGround.Height;
+   glb_iWidth         := ImageBackGround.Width;
    glb_iIdOperLogado  := 0;
    glb_iIdOperExecut  := 0;
    Left               := 0;
@@ -474,7 +474,7 @@ begin
    sPathexe                  := ExtractFilePath(ParamStr(0));
 
    if FileExists(sPathEXE + '\Wallpaper_GeraSys.Ti_02.jpg') then
-    Image1.Picture.LoadFromFile(sPathEXE + '\Wallpaper_GeraSys.Ti_02.jpg');
+    ImageBackGround.Picture.LoadFromFile(sPathEXE + '\Wallpaper_GeraSys.Ti_02.jpg');
 end;
 
 procedure TfrmPrincipal.FormShow(Sender: TObject);
