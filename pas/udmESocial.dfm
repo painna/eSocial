@@ -2,8 +2,8 @@ object dmESocial: TdmESocial
   OldCreateOrder = False
   OnCreate = DataModuleCreate
   OnDestroy = DataModuleDestroy
-  Height = 516
-  Width = 818
+  Height = 634
+  Width = 949
   object ACBrESocial: TACBreSocial
     MAIL = ACBrMail
     Configuracoes.Geral.SSLLib = libNone

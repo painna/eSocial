@@ -26,6 +26,14 @@ type
   TfrmEnvioEventoTabela = class(TfrmDialogoPadrao)
     gpbParametro: TGroupBox;
     gpbEvento: TGroupBox;
+    gpbOperacao: TRadioGroup;
+    lblAnoMes: TLabel;
+    cmbAnoMes: TComboBox;
+    pnlProcesso: TPanel;
+    gagProcesso: TGauge;
+    lblProcesso: TLabel;
+    Checb_ZeraBase: TCheckBox;
+    FlowPanel: TFlowPanel;
     cbS1000: TCheckBox;
     cbS1005: TCheckBox;
     cbS1010: TCheckBox;
@@ -37,20 +45,16 @@ type
     cbS1060: TCheckBox;
     cbS1070: TCheckBox;
     cbS1080: TCheckBox;
-    gpbOperacao: TRadioGroup;
-    lblAnoMes: TLabel;
-    cmbAnoMes: TComboBox;
-    pnlProcesso: TPanel;
-    gagProcesso: TGauge;
-    lblProcesso: TLabel;
-    Checb_ZeraBase: TCheckBox;
     procedure FormCreate(Sender: TObject);
     procedure btnOkClick(Sender: TObject);
     procedure cbS1040Click(Sender: TObject);
+    procedure cmbAnoMesChange(Sender: TObject);
+    procedure FormShow(Sender: TObject);
   private
     { Private declarations }
     ICompetencia : IControllerCompetencia;
     procedure LimparPainelProcesso(aVisualizar : Boolean);
+    procedure VerificarOperacoes;
 
     function GetESocial : TACBreSocial;
     function EventoSelecionado : Boolean;
@@ -97,6 +101,11 @@ begin
     cbS1030.Enabled := True;
 end;
 
+procedure TfrmEnvioEventoTabela.cmbAnoMesChange(Sender: TObject);
+begin
+  VerificarOperacoes;
+end;
+
 function TfrmEnvioEventoTabela.EventoSelecionado: Boolean;
 var
   I : Integer;
@@ -122,11 +131,24 @@ procedure TfrmEnvioEventoTabela.FormCreate(Sender: TObject);
 begin
   inherited;
   ICompetencia := TControllerFactory.Competencia;
+  ICompetencia.DAO.Get;
 
-  dmESocial.ListarCompetencias(cmbAnoMes);
+  dmESocial.LerConfiguracao;
+  dmESocial.ListarCompetencias(cmbAnoMes, ICompetencia.DAO.This.Ano + ICompetencia.DAO.This.Mes);
+
+  cmbAnoMes.Enabled    := ICompetencia.DAO.This.Encerrado;     // Obrigar envio na competência que ainda está em aberta
+  gpbOperacao.Enabled  := not ICompetencia.DAO.This.Encerrado; // Liberar apenas se algum evento estiver pendente de envio
+
   LimparPainelProcesso(False);
+
   cbS1035.Enabled := (Pesquisa('CONFIG_ESOCIAL', 'ID_CONFIG_ORGAO', '1', 'POSSUI_TABELA_CARREIRA', '') = FLAG_SIM);
   Checb_ZeraBase.Visible := dmESocial.AmbienteWebServiceHomologacao;
+end;
+
+procedure TfrmEnvioEventoTabela.FormShow(Sender: TObject);
+begin
+  inherited;
+  VerificarOperacoes;
 end;
 
 function TfrmEnvioEventoTabela.GeradoEnviado : Boolean;
@@ -228,6 +250,15 @@ begin
   pnlProcesso.Visible  := aVisualizar;
   lblProcesso.Caption  := EmptyStr;
   gagProcesso.Progress := 0;
+end;
+
+procedure TfrmEnvioEventoTabela.VerificarOperacoes;
+begin
+  ICompetencia.DAO.Get( StringReplace(cmbAnoMes.Text, '-', '', [rfReplaceAll]) );
+  gpbOperacao.Enabled := not ICompetencia.DAO.This.Encerrado; // Liberar apenas se algum evento estiver pendente de envio
+//  gpbOperacao.Controls[0].Enabled := False; // Inserção
+  gpbOperacao.Controls[1].Enabled := False; // Alteração
+  gpbOperacao.Controls[2].Enabled := False; // Exclusão
 end;
 
 end.

@@ -309,7 +309,7 @@ type
 
     property MensagemRetorno : TStringList read GetMensagemRetorno;
 
-    procedure ListarCompetencias(aLista : TComboBox);
+    procedure ListarCompetencias(aLista : TComboBox; const pAnoMesSelecionado : String);
     procedure ListarCompetenciasAdmissao(aLista : TComboBox);
     procedure ListarCompetenciasFolha(aLista : TComboBox);
     procedure LerConfiguracao;
@@ -6678,7 +6678,7 @@ begin
   end;
 end;
 
-procedure TdmESocial.ListarCompetencias(aLista: TComboBox);
+procedure TdmESocial.ListarCompetencias(aLista : TComboBox; const pAnoMesSelecionado : String);
 var
   x ,
   i : Integer;
@@ -6700,6 +6700,13 @@ begin
 
       aLista.Items.AddObject(c.Codigo, c);
       //aLista.Items.Add(s + '-' + FormatFloat('00', I));
+
+      if not pAnoMesSelecionado.Trim.IsEmpty then
+      begin
+        if (pAnoMesSelecionado = c.Codigo.Replace('-', ''))  then
+          x := aLista.Items.Count - 1;
+      end
+      else
       if (I = StrToInt(FormatDateTime('mm', Date)) ) then
         x := aLista.Items.Count - 1;
     end;

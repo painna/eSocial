@@ -71,9 +71,9 @@ begin
    glb_iIdOperExecut := glb_iIdOperLogado;
 }
    if (Empty(edUsuario.Text)) and (Empty(edSenha.Text)) then exit;
-   sSenhaTemp := Pesquisa('USUARIO','NOME_CURTO',
-      Criptografa(edUsuario.Text,'1',20),'SENHA','');
-   sSenhaTemp2:= Criptografa(edSenha.Text,'1',8);
+   sSenhaTemp := Pesquisa('USUARIO','NOME_CURTO', Criptografa(edUsuario.Text,'1',20),'SENHA','');
+   sSenhaTemp2:= Criptografa(edSenha.Text,'1', 8);
+
    pb_lSenhaOk := (sSenhaTemp2 = sSenhaTemp);
    If Not pb_lSenhaOk Then
    Begin
@@ -81,9 +81,10 @@ begin
       edUsuario.SetFocus;
       Exit;
    End;
+
    sSenhaTemp2 := Criptografa(sSenhaTemp2,'2',8);
-   sIdUsuario := Pesquisa('USUARIO','NOME_CURTO',
-      Criptografa(edUsuario.Text,'1',20),'ID','');
+   sIdUsuario  := Pesquisa('USUARIO','NOME_CURTO', Criptografa(edUsuario.Text,'1',20),'ID','');
+
    glb_iIdOperLogado := StrToInt(sIdUsuario);
    glb_iIdOperExecut := glb_iIdOperLogado;
 
@@ -109,8 +110,8 @@ end;
 procedure TfrmLogin.edUsuarioExit(Sender: TObject);
 begin
    If Empty(edUsuario.Text) Then Exit;
-   pv_sSenha := Pesquisa('USUARIO','NOME_CURTO',
-      Criptografa(edUsuario.Text,'1',20),'SENHA','Nome de Usuário Inválido ...');
+   pv_sSenha := Pesquisa('USUARIO','NOME_CURTO', Criptografa(edUsuario.Text,'1',20),'SENHA','Nome de Usuário Inválido ...');
+
    if (pv_sSenha = '') then edUsuario.SetFocus;
 end;
 
@@ -126,7 +127,7 @@ begin
   if IsDebuggerPresent then
   begin
     edUsuario.Text := 'GERASYS.TI';
-    edSenha.Text   := 'gsti2010'; //'gstinew1';
+    edSenha.Text   := 'gsti2014'; //'gstinew1';
   end
   else
   begin

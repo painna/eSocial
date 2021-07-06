@@ -22,6 +22,13 @@ begin
     , Case when new.tipo_operacao != 'P' then 'S' else 'N' end
     , 'Cadastro das configuracoes do orgao'
   );
+
+  execute procedure SET_ESOCIAL_GERAR_EVENTOS('S1020'
+    , :competencia
+    , new.tipo_operacao
+    , Case when new.tipo_operacao != 'P' then 'S' else 'N' end
+    , 'Cadastro das lotacoes tributarias'
+  );
 end
 ^
 
@@ -29,12 +36,13 @@ end
 SET TERM ; ^
 
 COMMENT ON TRIGGER TG_CONFIG_ORGAO_EVENTOESOCIAL IS 
-'Trigger Gerar Evento S1000 (eSocial - Configuracao Orgao)
+'Trigger Gerar Evento S1000 / S1020 (eSocial - Configuracao Orgao)
 
     Autor   :   Isaque M. Ribeiro
     Data    :   17/05/2021
 
-Trigger responsavel por gerar a necessidade de processamento do evento "S1000" no
+Trigger responsavel por gerar a necessidade de processamento do evento "S1000" e
+do evento "S1020" no
 eSocial.
 
 
@@ -45,6 +53,8 @@ Historico:
         - Remocao de objeto de banco
         * Modificacao no objeto de banco
 
+    06/07/2021 - IMR :
+        * Ajuste na trigger para contemplar o evento S1020.
     17/05/2021 - IMR :
         + Criacao da trigger na base de dados.';
 

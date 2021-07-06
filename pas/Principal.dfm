@@ -1046,14 +1046,17 @@ object frmPrincipal: TfrmPrincipal
       object imArquivoUnidadeGestora: TMenuItem
         Caption = 'Tabela S1005 - Unidades Gestoras'
         ImageIndex = 3
+        OnClick = imArquivoUnidadeGestoraClick
       end
       object imArquivoEvento: TMenuItem
         Caption = 'Tabela S1010 - Eventos'
         ImageIndex = 3
+        OnClick = imArquivoEventoClick
       end
       object imArquivoAmbienteTrabalho: TMenuItem
         Caption = 'Tabela S1060 - Ambiente de Trabalho (Departamentos)'
         ImageIndex = 3
+        OnClick = imArquivoAmbienteTrabalhoClick
       end
       object N31: TMenuItem
         Caption = '-'
@@ -1119,17 +1122,6 @@ object frmPrincipal: TfrmPrincipal
         Caption = 'Configurar eSocial'
         ImageIndex = 3
         OnClick = imConfigurarESocialClick
-      end
-      object N1: TMenuItem
-        Caption = '-'
-      end
-      object imAlterarSenha: TMenuItem
-        Tag = 5
-        Caption = 'Alterar Senha ...'
-      end
-      object imTrocarUsuario: TMenuItem
-        Tag = 6
-        Caption = 'Trocar Usu'#225'rio ...'
       end
     end
     object Ajuda1: TMenuItem

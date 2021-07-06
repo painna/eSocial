@@ -31,7 +31,9 @@ uses
   dxSkinSilver, dxSkinSpringTime, dxSkinStardust, dxSkinSummer2008,
   dxSkinTheAsphaltWorld, dxSkinValentine, dxSkinVisualStudio2013Blue,
   dxSkinVisualStudio2013Dark, dxSkinVisualStudio2013Light, dxSkinVS2010,
-  dxSkinWhiteprint, dxSkinXmas2008Blue, System.Actions, System.ImageList, cxImageList;
+  dxSkinWhiteprint, dxSkinXmas2008Blue, System.Actions, System.ImageList, cxImageList,
+  eSocial.Controllers.Interfaces,
+  eSocial.Controllers.Factory;
 
 type
   TfrmPrincipal = class(TForm)
@@ -88,8 +90,6 @@ type
     qryUsuarioLAN_PAGTO_PREST_SERVICO: TStringField;
     qryUsuarioLAN_ATESTADO_MEDICO: TStringField;
     qryUsuarioLAN_PORT_DIARIA: TStringField;
-    imAlterarSenha: TMenuItem;
-    imTrocarUsuario: TMenuItem;
     N31: TMenuItem;
     lblMsg1: TLabel;
     imgList24: TcxImageList;
@@ -102,7 +102,6 @@ type
     Image5: TImage;
     lblAcessoRemoto: TLabel;
     Image4: TImage;
-    N1: TMenuItem;
     imConfigurarCertificado: TMenuItem;
     mnEnvio: TMenuItem;
     imEventoTabela: TMenuItem;
@@ -133,8 +132,13 @@ type
     procedure imConfigurarESocialClick(Sender: TObject);
     procedure imEventoNaoPeriodicoClick(Sender: TObject);
     procedure imEventoPeriodicoClick(Sender: TObject);
+    procedure imArquivoUnidadeGestoraClick(Sender: TObject);
+    procedure imArquivoEventoClick(Sender: TObject);
+    procedure imArquivoAmbienteTrabalhoClick(Sender: TObject);
 
   private
+    ICompetencia : IControllerCompetencia;
+
     pv_lPerguntaFechar,
     pv_lPrimeiraVez,
     pv_lVerVersao,
@@ -176,6 +180,21 @@ uses
 
 {$R *.dfm}
 
+procedure TfrmPrincipal.imArquivoAmbienteTrabalhoClick(Sender: TObject);
+begin
+  Mensagem('Rotina ainda não disponível nesta versão!', 'Informação', MB_ICONINFORMATION);
+end;
+
+procedure TfrmPrincipal.imArquivoEventoClick(Sender: TObject);
+begin
+  Mensagem('Rotina ainda não disponível nesta versão!', 'Informação', MB_ICONINFORMATION);
+end;
+
+procedure TfrmPrincipal.imArquivoUnidadeGestoraClick(Sender: TObject);
+begin
+  Mensagem('Rotina ainda não disponível nesta versão!', 'Informação', MB_ICONINFORMATION);
+end;
+
 procedure TfrmPrincipal.imConfigurarCertificadoClick(Sender: TObject);
 begin
    if (MDIChildCount>0) then
@@ -213,12 +232,13 @@ begin
              'antes de Executar essa Operação ...',
              'Aviso !!!', MB_ICONEXCLAMATION)
   else
-    try
-      frmEnvioEventoNaoPeriodico := TfrmEnvioEventoNaoPeriodico.Create(Self);
-      frmEnvioEventoNaoPeriodico.ShowModal;
-    finally
-      FreeAndNil(frmEnvioEventoNaoPeriodico);
-    end;
+    Mensagem('Rotina ainda não disponível nesta versão!' + #13 + 'Recurso em homologação.', 'Informação', MB_ICONINFORMATION);
+//    try
+//      frmEnvioEventoNaoPeriodico := TfrmEnvioEventoNaoPeriodico.Create(Self);
+//      frmEnvioEventoNaoPeriodico.ShowModal;
+//    finally
+//      FreeAndNil(frmEnvioEventoNaoPeriodico);
+//    end;
 end;
 
 procedure TfrmPrincipal.imEventoPeriodicoClick(Sender: TObject);
@@ -228,12 +248,13 @@ begin
              'antes de Executar essa Operação ...',
              'Aviso !!!', MB_ICONEXCLAMATION)
   else
-    try
-      frmEnvioEventoPeriodico := TfrmEnvioEventoPeriodico.Create(Self);
-      frmEnvioEventoPeriodico.ShowModal;
-    finally
-      FreeAndNil(frmEnvioEventoPeriodico);
-    end;
+    Mensagem('Rotina ainda não disponível nesta versão!' + #13 + 'Recurso em homologação.', 'Informação', MB_ICONINFORMATION);
+//    try
+//      frmEnvioEventoPeriodico := TfrmEnvioEventoPeriodico.Create(Self);
+//      frmEnvioEventoPeriodico.ShowModal;
+//    finally
+//      FreeAndNil(frmEnvioEventoPeriodico);
+//    end;
 end;
 
 procedure TfrmPrincipal.imEventoTabelaClick(Sender: TObject);
@@ -460,12 +481,17 @@ begin
 
    Self.Caption := glb_sSistema+' - [VER. '+glb_sVersao+']';
 
-   try
-      glb_sDescrMesAnoTrab := Maiusculas(NomeMes(StrToInt(RightStr(glb_sAnoMesTrab,2))))+' / '+LeftStr(glb_sAnoMesTrab,4);
-   except
-      Mensagem('Ano/Mês atual: '+glb_sAnoMesTrab,'ERRO !!!',MB_OK+MB_ICONERROR);
-      glb_sDescrMesAnoTrab := 'DEZEMBRO / 1901';
-   end;
+//   try
+//      glb_sDescrMesAnoTrab := Maiusculas(NomeMes(StrToInt(RightStr(glb_sAnoMesTrab,2))))+' / '+LeftStr(glb_sAnoMesTrab,4);
+//   except
+//      Mensagem('Ano/Mês atual: '+glb_sAnoMesTrab,'ERRO !!!',MB_OK+MB_ICONERROR);
+//      glb_sDescrMesAnoTrab := 'DEZEMBRO / 1901';
+//   end;
+  ICompetencia := TControllerFactory.Competencia;
+  ICompetencia.DAO.Get;
+
+  glb_sDescrMesAnoTrab := ICompetencia.DAO.This.Descricao + '/' + ICompetencia.DAO.This.Ano;
+  glb_sAnoMesTrab      := ICompetencia.DAO.This.Ano + ICompetencia.DAO.This.Mes;
 
    stbInforme.Panels[0].Text := Criptografa(Pesquisa('CONFIG_ORGAO','ID','1','RAZAO_SOCIAL',''),'2',60);
    glb_sEmpresa              := stbInforme.Panels[0].Text;
@@ -523,7 +549,7 @@ end;
 
 procedure TfrmPrincipal.Label1MouseLeave(Sender: TObject);
 begin
-   Screen.Cursor := crDefault;
+  Screen.Cursor := crDefault;
 end;
 
 procedure TfrmPrincipal.Label1MouseMove(Sender: TObject; Shift: TShiftState; X, Y: Integer);

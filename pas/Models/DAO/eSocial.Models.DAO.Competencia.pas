@@ -41,13 +41,21 @@ uses
 constructor TModelDAOCompetencia.Create;
 begin
   FConnection := TModelComponentConnectionFactory.Connection;
-  FDataSet    := TDataSource.Create(nil);
+
+  FDataSet := TDataSource.Create(nil);
+  FDataSet.DataSet := FConnection.DataSet;
+
   FEntity     := TCompetencia.Create(Self);
 end;
 
 destructor TModelDAOCompetencia.Destroy;
 begin
-  FEntity.DisposeOf;
+  if Assigned(FDataSet) then
+    FDataSet.DisposeOf;
+
+  if Assigned(FEntity) then
+    FEntity.DisposeOf;
+
   inherited;
 end;
 
@@ -65,9 +73,17 @@ begin
       .SQL('  , c.encerrado')
       .SQL('  , c.origem')
       .SQL('from VW_ESOCIAL_COMPETENCIA c')
-      .SQL('where c.competencia = :id')
-      .AddParam('id', aID)
-    .Open;
+      .SQL('where (c.origem = 1)');
+
+    if not aID.Trim.IsEmpty then
+    begin
+      FConnection
+        .SQL('  and (c.competencia = :id)')
+        .FetchParams
+        .AddParam('id', aID);
+    end;
+
+    FConnection.Open;
 
     ReadFields;
   except
@@ -110,7 +126,10 @@ begin
       .SQL('  , c.origem')
       .SQL('from VW_ESOCIAL_COMPETENCIA c')
       .SQL('  inner join GET_ESOCIAL_COMPETENCIA_ATIVA g on (g.competencia = c.competencia)')
+      .SQL('where (c.origem = 1)')
     .Open;
+
+    FConnection.DataSet.Last; // último registro que corresponde ao eSocial
 
     ReadFields;
   except

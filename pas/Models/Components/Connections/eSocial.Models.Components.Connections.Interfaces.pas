@@ -9,6 +9,7 @@ type
   iModelComponentConnection = interface
     ['{E14316CA-4550-4273-BCD0-109F08BCE77B}']
     function Active(aValue : Boolean) : iModelComponentConnection;
+    function AddParam (aParam : String; aValue : Smallint) : iModelComponentConnection; overload;
     function AddParam (aParam : String; aValue : Integer) : iModelComponentConnection; overload;
     function AddParam (aParam : String; aValue : String) : iModelComponentConnection; overload;
     function AddParam (aParam : String; aValue : TDateTime) : iModelComponentConnection; overload;

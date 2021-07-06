@@ -29,6 +29,7 @@ type
       class function New(aDataBase : String) : iModelComponentConnection;
 
       function Active(aValue : Boolean) : iModelComponentConnection;
+      function AddParam (aParam : String; aValue : Smallint) : iModelComponentConnection; overload;
       function AddParam (aParam : String; aValue : Integer) : iModelComponentConnection; overload;
       function AddParam (aParam : String; aValue : String) : iModelComponentConnection; overload;
       function AddParam (aParam : String; aValue : TDateTime) : iModelComponentConnection; overload;
@@ -82,8 +83,8 @@ begin
     FProvider.DataSet    := FQuery;
 
     FClient := TClientDataSet.Create(nil);
-    FClient.ProviderName := FProvider.Name;
-    FClient.StoreDefs    := True;
+    FClient.SetProvider( FProvider );
+    FClient.StoreDefs := True;
 
     FConnection.Connected := True; // Testa os parâmetros de conexão
     FConnection.Connected := False;
@@ -136,6 +137,7 @@ end;
 function TModelComponentConnectionDBExpress.ExecSQL: iModelComponentConnection;
 begin
   Result := Self;
+
   try
     if FClient.Active then
       FClient.Close;
@@ -158,17 +160,21 @@ end;
 function TModelComponentConnectionDBExpress.FetchParams: iModelComponentConnection;
 begin
   Result := Self;
+  FClient.SetProvider( FProvider );
   FClient.FetchParams;
 end;
 
 function TModelComponentConnectionDBExpress.Open: iModelComponentConnection;
 begin
   Result := Self;
+  FClient.SetProvider( FProvider );
   FClient.Open;
 end;
 
 function TModelComponentConnectionDBExpress.SQL(aValue: String): iModelComponentConnection;
 begin
+  Result := Self;
+
   if FClient.Active then
     FClient.Close;
 
@@ -180,6 +186,8 @@ end;
 
 function TModelComponentConnectionDBExpress.SQLClear: iModelComponentConnection;
 begin
+  Result := Self;
+
   if FClient.Active then
     FClient.Close;
 
@@ -195,6 +203,13 @@ begin
   Result := Self;
   if ExistParam(aParam) then
     FClient.ParamByName(aParam).AsDateTime := aValue;
+end;
+
+function TModelComponentConnectionDBExpress.AddParam(aParam: String; aValue: Smallint): iModelComponentConnection;
+begin
+  Result := Self;
+  if ExistParam(aParam) then
+    FClient.ParamByName(aParam).AsSmallInt := aValue;
 end;
 
 end.

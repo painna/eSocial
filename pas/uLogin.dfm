@@ -6227,7 +6227,7 @@ inherited frmLogin: TfrmLogin
       0000}
     NumGlyphs = 2
     ParentFont = False
-    TabOrder = 3
+    TabOrder = 2
     OnClick = btnOkClick
   end
   object btnCancelar: TBitBtn

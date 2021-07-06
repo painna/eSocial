@@ -1,30 +1,37 @@
 inherited frmEnvioEventoTabela: TfrmEnvioEventoTabela
   Caption = 'eSocial - Enviar Eventos de Tabela'
+  ClientWidth = 704
   OnCreate = FormCreate
+  OnShow = FormShow
+  ExplicitWidth = 718
   PixelsPerInch = 96
   TextHeight = 13
   inherited pnlControle: TPanel
+    Width = 704
     TabOrder = 2
     inherited btnCancelar: TBitBtn
+      Left = 616
       ExplicitLeft = 584
     end
     inherited btnOk: TBitBtn
+      Left = 522
       OnClick = btnOkClick
       ExplicitLeft = 490
     end
     object pnlProcesso: TPanel
       Left = 0
       Top = 6
-      Width = 484
+      Width = 516
       Height = 30
       Anchors = [akLeft, akRight, akBottom]
       BevelOuter = bvNone
       TabOrder = 2
       Visible = False
+      ExplicitWidth = 484
       object gagProcesso: TGauge
         Left = 0
         Top = 13
-        Width = 484
+        Width = 516
         Height = 17
         Align = alTop
         ForeColor = clBlue
@@ -36,11 +43,12 @@ inherited frmEnvioEventoTabela: TfrmEnvioEventoTabela
         ParentFont = False
         Progress = 75
         ExplicitTop = 24
+        ExplicitWidth = 484
       end
       object lblProcesso: TLabel
         Left = 0
         Top = 0
-        Width = 484
+        Width = 516
         Height = 13
         Align = alTop
         Caption = 'Andamento do processo...'
@@ -57,7 +65,7 @@ inherited frmEnvioEventoTabela: TfrmEnvioEventoTabela
   object gpbParametro: TGroupBox
     Left = 0
     Top = 0
-    Width = 672
+    Width = 704
     Height = 65
     Align = alTop
     Caption = 'Par'#226'metros de gera'#231#227'o do(s) arquivo(s) XML'
@@ -68,8 +76,10 @@ inherited frmEnvioEventoTabela: TfrmEnvioEventoTabela
     Font.Style = [fsBold]
     ParentFont = False
     TabOrder = 0
+    ExplicitTop = -6
+    ExplicitWidth = 672
     DesignSize = (
-      672
+      704
       65)
     object lblAnoMes: TLabel
       Left = 12
@@ -81,7 +91,7 @@ inherited frmEnvioEventoTabela: TfrmEnvioEventoTabela
     end
     object gpbOperacao: TRadioGroup
       AlignWithMargins = True
-      Left = 358
+      Left = 390
       Top = 17
       Width = 308
       Height = 40
@@ -93,6 +103,7 @@ inherited frmEnvioEventoTabela: TfrmEnvioEventoTabela
         'Altera'#231#227'o'
         'Exclus'#227'o')
       TabOrder = 1
+      ExplicitLeft = 358
     end
     object cmbAnoMes: TComboBox
       Left = 12
@@ -101,138 +112,176 @@ inherited frmEnvioEventoTabela: TfrmEnvioEventoTabela
       Height = 21
       Style = csDropDownList
       TabOrder = 0
+      OnChange = cmbAnoMesChange
     end
   end
   object gpbEvento: TGroupBox
     Left = 0
     Top = 65
-    Width = 672
+    Width = 704
     Height = 218
     Align = alClient
     Caption = 'Eventos'
     TabOrder = 1
+    ExplicitWidth = 672
     DesignSize = (
-      672
+      704
       218)
-    object cbS1000: TCheckBox
-      Left = 12
-      Top = 20
-      Width = 329
-      Height = 17
-      Caption = 'S-1000 Informa'#231#245'es do Empregador (Unidade Gestora Principal)'
-      Ctl3D = False
-      ParentCtl3D = False
+    object FlowPanel: TFlowPanel
+      AlignWithMargins = True
+      Left = 5
+      Top = 18
+      Width = 694
+      Height = 195
+      Align = alClient
+      BevelOuter = bvNone
+      Padding.Left = 3
+      Padding.Top = 3
+      Padding.Right = 3
+      Padding.Bottom = 3
       TabOrder = 0
-    end
-    object cbS1005: TCheckBox
-      Left = 12
-      Top = 41
-      Width = 329
-      Height = 17
-      Caption = 'S-1005 Tabela de Estab., Obras ou Unidades de '#211'rg'#227'os P'#250'blicos'
-      Ctl3D = False
-      ParentCtl3D = False
-      TabOrder = 1
-    end
-    object cbS1010: TCheckBox
-      Left = 12
-      Top = 62
-      Width = 156
-      Height = 17
-      Caption = 'S-1010 Tabela de Rubricas'
-      Ctl3D = False
-      ParentCtl3D = False
-      TabOrder = 2
-    end
-    object cbS1020: TCheckBox
-      Left = 12
-      Top = 82
-      Width = 236
-      Height = 17
-      Caption = 'S-1020 Tabela de Lota'#231#245'es Tribut'#225'rias'
-      Ctl3D = False
-      ParentCtl3D = False
-      TabOrder = 3
-    end
-    object cbS1030: TCheckBox
-      Left = 12
-      Top = 105
-      Width = 144
-      Height = 17
-      Caption = 'S-1030 Tabela de Cargos'
-      Ctl3D = False
-      Enabled = False
-      ParentCtl3D = False
-      TabOrder = 4
-    end
-    object cbS1035: TCheckBox
-      Left = 12
-      Top = 126
-      Width = 249
-      Height = 17
-      Caption = 'S-1035 Tabela de Carreiras P'#250'blicas'
-      Enabled = False
-      TabOrder = 5
-    end
-    object cbS1040: TCheckBox
-      Left = 358
-      Top = 20
-      Width = 156
-      Height = 17
-      Caption = 'S-1040 Tabela de Fun'#231#245'es'
-      Ctl3D = False
-      Enabled = False
-      ParentCtl3D = False
-      TabOrder = 6
-      OnClick = cbS1040Click
-    end
-    object cbS1050: TCheckBox
-      Left = 358
-      Top = 41
-      Width = 248
-      Height = 17
-      Caption = 'S-1050 Tabela de Hor'#225'rios/Turnos de Trabalho'
-      Ctl3D = False
-      Enabled = False
-      ParentCtl3D = False
-      TabOrder = 7
-    end
-    object cbS1060: TCheckBox
-      Left = 358
-      Top = 62
-      Width = 228
-      Height = 17
-      Caption = 'S-1060 Tabela de Ambientes de Trabalho'
-      Ctl3D = False
-      Enabled = False
-      ParentCtl3D = False
-      TabOrder = 8
-    end
-    object cbS1070: TCheckBox
-      Left = 358
-      Top = 83
-      Width = 168
-      Height = 17
-      Caption = 'S-1070 Tabela de Processos'
-      Ctl3D = False
-      Enabled = False
-      ParentCtl3D = False
-      TabOrder = 9
-    end
-    object cbS1080: TCheckBox
-      Left = 358
-      Top = 105
-      Width = 224
-      Height = 17
-      Caption = 'S-1080 Tabela de Operadores Portu'#225'rios'
-      Ctl3D = False
-      Enabled = False
-      ParentCtl3D = False
-      TabOrder = 10
+      ExplicitLeft = 1
+      ExplicitTop = 17
+      ExplicitWidth = 700
+      ExplicitHeight = 201
+      object cbS1000: TCheckBox
+        AlignWithMargins = True
+        Left = 6
+        Top = 6
+        Width = 330
+        Height = 17
+        Caption = 'S1000 - Unidade Gestora Principal (Informa'#231#245'es do Empregador)'
+        Ctl3D = False
+        ParentCtl3D = False
+        TabOrder = 0
+      end
+      object cbS1005: TCheckBox
+        AlignWithMargins = True
+        Left = 342
+        Top = 6
+        Width = 330
+        Height = 17
+        Caption = 'S1005 - Outras Unidades Gestoras (Unidades de '#211'rg'#227'os P'#250'blicos)'
+        Ctl3D = False
+        ParentCtl3D = False
+        TabOrder = 1
+      end
+      object cbS1010: TCheckBox
+        AlignWithMargins = True
+        Left = 6
+        Top = 29
+        Width = 330
+        Height = 17
+        Caption = 'S1010 - Eventos (Tabela de Rubricas)'
+        Ctl3D = False
+        ParentCtl3D = False
+        TabOrder = 2
+      end
+      object cbS1020: TCheckBox
+        AlignWithMargins = True
+        Left = 342
+        Top = 29
+        Width = 330
+        Height = 17
+        Caption = 'S1020 - Configura'#231#245'es do '#211'rg'#227'o (Lota'#231#245'es Tribut'#225'rias)'
+        Ctl3D = False
+        ParentCtl3D = False
+        TabOrder = 3
+      end
+      object cbS1030: TCheckBox
+        AlignWithMargins = True
+        Left = 6
+        Top = 52
+        Width = 330
+        Height = 17
+        Caption = 'S-1030 Tabela de Cargos'
+        Ctl3D = False
+        Enabled = False
+        ParentCtl3D = False
+        TabOrder = 4
+        Visible = False
+      end
+      object cbS1035: TCheckBox
+        AlignWithMargins = True
+        Left = 342
+        Top = 52
+        Width = 330
+        Height = 17
+        Caption = 'S-1035 Tabela de Carreiras P'#250'blicas'
+        Enabled = False
+        TabOrder = 5
+        Visible = False
+      end
+      object cbS1040: TCheckBox
+        AlignWithMargins = True
+        Left = 6
+        Top = 75
+        Width = 330
+        Height = 17
+        Caption = 'S-1040 Tabela de Fun'#231#245'es'
+        Ctl3D = False
+        Enabled = False
+        ParentCtl3D = False
+        TabOrder = 6
+        Visible = False
+        OnClick = cbS1040Click
+      end
+      object cbS1050: TCheckBox
+        AlignWithMargins = True
+        Left = 342
+        Top = 75
+        Width = 330
+        Height = 17
+        Caption = 'S-1050 Tabela de Hor'#225'rios/Turnos de Trabalho'
+        Ctl3D = False
+        Enabled = False
+        ParentCtl3D = False
+        TabOrder = 7
+        Visible = False
+      end
+      object cbS1060: TCheckBox
+        AlignWithMargins = True
+        Left = 6
+        Top = 98
+        Width = 330
+        Height = 17
+        Caption = 'S-1060 Tabela de Ambientes de Trabalho'
+        Ctl3D = False
+        Enabled = False
+        ParentCtl3D = False
+        TabOrder = 8
+        Visible = False
+      end
+      object cbS1070: TCheckBox
+        AlignWithMargins = True
+        Left = 342
+        Top = 98
+        Width = 330
+        Height = 17
+        Caption = 'S-1070 Tabela de Processos'
+        Ctl3D = False
+        Enabled = False
+        ParentCtl3D = False
+        TabOrder = 9
+        Visible = False
+      end
+      object cbS1080: TCheckBox
+        AlignWithMargins = True
+        Left = 6
+        Top = 121
+        Width = 330
+        Height = 17
+        Caption = 'S-1080 Tabela de Operadores Portu'#225'rios'
+        Ctl3D = False
+        Enabled = False
+        ParentCtl3D = False
+        TabOrder = 10
+        Visible = False
+      end
     end
     object Checb_ZeraBase: TCheckBox
       AlignWithMargins = True
-      Left = 490
+      Left = 522
       Top = 196
       Width = 177
       Height = 17
@@ -245,7 +294,8 @@ inherited frmEnvioEventoTabela: TfrmEnvioEventoTabela
       Font.Name = 'Tahoma'
       Font.Style = [fsBold]
       ParentFont = False
-      TabOrder = 11
+      TabOrder = 1
+      ExplicitLeft = 490
     end
   end
 end
