@@ -28,7 +28,6 @@ inherited frmSobre: TfrmSobre
       BevelOuter = bvNone
       Color = 11528698
       TabOrder = 0
-      ExplicitTop = 415
       object Label1: TLabel
         AlignWithMargins = True
         Left = 10
@@ -69,7 +68,6 @@ inherited frmSobre: TfrmSobre
         Font.Style = [fsBold]
         ParentFont = False
         ExplicitLeft = 564
-        ExplicitTop = 50
         ExplicitWidth = 102
       end
       object lblCopyright: TLabel
@@ -77,7 +75,7 @@ inherited frmSobre: TfrmSobre
         Left = 10
         Top = 77
         Width = 656
-        Height = 32
+        Height = 51
         Margins.Left = 10
         Margins.Top = 0
         Margins.Right = 10
@@ -97,6 +95,7 @@ inherited frmSobre: TfrmSobre
         ExplicitLeft = 6
         ExplicitTop = 85
         ExplicitWidth = 661
+        ExplicitHeight = 32
       end
       object lblCelular2: TLabel
         AlignWithMargins = True
@@ -118,7 +117,6 @@ inherited frmSobre: TfrmSobre
         Font.Style = [fsBold]
         ParentFont = False
         ExplicitLeft = 564
-        ExplicitTop = 67
         ExplicitWidth = 102
       end
       object lblTelFixo: TLabel
@@ -141,15 +139,14 @@ inherited frmSobre: TfrmSobre
         Font.Style = [fsBold]
         ParentFont = False
         ExplicitLeft = 493
-        ExplicitTop = 34
         ExplicitWidth = 173
       end
       object lblAguarde: TLabel
         AlignWithMargins = True
         Left = 10
-        Top = 112
+        Top = 131
         Width = 656
-        Height = 35
+        Height = 16
         Margins.Left = 10
         Margins.Right = 10
         Align = alBottom
@@ -160,8 +157,8 @@ inherited frmSobre: TfrmSobre
         Font.Name = 'Tahoma'
         Font.Style = [fsBold]
         ParentFont = False
-        ExplicitLeft = 3
-        ExplicitWidth = 670
+        ExplicitTop = 112
+        ExplicitWidth = 186
       end
       object btnOk: TBitBtn
         Left = 584
@@ -191,8 +188,7 @@ inherited frmSobre: TfrmSobre
       Color = 14013866
       ParentBackground = False
       TabOrder = 1
-      ExplicitHeight = 413
-      object Image2: TImage
+      object imgBanner: TImage
         Left = 0
         Top = 0
         Width = 676
@@ -249,7 +245,6 @@ inherited frmSobre: TfrmSobre
         ParentFont = False
         ReadOnly = True
         TabOrder = 1
-        ExplicitTop = 352
       end
       object Memo2: TMemo
         Left = 0
@@ -273,7 +268,6 @@ inherited frmSobre: TfrmSobre
         ParentFont = False
         ReadOnly = True
         TabOrder = 2
-        ExplicitHeight = 98
       end
     end
   end

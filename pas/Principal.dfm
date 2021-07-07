@@ -1114,6 +1114,17 @@ object frmPrincipal: TfrmPrincipal
     end
     object imFerramentas: TMenuItem
       Caption = '&Sistema'
+      object imAtualizarSquemasXSD: TMenuItem
+        Caption = 'Atualizar Squemas XSD (*.xsd)'
+        Enabled = False
+      end
+      object imBaixarBibliotecas: TMenuItem
+        Caption = 'Baixar/Instalar Bibliotecas (*.dll)'
+        Enabled = False
+      end
+      object N1: TMenuItem
+        Caption = '-'
+      end
       object imConfigurarCertificado: TMenuItem
         Caption = 'Configurar Certificado'
         OnClick = imConfigurarCertificadoClick

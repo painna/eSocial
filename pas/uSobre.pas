@@ -18,7 +18,7 @@ type
     btnOk: TBitBtn;
     Panel3: TPanel;
     lblAguarde: TLabel;
-    Image2: TImage;
+    imgBanner: TImage;
     Memo1: TMemo;
     Memo3: TMemo;
     Memo2: TMemo;
@@ -77,8 +77,8 @@ begin
   sCNPJ := Pesquisa('CONFIG_ORGAO','ID','1','CNPJ','');
   sCNPJ := Criptografa(sCNPJ,'2',14);
 
-  if FileExists(ExtractFilePath(Application.ExeName) + '\GERASYS_Logo_2011.Jpg') then
-    Image2.Picture.LoadFromFile(ExtractFilePath(Application.ExeName) + '\GERASYS_Logo_2011.Jpg');
+  if FileExists(ExtractFilePath(Application.ExeName) + '\Remun_eSocial_Banner.Jpg') then
+    imgBanner.Picture.LoadFromFile(ExtractFilePath(Application.ExeName) + '\Remun_eSocial_Banner.Jpg');
 
   try
      sDtVerDb := Pesquisa('CONFIG_SISTEMA','ID','1','DT_VER_DB','');

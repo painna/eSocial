@@ -115,6 +115,9 @@ type
     imArquivoUnidadeGestora: TMenuItem;
     imArquivoEvento: TMenuItem;
     imArquivoAmbienteTrabalho: TMenuItem;
+    imAtualizarSquemasXSD: TMenuItem;
+    N1: TMenuItem;
+    imBaixarBibliotecas: TMenuItem;
     procedure FormCreate(Sender: TObject);
     procedure FormActivate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
@@ -265,11 +268,14 @@ begin
              'Aviso !!!', MB_ICONEXCLAMATION)
   else
     try
+      Screen.Cursor := crSQLWait;
       dmPrincipal.SConPrincipal.ExecuteDirect('execute procedure SP_ESOCIAL_EVENTOS_PEND_TABELAS');
+      Screen.Cursor := crDefault;
 
       frmEnvioEventoTabela := TfrmEnvioEventoTabela.Create(Self);
       frmEnvioEventoTabela.ShowModal;
     finally
+      Screen.Cursor := crDefault;
       FreeAndNil(frmEnvioEventoTabela);
     end;
 end;
