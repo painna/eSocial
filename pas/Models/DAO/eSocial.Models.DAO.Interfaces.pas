@@ -3,7 +3,9 @@ unit eSocial.Models.DAO.Interfaces;
 interface
 
 uses
-  Data.DB;
+  Data.DB,
+  System.Generics.Collections,
+  eSocial.Models.ComplexTypes;
 
 type
   iModelDAOEntity<T> = interface
@@ -12,6 +14,8 @@ type
     function Delete : iModelDAOEntity<T>;
     function Get    : iModelDAOEntity<T>; overload;
     function Get(aID : String)    : iModelDAOEntity<T>; overload;
+    function Get(aParams : TDictionary<String, String>) : iModelDAOEntity<T>; overload;
+    function Get(aParams : TArrayStrings) : iModelDAOEntity<T>; overload;
     function Insert : iModelDAOEntity<T>;
     function This   : T;
     function Update : iModelDAOEntity<T>;

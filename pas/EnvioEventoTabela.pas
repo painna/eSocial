@@ -50,11 +50,13 @@ type
     procedure cbS1040Click(Sender: TObject);
     procedure cmbAnoMesChange(Sender: TObject);
     procedure FormShow(Sender: TObject);
+    procedure gpbOperacaoClick(Sender: TObject);
   private
     { Private declarations }
     ICompetencia : IControllerCompetencia;
     procedure LimparPainelProcesso(aVisualizar : Boolean);
     procedure VerificarOperacoes;
+    procedure VerificarEventos;
 
     function GetESocial : TACBreSocial;
     function EventoSelecionado : Boolean;
@@ -104,6 +106,7 @@ end;
 procedure TfrmEnvioEventoTabela.cmbAnoMesChange(Sender: TObject);
 begin
   VerificarOperacoes;
+  VerificarEventos;
 end;
 
 function TfrmEnvioEventoTabela.EventoSelecionado: Boolean;
@@ -149,6 +152,7 @@ procedure TfrmEnvioEventoTabela.FormShow(Sender: TObject);
 begin
   inherited;
   VerificarOperacoes;
+  VerificarEventos;
 end;
 
 function TfrmEnvioEventoTabela.GeradoEnviado : Boolean;
@@ -245,6 +249,11 @@ begin
   Result := dmESocial.ACBrESocial;
 end;
 
+procedure TfrmEnvioEventoTabela.gpbOperacaoClick(Sender: TObject);
+begin
+  VerificarEventos;
+end;
+
 procedure TfrmEnvioEventoTabela.LimparPainelProcesso(aVisualizar: Boolean);
 begin
   pnlProcesso.Visible  := aVisualizar;
@@ -252,13 +261,58 @@ begin
   gagProcesso.Progress := 0;
 end;
 
-procedure TfrmEnvioEventoTabela.VerificarOperacoes;
+procedure TfrmEnvioEventoTabela.VerificarEventos;
+var
+  aCompetencia,
+  aOperacao   : String;
+  IOperacao : IControllerOperacao;
 begin
-  ICompetencia.DAO.Get( StringReplace(cmbAnoMes.Text, '-', '', [rfReplaceAll]) );
-  gpbOperacao.Enabled := not ICompetencia.DAO.This.Encerrado; // Liberar apenas se algum evento estiver pendente de envio
-//  gpbOperacao.Controls[0].Enabled := False; // Inserção
-  gpbOperacao.Controls[1].Enabled := False; // Alteração
-  gpbOperacao.Controls[2].Enabled := False; // Exclusão
+  aCompetencia := StringReplace(cmbAnoMes.Text, '-', '', [rfReplaceAll]);
+  IOperacao := TControllerFactory.Operacao;
+
+  case gpbOperacao.ItemIndex of
+    0 : aOperacao := 'I';
+    1 : aOperacao := 'A';
+    2 : aOperacao := 'E';
+  end;
+
+  cbS1000.Checked := IOperacao.DAO.Get([aCompetencia, 'S1000', aOperacao]).This.Processar;
+  cbS1005.Checked := IOperacao.DAO.Get([aCompetencia, 'S1005', aOperacao]).This.Processar;
+  cbS1010.Checked := IOperacao.DAO.Get([aCompetencia, 'S1010', aOperacao]).This.Processar;
+  cbS1020.Checked := IOperacao.DAO.Get([aCompetencia, 'S1020', aOperacao]).This.Processar;
+
+  cbS1000.Enabled := cbS1000.Checked;
+  cbS1005.Enabled := cbS1005.Checked;
+  cbS1010.Enabled := cbS1010.Checked;
+  cbS1020.Enabled := cbS1020.Checked;
+end;
+
+procedure TfrmEnvioEventoTabela.VerificarOperacoes;
+var
+  aCompetencia : String;
+  IOperacao : IControllerOperacao;
+begin
+  aCompetencia := StringReplace(cmbAnoMes.Text, '-', '', [rfReplaceAll]);
+  IOperacao    := TControllerFactory.Operacao;
+
+  ICompetencia.DAO.Get( aCompetencia );
+  IOperacao.DAO.Get( aCompetencia );
+
+  gpbOperacao.Enabled   := not ICompetencia.DAO.This.Encerrado; // Liberar apenas se algum evento estiver pendente de envio
+  gpbOperacao.ItemIndex := -1;
+
+  gpbOperacao.Controls[0].Enabled := IOperacao.DAO.This.Insercao;
+  gpbOperacao.Controls[1].Enabled := IOperacao.DAO.This.Alteracao;
+  gpbOperacao.Controls[2].Enabled := IOperacao.DAO.This.Exclusao;
+
+  if gpbOperacao.Controls[0].Enabled and (not gpbOperacao.Controls[1].Enabled) and (not gpbOperacao.Controls[2].Enabled) then
+    gpbOperacao.ItemIndex := 0
+  else
+  if (not gpbOperacao.Controls[0].Enabled) and gpbOperacao.Controls[1].Enabled and (not gpbOperacao.Controls[2].Enabled) then
+    gpbOperacao.ItemIndex := 1
+  else
+  if (not gpbOperacao.Controls[0].Enabled) and (not gpbOperacao.Controls[1].Enabled) and gpbOperacao.Controls[2].Enabled then
+    gpbOperacao.ItemIndex := 2;
 end;
 
 end.

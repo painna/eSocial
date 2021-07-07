@@ -13,8 +13,8 @@ object dmPrincipal: TdmPrincipal
       'User_Name=GERASYS.TI'
       'Password=gsti2010'
       
-        'Database=C:\Users\Isaque\Documents\Projetos\GeraSysTI\eSocial\tr' +
-        'unk\db\REMUN_PMSJA_USO_ESOCIAL.FDB'
+        'Database=C:\Users\Isaque\Documents\Bases\firebird\GeraSysTI\REMU' +
+        'N_PM_STA_ISABEL_PA_ESOCIAL.FDB'
       'ServerCharSet=WIN1252')
     BeforeConnect = SConPrincipalBeforeConnect
     Left = 56

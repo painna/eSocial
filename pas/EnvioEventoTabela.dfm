@@ -1,37 +1,38 @@
 inherited frmEnvioEventoTabela: TfrmEnvioEventoTabela
   Caption = 'eSocial - Enviar Eventos de Tabela'
-  ClientWidth = 704
+  ClientWidth = 716
   OnCreate = FormCreate
   OnShow = FormShow
-  ExplicitWidth = 718
+  ExplicitWidth = 730
   PixelsPerInch = 96
   TextHeight = 13
   inherited pnlControle: TPanel
-    Width = 704
+    Width = 716
     TabOrder = 2
+    ExplicitWidth = 704
     inherited btnCancelar: TBitBtn
-      Left = 616
-      ExplicitLeft = 584
+      Left = 628
+      ExplicitLeft = 616
     end
     inherited btnOk: TBitBtn
-      Left = 522
+      Left = 534
       OnClick = btnOkClick
-      ExplicitLeft = 490
+      ExplicitLeft = 522
     end
     object pnlProcesso: TPanel
       Left = 0
       Top = 6
-      Width = 516
+      Width = 528
       Height = 30
       Anchors = [akLeft, akRight, akBottom]
       BevelOuter = bvNone
       TabOrder = 2
       Visible = False
-      ExplicitWidth = 484
+      ExplicitWidth = 516
       object gagProcesso: TGauge
         Left = 0
         Top = 13
-        Width = 516
+        Width = 528
         Height = 17
         Align = alTop
         ForeColor = clBlue
@@ -48,7 +49,7 @@ inherited frmEnvioEventoTabela: TfrmEnvioEventoTabela
       object lblProcesso: TLabel
         Left = 0
         Top = 0
-        Width = 516
+        Width = 528
         Height = 13
         Align = alTop
         Caption = 'Andamento do processo...'
@@ -65,7 +66,7 @@ inherited frmEnvioEventoTabela: TfrmEnvioEventoTabela
   object gpbParametro: TGroupBox
     Left = 0
     Top = 0
-    Width = 704
+    Width = 716
     Height = 65
     Align = alTop
     Caption = 'Par'#226'metros de gera'#231#227'o do(s) arquivo(s) XML'
@@ -76,10 +77,9 @@ inherited frmEnvioEventoTabela: TfrmEnvioEventoTabela
     Font.Style = [fsBold]
     ParentFont = False
     TabOrder = 0
-    ExplicitTop = -6
-    ExplicitWidth = 672
+    ExplicitWidth = 704
     DesignSize = (
-      704
+      716
       65)
     object lblAnoMes: TLabel
       Left = 12
@@ -91,7 +91,7 @@ inherited frmEnvioEventoTabela: TfrmEnvioEventoTabela
     end
     object gpbOperacao: TRadioGroup
       AlignWithMargins = True
-      Left = 390
+      Left = 402
       Top = 17
       Width = 308
       Height = 40
@@ -103,7 +103,8 @@ inherited frmEnvioEventoTabela: TfrmEnvioEventoTabela
         'Altera'#231#227'o'
         'Exclus'#227'o')
       TabOrder = 1
-      ExplicitLeft = 358
+      OnClick = gpbOperacaoClick
+      ExplicitLeft = 390
     end
     object cmbAnoMes: TComboBox
       Left = 12
@@ -118,20 +119,20 @@ inherited frmEnvioEventoTabela: TfrmEnvioEventoTabela
   object gpbEvento: TGroupBox
     Left = 0
     Top = 65
-    Width = 704
+    Width = 716
     Height = 218
     Align = alClient
     Caption = 'Eventos'
     TabOrder = 1
-    ExplicitWidth = 672
+    ExplicitWidth = 704
     DesignSize = (
-      704
+      716
       218)
     object FlowPanel: TFlowPanel
       AlignWithMargins = True
       Left = 5
       Top = 18
-      Width = 694
+      Width = 706
       Height = 195
       Align = alClient
       BevelOuter = bvNone
@@ -140,15 +141,12 @@ inherited frmEnvioEventoTabela: TfrmEnvioEventoTabela
       Padding.Right = 3
       Padding.Bottom = 3
       TabOrder = 0
-      ExplicitLeft = 1
-      ExplicitTop = 17
-      ExplicitWidth = 700
-      ExplicitHeight = 201
+      ExplicitWidth = 694
       object cbS1000: TCheckBox
         AlignWithMargins = True
         Left = 6
         Top = 6
-        Width = 330
+        Width = 340
         Height = 17
         Caption = 'S1000 - Unidade Gestora Principal (Informa'#231#245'es do Empregador)'
         Ctl3D = False
@@ -157,9 +155,9 @@ inherited frmEnvioEventoTabela: TfrmEnvioEventoTabela
       end
       object cbS1005: TCheckBox
         AlignWithMargins = True
-        Left = 342
+        Left = 352
         Top = 6
-        Width = 330
+        Width = 340
         Height = 17
         Caption = 'S1005 - Outras Unidades Gestoras (Unidades de '#211'rg'#227'os P'#250'blicos)'
         Ctl3D = False
@@ -170,7 +168,7 @@ inherited frmEnvioEventoTabela: TfrmEnvioEventoTabela
         AlignWithMargins = True
         Left = 6
         Top = 29
-        Width = 330
+        Width = 340
         Height = 17
         Caption = 'S1010 - Eventos (Tabela de Rubricas)'
         Ctl3D = False
@@ -179,9 +177,9 @@ inherited frmEnvioEventoTabela: TfrmEnvioEventoTabela
       end
       object cbS1020: TCheckBox
         AlignWithMargins = True
-        Left = 342
+        Left = 352
         Top = 29
-        Width = 330
+        Width = 340
         Height = 17
         Caption = 'S1020 - Configura'#231#245'es do '#211'rg'#227'o (Lota'#231#245'es Tribut'#225'rias)'
         Ctl3D = False
@@ -192,7 +190,7 @@ inherited frmEnvioEventoTabela: TfrmEnvioEventoTabela
         AlignWithMargins = True
         Left = 6
         Top = 52
-        Width = 330
+        Width = 340
         Height = 17
         Caption = 'S-1030 Tabela de Cargos'
         Ctl3D = False
@@ -203,9 +201,9 @@ inherited frmEnvioEventoTabela: TfrmEnvioEventoTabela
       end
       object cbS1035: TCheckBox
         AlignWithMargins = True
-        Left = 342
+        Left = 352
         Top = 52
-        Width = 330
+        Width = 340
         Height = 17
         Caption = 'S-1035 Tabela de Carreiras P'#250'blicas'
         Enabled = False
@@ -216,7 +214,7 @@ inherited frmEnvioEventoTabela: TfrmEnvioEventoTabela
         AlignWithMargins = True
         Left = 6
         Top = 75
-        Width = 330
+        Width = 340
         Height = 17
         Caption = 'S-1040 Tabela de Fun'#231#245'es'
         Ctl3D = False
@@ -228,9 +226,9 @@ inherited frmEnvioEventoTabela: TfrmEnvioEventoTabela
       end
       object cbS1050: TCheckBox
         AlignWithMargins = True
-        Left = 342
+        Left = 352
         Top = 75
-        Width = 330
+        Width = 340
         Height = 17
         Caption = 'S-1050 Tabela de Hor'#225'rios/Turnos de Trabalho'
         Ctl3D = False
@@ -243,7 +241,7 @@ inherited frmEnvioEventoTabela: TfrmEnvioEventoTabela
         AlignWithMargins = True
         Left = 6
         Top = 98
-        Width = 330
+        Width = 340
         Height = 17
         Caption = 'S-1060 Tabela de Ambientes de Trabalho'
         Ctl3D = False
@@ -254,9 +252,9 @@ inherited frmEnvioEventoTabela: TfrmEnvioEventoTabela
       end
       object cbS1070: TCheckBox
         AlignWithMargins = True
-        Left = 342
+        Left = 352
         Top = 98
-        Width = 330
+        Width = 340
         Height = 17
         Caption = 'S-1070 Tabela de Processos'
         Ctl3D = False
@@ -269,7 +267,7 @@ inherited frmEnvioEventoTabela: TfrmEnvioEventoTabela
         AlignWithMargins = True
         Left = 6
         Top = 121
-        Width = 330
+        Width = 340
         Height = 17
         Caption = 'S-1080 Tabela de Operadores Portu'#225'rios'
         Ctl3D = False
@@ -281,7 +279,7 @@ inherited frmEnvioEventoTabela: TfrmEnvioEventoTabela
     end
     object Checb_ZeraBase: TCheckBox
       AlignWithMargins = True
-      Left = 522
+      Left = 534
       Top = 196
       Width = 177
       Height = 17
@@ -295,7 +293,7 @@ inherited frmEnvioEventoTabela: TfrmEnvioEventoTabela
       Font.Style = [fsBold]
       ParentFont = False
       TabOrder = 1
-      ExplicitLeft = 490
+      ExplicitLeft = 522
     end
   end
 end

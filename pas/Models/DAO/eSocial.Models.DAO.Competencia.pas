@@ -4,6 +4,7 @@ interface
 
 uses
   Data.DB,
+  System.Generics.Collections,
   eSocial.Models.DAO.Interfaces,
   eSocial.Models.ComplexTypes,
   eSocial.Models.Entities.Competencia,
@@ -25,6 +26,8 @@ type
       function Delete : iModelDAOEntity<TCompetencia>; virtual; abstract;
       function Get    : iModelDAOEntity<TCompetencia>; overload;
       function Get(aID : String)    : iModelDAOEntity<TCompetencia>; overload;
+      function Get(aParams : TDictionary<String, String>) : iModelDAOEntity<TCompetencia>; overload;
+      function Get(aParams : TArrayStrings) : iModelDAOEntity<TCompetencia>; overload;
       function Insert : iModelDAOEntity<TCompetencia>; virtual; abstract;
       function This   : TCompetencia;
       function Update : iModelDAOEntity<TCompetencia>; virtual; abstract;
@@ -57,6 +60,33 @@ begin
     FEntity.DisposeOf;
 
   inherited;
+end;
+
+function TModelDAOCompetencia.Get(aParams: TDictionary<String, String>): iModelDAOEntity<TCompetencia>;
+begin
+  Result := Self;
+  try
+    FConnection
+      .SQLClear
+      .SQL('Select')
+      .SQL('    c.competencia')
+      .SQL('  , c.ano')
+      .SQL('  , c.mes')
+      .SQL('  , c.descricao')
+      .SQL('  , c.encerrado')
+      .SQL('  , c.origem')
+      .SQL('from VW_ESOCIAL_COMPETENCIA c')
+      .SQL('  and (c.competencia = :competencia)')
+      .FetchParams
+      .AddParam('competencia', aParams.Items['competencia'])
+      .Open;
+
+    ReadFields;
+    aParams.DisposeOf;
+  except
+    on E : Exception do
+      raise Exception.Create('Erro ao consultar a competência : ' + #13#13 + E.Message);
+  end;
 end;
 
 function TModelDAOCompetencia.Get(aID: String): iModelDAOEntity<TCompetencia>;
@@ -148,6 +178,32 @@ end;
 function TModelDAOCompetencia.This: TCompetencia;
 begin
   Result := FEntity;
+end;
+
+function TModelDAOCompetencia.Get(aParams: TArrayStrings): iModelDAOEntity<TCompetencia>;
+begin
+  Result := Self;
+  try
+    FConnection
+      .SQLClear
+      .SQL('Select')
+      .SQL('    c.competencia')
+      .SQL('  , c.ano')
+      .SQL('  , c.mes')
+      .SQL('  , c.descricao')
+      .SQL('  , c.encerrado')
+      .SQL('  , c.origem')
+      .SQL('from VW_ESOCIAL_COMPETENCIA c')
+      .SQL('  and (c.competencia = :competencia)')
+      .FetchParams
+      .AddParam('competencia', aParams[0])
+      .Open;
+
+    ReadFields;
+  except
+    on E : Exception do
+      raise Exception.Create('Erro ao consultar a competência : ' + #13#13 + E.Message);
+  end;
 end;
 
 end.

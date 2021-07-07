@@ -36,7 +36,10 @@ uses
   eSocial.Models.Components.Connections.Factory in '..\pas\Models\Components\Connections\eSocial.Models.Components.Connections.Factory.pas',
   eSocial.Controllers.Competencia in '..\pas\Controllers\eSocial.Controllers.Competencia.pas',
   eSocial.Controllers.Interfaces in '..\pas\Controllers\eSocial.Controllers.Interfaces.pas',
-  eSocial.Controllers.Factory in '..\pas\Controllers\eSocial.Controllers.Factory.pas';
+  eSocial.Controllers.Factory in '..\pas\Controllers\eSocial.Controllers.Factory.pas',
+  eSocial.Models.Entities.Operacao in '..\pas\Models\Entities\eSocial.Models.Entities.Operacao.pas',
+  eSocial.Models.DAO.Operacao in '..\pas\Models\DAO\eSocial.Models.DAO.Operacao.pas',
+  eSocial.Controllers.Operacao in '..\pas\Controllers\eSocial.Controllers.Operacao.pas';
 
 {$R *.res}
 

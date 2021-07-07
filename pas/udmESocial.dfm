@@ -1116,4 +1116,12 @@ object dmESocial: TdmESocial
       Size = 1
     end
   end
+  object spEventosPendentesTabelas: TSQLStoredProc
+    MaxBlobSize = -1
+    Params = <>
+    SQLConnection = dmPrincipal.SConPrincipal
+    StoredProcName = 'SP_ESOCIAL_EVENTOS_PEND_TABELAS'
+    Left = 648
+    Top = 472
+  end
 end

@@ -214,6 +214,9 @@
         <DCCReference Include="..\pas\Controllers\eSocial.Controllers.Competencia.pas"/>
         <DCCReference Include="..\pas\Controllers\eSocial.Controllers.Interfaces.pas"/>
         <DCCReference Include="..\pas\Controllers\eSocial.Controllers.Factory.pas"/>
+        <DCCReference Include="..\pas\Models\Entities\eSocial.Models.Entities.Operacao.pas"/>
+        <DCCReference Include="..\pas\Models\DAO\eSocial.Models.DAO.Operacao.pas"/>
+        <DCCReference Include="..\pas\Controllers\eSocial.Controllers.Operacao.pas"/>
         <BuildConfiguration Include="Debug">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

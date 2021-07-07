@@ -265,6 +265,8 @@ begin
              'Aviso !!!', MB_ICONEXCLAMATION)
   else
     try
+      dmPrincipal.SConPrincipal.ExecuteDirect('execute procedure SP_ESOCIAL_EVENTOS_PEND_TABELAS');
+
       frmEnvioEventoTabela := TfrmEnvioEventoTabela.Create(Self);
       frmEnvioEventoTabela.ShowModal;
     finally

@@ -251,6 +251,7 @@ type
     cdsFechamentoCOM_MOVIMENTO: TStringField;
     qryFechamentoUSUARIO_ENVIO: TStringField;
     cdsFechamentoUSUARIO_ENVIO: TStringField;
+    spEventosPendentesTabelas: TSQLStoredProc;
     procedure DataModuleCreate(Sender: TObject);
     procedure DataModuleDestroy(Sender: TObject);
     procedure btnSalvar(Sender: TObject);
@@ -1458,7 +1459,7 @@ begin
     aSQL.Add('    group by');
     aSQL.Add('        l.id_evento');
     aSQL.Add('  ) x on (x.id_evento = e.id)');
-    aSQL.Add('where (coalesce(e.nat_rubrica, '''') <> '''')');
+    aSQL.Add('where (coalesce(trim(e.nat_rubrica), '''') != '''')');
 
     case aModoLancamento of
       mlInclusao  : aSQL.Add('  and e.tipo_operacao = ' + QuotedStr(FLAG_OPERACAO_INSERIR));
