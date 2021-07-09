@@ -66,6 +66,7 @@
         <DCC_S>false</DCC_S>
         <DCC_E>false</DCC_E>
         <DCC_F>false</DCC_F>
+        <DCC_UnitSearchPath>modules\.dcp;modules\.dcu;modules;modules\HStorage4Bind\src;modules\aws4d\src;modules\bind4d\Sample;modules\bind4d\Sample\fmx;modules\bind4d\src;modules\bind4d\src\Forms;modules\dataset-serialize\src;modules\hstorage4d\src;modules\localcache4d\samples\LocalCache4D;modules\localcache4d\src;modules\restrequest4delphi\src;modules\router4delphi\src;modules\translator4d\samples\GoogleTranslator;modules\translator4d\src;modules\zipcode4bind\src;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win32)'!=''">
         <VerInfo_Build>0</VerInfo_Build>
@@ -223,6 +224,21 @@
         <DCCReference Include="..\pas\Controllers\eSocial.Controllers.Factory.pas"/>
         <DCCReference Include="..\pas\Controllers\eSocial.Controllers.Operacao.pas"/>
         <DCCReference Include="..\pas\Controllers\eSocial.Controllers.Configuracao.pas"/>
+        <DCCReference Include="..\pas\Views\eSocial.Views.Esmaecer.pas">
+            <Form>ViewEsmaecer</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="..\pas\Views\eSocial.Views.Default.pas">
+            <Form>ViewDefault</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="..\pas\Views\eSocial.Views.Styles.pas"/>
+        <DCCReference Include="..\pas\Views\eSocial.Views.Styles.Colors.pas"/>
+        <DCCReference Include="..\pas\Classes\eSocial.Classes.Events.pas"/>
+        <DCCReference Include="..\pas\Views\eSocial.Views.ViewEventoTabelaEnviar.pas">
+            <Form>ViewEventoTabelaEnviar</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
         <BuildConfiguration Include="Debug">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

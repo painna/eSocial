@@ -44,7 +44,13 @@ uses
   eSocial.Controllers.Interfaces in '..\pas\Controllers\eSocial.Controllers.Interfaces.pas',
   eSocial.Controllers.Factory in '..\pas\Controllers\eSocial.Controllers.Factory.pas',
   eSocial.Controllers.Operacao in '..\pas\Controllers\eSocial.Controllers.Operacao.pas',
-  eSocial.Controllers.Configuracao in '..\pas\Controllers\eSocial.Controllers.Configuracao.pas';
+  eSocial.Controllers.Configuracao in '..\pas\Controllers\eSocial.Controllers.Configuracao.pas',
+  eSocial.Views.Esmaecer in '..\pas\Views\eSocial.Views.Esmaecer.pas' {ViewEsmaecer},
+  eSocial.Views.Default in '..\pas\Views\eSocial.Views.Default.pas' {ViewDefault},
+  eSocial.Views.Styles in '..\pas\Views\eSocial.Views.Styles.pas',
+  eSocial.Views.Styles.Colors in '..\pas\Views\eSocial.Views.Styles.Colors.pas',
+  eSocial.Classes.Events in '..\pas\Classes\eSocial.Classes.Events.pas',
+  eSocial.Views.ViewEventoTabelaEnviar in '..\pas\Views\eSocial.Views.ViewEventoTabelaEnviar.pas' {ViewEventoTabelaEnviar};
 
 {$R *.res}
 

@@ -1,0 +1,12 @@
+{
+	"name": "Remun_eSocial",
+	"description": "Aplicativo de apoio ao sistema Remuneratus para a geração/envio de eventos do e-Social",
+	"version": "1.0.0",
+	"homepage": "",
+	"mainsrc": "./",
+	"projects": [],
+	"dependencies": {
+		"https://github.com/bittencourtthulio/bind4d": "^1.0.27",
+		"https://github.com/bittencourtthulio/router4delphi": "^1.0.6"
+	}
+}

@@ -33,7 +33,7 @@ uses
   dxSkinVisualStudio2013Dark, dxSkinVisualStudio2013Light, dxSkinVS2010,
   dxSkinWhiteprint, dxSkinXmas2008Blue, System.Actions, System.ImageList, cxImageList,
   eSocial.Controllers.Interfaces,
-  eSocial.Controllers.Factory;
+  eSocial.Controllers.Factory, Vcl.AppEvnts;
 
 type
   TfrmPrincipal = class(TForm)
@@ -118,6 +118,7 @@ type
     imAtualizarSquemasXSD: TMenuItem;
     N1: TMenuItem;
     imBaixarBibliotecas: TMenuItem;
+    AppEvents: TApplicationEvents;
     procedure FormCreate(Sender: TObject);
     procedure FormActivate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
@@ -138,6 +139,9 @@ type
     procedure imArquivoUnidadeGestoraClick(Sender: TObject);
     procedure imArquivoEventoClick(Sender: TObject);
     procedure imArquivoAmbienteTrabalhoClick(Sender: TObject);
+    procedure AppEventsActivate(Sender: TObject);
+    procedure AppEventsModalBegin(Sender: TObject);
+    procedure AppEventsModalEnd(Sender: TObject);
 
   private
     ICompetencia : IControllerCompetencia;
@@ -179,7 +183,9 @@ uses
   ConfigurarESocial,
   EnvioEventoTabela,
   EnvioEventoNaoPeriodico,
-  EnvioEventoPeriodico;
+  EnvioEventoPeriodico,
+  eSocial.Views.Esmaecer,
+  eSocial.Views.ViewEventoTabelaEnviar;
 
 {$R *.dfm}
 
@@ -279,19 +285,38 @@ begin
                'Validação', MB_ICONERROR)
     else
     begin
-      try
-        Screen.Cursor := crSQLWait;
-        dmPrincipal.SConPrincipal.ExecuteDirect('execute procedure SP_ESOCIAL_EVENTOS_PEND_TABELAS');
-        Screen.Cursor := crDefault;
-
-        frmEnvioEventoTabela := TfrmEnvioEventoTabela.Create(Self);
-        frmEnvioEventoTabela.ShowModal;
-      finally
-        Screen.Cursor := crDefault;
-        FreeAndNil(frmEnvioEventoTabela);
-      end;
+      ViewEventoTabelaEnviar(Self);
+//      try
+//        Screen.Cursor := crSQLWait;
+//        dmPrincipal.SConPrincipal.ExecuteDirect('execute procedure SP_ESOCIAL_EVENTOS_PEND_TABELAS');
+//        Screen.Cursor := crDefault;
+//
+//        frmEnvioEventoTabela := TfrmEnvioEventoTabela.Create(Self);
+//        frmEnvioEventoTabela.ShowModal;
+//      finally
+//        Screen.Cursor := crDefault;
+//        FreeAndNil(frmEnvioEventoTabela);
+//      end;
     end;
   end;
+end;
+
+procedure TfrmPrincipal.AppEventsActivate(Sender: TObject);
+begin
+  Application.BringToFront;
+end;
+
+procedure TfrmPrincipal.AppEventsModalBegin(Sender: TObject);
+begin
+  if Self.Showing then
+    if not TViewEsmaecer.GetInstance(Self).Showing then
+      TViewEsmaecer.GetInstance(Application).Show;
+end;
+
+procedure TfrmPrincipal.AppEventsModalEnd(Sender: TObject);
+begin
+  if Self.Showing then
+    TViewEsmaecer.GetInstance(Self).Close;
 end;
 
 procedure TfrmPrincipal.FormActivate(Sender: TObject);

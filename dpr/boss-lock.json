@@ -1,0 +1,102 @@
+{
+	"hash": "d41d8cd98f00b204e9800998ecf8427e",
+	"updated": "2021-07-09T12:13:09.114135-03:00",
+	"installedModules": {
+		"github.com/viniciussanchez/dataset-serialize": {
+			"name": "dataset-serialize",
+			"version": "v2.3.2",
+			"hash": "f3653d4a931b4253230b442000208e6c",
+			"artifacts": {},
+			"failed": false,
+			"changed": false
+		},
+		"github.com/viniciussanchez/restrequest4delphi": {
+			"name": "restrequest4delphi",
+			"version": "v3.0.6",
+			"hash": "c113a36fa794862991b7d85d8a23053a",
+			"artifacts": {},
+			"failed": false,
+			"changed": true
+		},
+		"https://github.com/bittencourtthulio/aws4d": {
+			"name": "aws4d",
+			"version": "1.0.7",
+			"hash": "12e19c045cd2dc38cc483e2c3cd7c47b",
+			"artifacts": {},
+			"failed": false,
+			"changed": false
+		},
+		"https://github.com/bittencourtthulio/bind4d": {
+			"name": "bind4d",
+			"version": "1.0.27",
+			"hash": "87c96e229d468936ca821a0854bb4dde",
+			"artifacts": {},
+			"failed": false,
+			"changed": false
+		},
+		"https://github.com/bittencourtthulio/hstorage4d": {
+			"name": "hstorage4d",
+			"version": "1.0.2",
+			"hash": "3cf606bddab3b3f310daf0952e28dddd",
+			"artifacts": {},
+			"failed": false,
+			"changed": false
+		},
+		"https://github.com/bittencourtthulio/localcache4d": {
+			"name": "localcache4d",
+			"version": "1.0.4",
+			"hash": "78a7747cc7f2f79822d67610672800a5",
+			"artifacts": {},
+			"failed": false,
+			"changed": false
+		},
+		"https://github.com/bittencourtthulio/router4delphi": {
+			"name": "router4delphi",
+			"version": "1.0.6",
+			"hash": "5e77550c45e734fd4e24e4d9165343e9",
+			"artifacts": {},
+			"failed": false,
+			"changed": false
+		},
+		"https://github.com/bittencourtthulio/translator4d": {
+			"name": "translator4d",
+			"version": "1.0.4",
+			"hash": "a952ed310e4f8770b0eef08a7b9c5967",
+			"artifacts": {},
+			"failed": false,
+			"changed": false
+		},
+		"https://github.com/pmadalozzo/hstorage4bind": {
+			"name": "HStorage4Bind",
+			"version": "1.0.1",
+			"hash": "6bf43044101a9b073f011960a385d8e7",
+			"artifacts": {},
+			"failed": false,
+			"changed": false
+		},
+		"https://github.com/pmadalozzo/zipcode4bind": {
+			"name": "zipcode4bind",
+			"version": "1.0.2",
+			"hash": "efa21c7b1f61abc5da3c6cb1fe8b49f4",
+			"artifacts": {},
+			"failed": false,
+			"changed": false
+		},
+		"https://github.com/viniciussanchez/dataset-serialize": {
+			"name": "dataset-serialize",
+			"version": "v2.3.2",
+			"hash": "f3653d4a931b4253230b442000208e6c",
+			"artifacts": {},
+			"failed": false,
+			"changed": true
+		},
+		"https://github.com/viniciussanchez/restrequest4delphi": {
+			"name": "restrequest4delphi",
+			"version": "v3.0.6",
+			"hash": "c113a36fa794862991b7d85d8a23053a",
+			"artifacts": {},
+			"failed": false,
+			"changed": false
+		}
+	}
+}

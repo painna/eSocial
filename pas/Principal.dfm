@@ -5,10 +5,10 @@ object frmPrincipal: TfrmPrincipal
   ClientHeight = 545
   ClientWidth = 1045
   Color = clBtnFace
-  Font.Charset = DEFAULT_CHARSET
+  Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
   Font.Height = -11
-  Font.Name = 'Calibri'
+  Font.Name = 'Tahoma'
   Font.Style = []
   FormStyle = fsMDIForm
   KeyPreview = True
@@ -1861,5 +1861,12 @@ object frmPrincipal: TfrmPrincipal
           0000000000000000000000000000000000000000000000010101192D13511E30
           0B5A1E2F0B5A1E2F0B5A1E2F0B5A1E300B5A0E14082300000000}
       end>
+  end
+  object AppEvents: TApplicationEvents
+    OnActivate = AppEventsActivate
+    OnModalBegin = AppEventsModalBegin
+    OnModalEnd = AppEventsModalEnd
+    Left = 752
+    Top = 64
   end
 end
