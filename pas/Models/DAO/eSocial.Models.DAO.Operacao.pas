@@ -70,10 +70,13 @@ begin
       .SQLClear
       .SQL('Select')
       .SQL('    e.competencia')
-      .SQL('  , sum(Case when (e.insercao  = ''S'') then 1 else 0 end) as insercao')
-      .SQL('  , sum(Case when (e.alteracao = ''S'') then 1 else 0 end) as alteracao')
-      .SQL('  , sum(Case when (e.exclusao  = ''S'') then 1 else 0 end) as exclusao')
+      .SQL('  , sum(Case when (e.insercao  = ''S'') and (coalesce(pI.enviado, ''N'') = ''N'') or (coalesce((Select pendencias from GET_ESOCIAL_PENDENCIA(e.evento, ''I'')), 0) > 0) then 1 else 0 end) as insercao ')
+      .SQL('  , sum(Case when (e.alteracao = ''S'') and (coalesce(pA.enviado, ''N'') = ''N'') or (coalesce((Select pendencias from GET_ESOCIAL_PENDENCIA(e.evento, ''A'')), 0) > 0) then 1 else 0 end) as alteracao')
+      .SQL('  , sum(Case when (e.exclusao  = ''S'') and (coalesce(pE.enviado, ''N'') = ''N'') or (coalesce((Select pendencias from GET_ESOCIAL_PENDENCIA(e.evento, ''E'')), 0) > 0) then 1 else 0 end) as exclusao ')
       .SQL('from ESOCIAL_GERAR_EVENTOS e')
+      .SQL('  left join ESOCIAL_EVENTO pI on (pI.evento = e.evento and pI.competencia = e.competencia and pI.operacao = ''I'') ')
+      .SQL('  left join ESOCIAL_EVENTO pA on (pA.evento = e.evento and pA.competencia = e.competencia and pA.operacao = ''A'') ')
+      .SQL('  left join ESOCIAL_EVENTO pE on (pE.evento = e.evento and pE.competencia = e.competencia and pE.operacao = ''E'') ')
       .SQL('where (e.competencia = :competencia)')
       .SQL('  and (e.evento      = :evento)')
       .FetchParams
@@ -110,10 +113,13 @@ begin
       .SQLClear
       .SQL('Select')
       .SQL('    e.competencia')
-      .SQL('  , sum(Case when (e.insercao  = ''S'') then 1 else 0 end) as insercao')
-      .SQL('  , sum(Case when (e.alteracao = ''S'') then 1 else 0 end) as alteracao')
-      .SQL('  , sum(Case when (e.exclusao  = ''S'') then 1 else 0 end) as exclusao')
-      .SQL('from ESOCIAL_GERAR_EVENTOS e');
+      .SQL('  , sum(Case when (e.insercao  = ''S'') and (coalesce(pI.enviado, ''N'') = ''N'') or (coalesce((Select pendencias from GET_ESOCIAL_PENDENCIA(e.evento, ''I'')), 0) > 0) then 1 else 0 end) as insercao ')
+      .SQL('  , sum(Case when (e.alteracao = ''S'') and (coalesce(pA.enviado, ''N'') = ''N'') or (coalesce((Select pendencias from GET_ESOCIAL_PENDENCIA(e.evento, ''A'')), 0) > 0) then 1 else 0 end) as alteracao')
+      .SQL('  , sum(Case when (e.exclusao  = ''S'') and (coalesce(pE.enviado, ''N'') = ''N'') or (coalesce((Select pendencias from GET_ESOCIAL_PENDENCIA(e.evento, ''E'')), 0) > 0) then 1 else 0 end) as exclusao ')
+      .SQL('from ESOCIAL_GERAR_EVENTOS e')
+      .SQL('  left join ESOCIAL_EVENTO pI on (pI.evento = e.evento and pI.competencia = e.competencia and pI.operacao = ''I'') ')
+      .SQL('  left join ESOCIAL_EVENTO pA on (pA.evento = e.evento and pA.competencia = e.competencia and pA.operacao = ''A'') ')
+      .SQL('  left join ESOCIAL_EVENTO pE on (pE.evento = e.evento and pE.competencia = e.competencia and pE.operacao = ''E'') ');
 
     if not aID.Trim.IsEmpty then
     begin
@@ -143,10 +149,13 @@ begin
       .SQLClear
       .SQL('Select')
       .SQL('    e.competencia')
-      .SQL('  , sum(Case when (e.insercao  = ''S'') then 1 else 0 end) as insercao')
-      .SQL('  , sum(Case when (e.alteracao = ''S'') then 1 else 0 end) as alteracao')
-      .SQL('  , sum(Case when (e.exclusao  = ''S'') then 1 else 0 end) as exclusao')
+      .SQL('  , sum(Case when (e.insercao  = ''S'') and (coalesce(pI.enviado, ''N'') = ''N'') or (coalesce((Select pendencias from GET_ESOCIAL_PENDENCIA(e.evento, ''I'')), 0) > 0) then 1 else 0 end) as insercao ')
+      .SQL('  , sum(Case when (e.alteracao = ''S'') and (coalesce(pA.enviado, ''N'') = ''N'') or (coalesce((Select pendencias from GET_ESOCIAL_PENDENCIA(e.evento, ''A'')), 0) > 0) then 1 else 0 end) as alteracao')
+      .SQL('  , sum(Case when (e.exclusao  = ''S'') and (coalesce(pE.enviado, ''N'') = ''N'') or (coalesce((Select pendencias from GET_ESOCIAL_PENDENCIA(e.evento, ''E'')), 0) > 0) then 1 else 0 end) as exclusao ')
       .SQL('from ESOCIAL_GERAR_EVENTOS e')
+      .SQL('  left join ESOCIAL_EVENTO pI on (pI.evento = e.evento and pI.competencia = e.competencia and pI.operacao = ''I'') ')
+      .SQL('  left join ESOCIAL_EVENTO pA on (pA.evento = e.evento and pA.competencia = e.competencia and pA.operacao = ''A'') ')
+      .SQL('  left join ESOCIAL_EVENTO pE on (pE.evento = e.evento and pE.competencia = e.competencia and pE.operacao = ''E'') ')
       .SQL('where (e.competencia = :competencia)')
       .SQL('group by')
       .SQL('    e.competencia')
@@ -186,10 +195,13 @@ begin
       .SQLClear
       .SQL('Select')
       .SQL('    e.competencia')
-      .SQL('  , sum(Case when (e.insercao  = ''S'') then 1 else 0 end) as insercao')
-      .SQL('  , sum(Case when (e.alteracao = ''S'') then 1 else 0 end) as alteracao')
-      .SQL('  , sum(Case when (e.exclusao  = ''S'') then 1 else 0 end) as exclusao')
+      .SQL('  , sum(Case when (e.insercao  = ''S'') and (coalesce(pI.enviado, ''N'') = ''N'') or (coalesce((Select pendencias from GET_ESOCIAL_PENDENCIA(e.evento, ''I'')), 0) > 0) then 1 else 0 end) as insercao ')
+      .SQL('  , sum(Case when (e.alteracao = ''S'') and (coalesce(pA.enviado, ''N'') = ''N'') or (coalesce((Select pendencias from GET_ESOCIAL_PENDENCIA(e.evento, ''A'')), 0) > 0) then 1 else 0 end) as alteracao')
+      .SQL('  , sum(Case when (e.exclusao  = ''S'') and (coalesce(pE.enviado, ''N'') = ''N'') or (coalesce((Select pendencias from GET_ESOCIAL_PENDENCIA(e.evento, ''E'')), 0) > 0) then 1 else 0 end) as exclusao ')
       .SQL('from ESOCIAL_GERAR_EVENTOS e')
+      .SQL('  left join ESOCIAL_EVENTO pI on (pI.evento = e.evento and pI.competencia = e.competencia and pI.operacao = ''I'') ')
+      .SQL('  left join ESOCIAL_EVENTO pA on (pA.evento = e.evento and pA.competencia = e.competencia and pA.operacao = ''A'') ')
+      .SQL('  left join ESOCIAL_EVENTO pE on (pE.evento = e.evento and pE.competencia = e.competencia and pE.operacao = ''E'') ')
       .SQL('where (e.competencia = :competencia)')
       .SQL('  and (e.evento      = :evento)')
       .FetchParams

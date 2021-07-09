@@ -111,13 +111,22 @@ type
     cds1RESPONSAVEL_FONEFIXO: TStringField;
     cds1RESPONSAVEL_FONECELULAR: TStringField;
     cds1RESPONSAVEL_EMAIL: TStringField;
+    qryServidor: TSQLDataSet;
+    dspServidor: TDataSetProvider;
+    cdsServidor: TClientDataSet;
+    procedure ValidarFone(Sender: TObject; var DisplayValue: Variant;
+      var ErrorText: TCaption; var Error: Boolean);
+    procedure ValidarNumeroCPF(Sender: TObject; var DisplayValue: Variant;
+      var ErrorText: TCaption; var Error: Boolean);
     procedure FormCreate(Sender: TObject);
     procedure cds1NewRecord(DataSet: TDataSet);
     procedure FormShow(Sender: TObject);
     procedure cds1BeforePost(DataSet: TDataSet);
     procedure btnGravarClick(Sender: TObject);
+    procedure ds1DataChange(Sender: TObject; Field: TField);
   private
     { Private declarations }
+    procedure ServidorGestorUG(const aUG : Integer);
   public
     { Public declarations }
   end;
@@ -138,7 +147,10 @@ begin
   if cds1.State = dsInsert then
     cds1TIPO_OPERACAO.AsString := FLAG_OPERACAO_INSERIR
   else
-    cds1TIPO_OPERACAO.AsString := FLAG_OPERACAO_ALTERAR;
+  begin
+    if cds1TIPO_OPERACAO.AsString = FLAG_OPERACAO_ENVIADO then
+      cds1TIPO_OPERACAO.AsString := FLAG_OPERACAO_ALTERAR;
+  end;
 
   inherited;
 end;
@@ -158,6 +170,9 @@ begin
     Abort;
   end;
 
+  if cds1DATA_IMPLANTACAO.IsNull then
+    cds1DATA_IMPLANTACAO.AsDateTime := StrToDate('01/' + FormatDateTime('mm/yyyy', Date));
+
   if cds1.State = dsInsert then
     cds1TIPO_OPERACAO.AsString := FLAG_OPERACAO_INSERIR
   else
@@ -169,7 +184,24 @@ begin
   inherited;
   cds1ID_CONFIG_ORGAO.AsInteger       := 1;
   cds1POSSUI_RPPS.AsString            := FLAG_NAO;
-  cds1POSSUI_TABELA_CARREIRA.AsString := FLAG_NAO;
+  cds1POSSUI_TABELA_CARREIRA.AsString := FLAG_SIM;
+  cds1DATA_IMPLANTACAO.AsDateTime     := StrToDate('01/' + FormatDateTime('mm/yyyy', Date));
+end;
+
+procedure TfrmConfigurarESocial.ds1DataChange(Sender: TObject; Field: TField);
+begin
+  if Field = cds1ID_UNID_GESTORA then
+  begin
+    ServidorGestorUG(cds1ID_UNID_GESTORA.AsInteger);
+    if (not cdsServidor.IsEmpty) and (cds1.State in [dsInsert, dsEdit]) then
+    begin
+      cds1RESPONSAVEL_NOME.AsString := Trim(Copy(cdsServidor.FieldByName('nome').AsString, 1, cds1RESPONSAVEL_NOME.Size));
+      cds1RESPONSAVEL_CPF.AsString  := Trim(Copy(cdsServidor.FieldByName('cpf').AsString, 1, cds1RESPONSAVEL_CPF.Size));
+      cds1RESPONSAVEL_FONEFIXO.AsString    := Trim(Copy(cdsServidor.FieldByName('telefone').AsString, 1, cds1RESPONSAVEL_FONEFIXO.Size));
+      cds1RESPONSAVEL_FONECELULAR.AsString := Trim(Copy(cdsServidor.FieldByName('celular').AsString, 1, cds1RESPONSAVEL_FONECELULAR.Size));
+      cds1RESPONSAVEL_EMAIL.AsString       := Trim(Copy(cdsServidor.FieldByName('e_mail').AsString, 1, cds1RESPONSAVEL_EMAIL.Size));
+    end;
+  end;
 end;
 
 procedure TfrmConfigurarESocial.FormCreate(Sender: TObject);
@@ -192,6 +224,42 @@ begin
   inherited;
   cds1.ParamByName('ID').AsInteger := 1;
   cds1.Open;
+
+  ServidorGestorUG(cds1ID_UNID_GESTORA.AsInteger);
+end;
+
+procedure TfrmConfigurarESocial.ServidorGestorUG(const aUG: Integer);
+begin
+  cdsServidor.Close;
+  cdsServidor.ParamByName('ug').AsInteger := aUG;
+  cdsServidor.Open;
+end;
+
+procedure TfrmConfigurarESocial.ValidarNumeroCPF(Sender: TObject; var DisplayValue: Variant; var ErrorText: TCaption;
+  var Error: Boolean);
+var
+  aValue : String;
+begin
+  aValue := VarToStr(DisplayValue)
+    .Replace('.', '', [rfReplaceAll])
+    .Replace('-', '', [rfReplaceAll])
+    .Trim;
+  ErrorText := 'O número de CPF está incompleto!';
+  Error  := (aValue <> EmptyStr) and (aValue.Length < 11);
+end;
+
+procedure TfrmConfigurarESocial.ValidarFone(Sender: TObject; var DisplayValue: Variant; var ErrorText: TCaption;
+  var Error: Boolean);
+var
+  aValue : String;
+begin
+  aValue := VarToStr(DisplayValue)
+    .Replace('(', '', [rfReplaceAll])
+    .Replace('-', '', [rfReplaceAll])
+    .Replace(')', '', [rfReplaceAll])
+    .Trim;
+  ErrorText := 'O número de informado está incompleto!';
+  Error  := (aValue <> EmptyStr) and (aValue.Length < 10);
 end;
 
 end.

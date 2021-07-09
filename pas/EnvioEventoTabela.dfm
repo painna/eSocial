@@ -9,15 +9,15 @@ inherited frmEnvioEventoTabela: TfrmEnvioEventoTabela
   inherited pnlControle: TPanel
     Width = 716
     TabOrder = 2
-    ExplicitWidth = 704
+    ExplicitWidth = 716
     inherited btnCancelar: TBitBtn
       Left = 628
-      ExplicitLeft = 616
+      ExplicitLeft = 628
     end
     inherited btnOk: TBitBtn
       Left = 534
       OnClick = btnOkClick
-      ExplicitLeft = 522
+      ExplicitLeft = 534
     end
     object pnlProcesso: TPanel
       Left = 0
@@ -28,7 +28,6 @@ inherited frmEnvioEventoTabela: TfrmEnvioEventoTabela
       BevelOuter = bvNone
       TabOrder = 2
       Visible = False
-      ExplicitWidth = 516
       object gagProcesso: TGauge
         Left = 0
         Top = 13
@@ -77,7 +76,6 @@ inherited frmEnvioEventoTabela: TfrmEnvioEventoTabela
     Font.Style = [fsBold]
     ParentFont = False
     TabOrder = 0
-    ExplicitWidth = 704
     DesignSize = (
       716
       65)
@@ -104,7 +102,6 @@ inherited frmEnvioEventoTabela: TfrmEnvioEventoTabela
         'Exclus'#227'o')
       TabOrder = 1
       OnClick = gpbOperacaoClick
-      ExplicitLeft = 390
     end
     object cmbAnoMes: TComboBox
       Left = 12
@@ -124,7 +121,6 @@ inherited frmEnvioEventoTabela: TfrmEnvioEventoTabela
     Align = alClient
     Caption = 'Eventos'
     TabOrder = 1
-    ExplicitWidth = 704
     DesignSize = (
       716
       218)
@@ -141,7 +137,6 @@ inherited frmEnvioEventoTabela: TfrmEnvioEventoTabela
       Padding.Right = 3
       Padding.Bottom = 3
       TabOrder = 0
-      ExplicitWidth = 694
       object cbS1000: TCheckBox
         AlignWithMargins = True
         Left = 6
@@ -163,6 +158,7 @@ inherited frmEnvioEventoTabela: TfrmEnvioEventoTabela
         Ctl3D = False
         ParentCtl3D = False
         TabOrder = 1
+        OnClick = cbS1005Click
       end
       object cbS1010: TCheckBox
         AlignWithMargins = True
@@ -293,7 +289,6 @@ inherited frmEnvioEventoTabela: TfrmEnvioEventoTabela
       Font.Style = [fsBold]
       ParentFont = False
       TabOrder = 1
-      ExplicitLeft = 522
     end
   end
 end

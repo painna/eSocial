@@ -572,8 +572,8 @@ var
         if (aEventoTemp <> aRegistro[0]) then
           SetEventoESocial(aRegistro[0]
             , IntToStr(aCompetencia.ID)
-            , aProtocolo.Numero
             , aRegistro[2] // Operação
+            , aProtocolo.Numero
             , gUsuarioLogin
             , aProtocolo.DataHora
             , True
@@ -1219,8 +1219,8 @@ begin
     else
       SetEventoESocial('S1000'
         , aProtocolo.CompetenciaID
-        , aProtocolo.Numero
         , MODO_OPERACAO[Ord(aModoLancamento)]
+        , aProtocolo.Numero
         , gUsuarioLogin
         , Now
         , True
@@ -1257,7 +1257,7 @@ begin
 
     aSQL.BeginUpdate;
     aSQL.Clear;
-    aSQL.Add('Select First 1');
+    aSQL.Add('Select First 1'); // Apenas uma unidade pode ser enviada por lote
     aSQL.Add('    ug.*');
     aSQL.Add('  , ' + QuotedStr(eSAliqRatToStr(arat2)) + ' as aliquota_rat ');
     aSQL.Add('  , coalesce(fp.valor, 0.0) as aliquota_fap ');
@@ -1333,7 +1333,7 @@ begin
             begin
               TpInsc   := tiCNPJ;
               NrInsc   := cdsTabela.FieldByName('CNPJ').AsString;
-              IniValid := aCompetencia;;
+              IniValid := aCompetencia;
               FimValid := '2099-12';
             end;
 
@@ -1405,8 +1405,8 @@ begin
     else
       SetEventoESocial('S1005'
         , aProtocolo.CompetenciaID
-        , aProtocolo.Numero
         , MODO_OPERACAO[Ord(aModoLancamento)]
+        , aProtocolo.Numero
         , gUsuarioLogin
         , Now
         , True
@@ -1443,7 +1443,7 @@ begin
   try
     aSQL.BeginUpdate;
     aSQL.Clear;
-    aSQL.Add('Select');
+    aSQL.Add('Select First 50'); // É permitido apenas 50 registros por lote
     aSQL.Add('    e.*');
     aSQL.Add('  , x.ano_mes_min');
     aSQL.Add('  , x.ano_mes_max');
@@ -1612,8 +1612,8 @@ begin
     else
       SetEventoESocial('S1010'
         , aProtocolo.CompetenciaID
-        , aProtocolo.Numero
         , MODO_OPERACAO[Ord(aModoLancamento)]
+        , aProtocolo.Numero
         , gUsuarioLogin
         , Now
         , True
@@ -1825,8 +1825,8 @@ begin
     else
       SetEventoESocial('S1020'
         , aProtocolo.CompetenciaID
-        , aProtocolo.Numero
         , MODO_OPERACAO[Ord(aModoLancamento)]
+        , aProtocolo.Numero
         , gUsuarioLogin
         , Now
         , True
@@ -1963,8 +1963,8 @@ begin
     else
       SetEventoESocial('S1030'
         , aProtocolo.CompetenciaID
-        , aProtocolo.Numero
         , MODO_OPERACAO[Ord(aModoLancamento)]
+        , aProtocolo.Numero
         , gUsuarioLogin
         , Now
         , True
@@ -2100,8 +2100,8 @@ begin
     else
       SetEventoESocial('S1040'
         , aProtocolo.CompetenciaID
-        , aProtocolo.Numero
         , MODO_OPERACAO[Ord(aModoLancamento)]
+        , aProtocolo.Numero
         , gUsuarioLogin
         , Now
         , True
@@ -2235,8 +2235,8 @@ begin
     else
       SetEventoESocial('S1050'
         , aProtocolo.CompetenciaID
-        , aProtocolo.Numero
         , MODO_OPERACAO[Ord(aModoLancamento)]
+        , aProtocolo.Numero
         , gUsuarioLogin
         , Now
         , True
@@ -2387,8 +2387,8 @@ begin
     else
       SetEventoESocial('S1060'
         , aProtocolo.CompetenciaID
-        , aProtocolo.Numero
         , MODO_OPERACAO[Ord(aModoLancamento)]
+        , aProtocolo.Numero
         , gUsuarioLogin
         , Now
         , True
@@ -2749,8 +2749,8 @@ begin
     else
       SetEventoESocial('S1200'
         , aProtocolo.CompetenciaID
-        , aProtocolo.Numero
         , MODO_OPERACAO[Ord(aModoLancamento)]
+        , aProtocolo.Numero
         , gUsuarioLogin
         , Now
         , True
@@ -3067,8 +3067,8 @@ begin
     else
       SetEventoESocial('S1202'
         , aProtocolo.CompetenciaID
-        , aProtocolo.Numero
         , MODO_OPERACAO[Ord(aModoLancamento)]
+        , aProtocolo.Numero
         , gUsuarioLogin
         , Now
         , True
@@ -3275,8 +3275,8 @@ begin
     else
       SetEventoESocial('S1207'
         , aProtocolo.CompetenciaID
-        , aProtocolo.Numero
         , MODO_OPERACAO[Ord(aModoLancamento)]
+        , aProtocolo.Numero
         , gUsuarioLogin
         , Now
         , True
@@ -3702,8 +3702,8 @@ begin
     else
       SetEventoESocial('S1210'
         , aProtocolo.CompetenciaID
-        , aProtocolo.Numero
         , MODO_OPERACAO[Ord(aModoLancamento)]
+        , aProtocolo.Numero
         , gUsuarioLogin
         , Now
         , True
@@ -3829,8 +3829,8 @@ begin
     else
       SetEventoESocial('S1295'
         , aProtocolo.CompetenciaID
-        , aProtocolo.Numero
         , MODO_OPERACAO[Ord(aModoLancamento)]
+        , aProtocolo.Numero
         , gUsuarioLogin
         , Now
         , True
@@ -3939,8 +3939,8 @@ begin
     else
       SetEventoESocial('S1298'
         , aProtocolo.CompetenciaID
-        , aProtocolo.Numero
         , MODO_OPERACAO[Ord(aModoLancamento)]
+        , aProtocolo.Numero
         , gUsuarioLogin
         , Now
         , True
@@ -4171,8 +4171,8 @@ begin
     else
       SetEventoESocial('S1299'
         , aProtocolo.CompetenciaID
-        , aProtocolo.Numero
         , MODO_OPERACAO[Ord(aModoLancamento)]
+        , aProtocolo.Numero
         , gUsuarioLogin
         , Now
         , True
@@ -4763,8 +4763,8 @@ begin
     else
       SetEventoESocial('S2200'
         , aProtocolo.CompetenciaID
-        , aProtocolo.Numero
         , MODO_OPERACAO[Ord(aModoLancamento)]
+        , aProtocolo.Numero
         , gUsuarioLogin
         , Now
         , True
@@ -5122,8 +5122,8 @@ begin
     else
       SetEventoESocial('S2205'
         , aProtocolo.CompetenciaID
-        , aProtocolo.Numero
         , MODO_OPERACAO[Ord(aModoLancamento)]
+        , aProtocolo.Numero
         , gUsuarioLogin
         , Now
         , True
@@ -5465,8 +5465,8 @@ begin
     else
       SetEventoESocial('S2206'
         , aProtocolo.CompetenciaID
-        , aProtocolo.Numero
         , MODO_OPERACAO[Ord(aModoLancamento)]
+        , aProtocolo.Numero
         , gUsuarioLogin
         , Now
         , True
@@ -5817,8 +5817,8 @@ begin
     else
       SetEventoESocial('S2240'
         , aProtocolo.CompetenciaID
-        , aProtocolo.Numero
         , MODO_OPERACAO[Ord(aModoLancamento)]
+        , aProtocolo.Numero
         , gUsuarioLogin
         , Now
         , True
@@ -6153,8 +6153,8 @@ begin
     else
       SetEventoESocial('S2241'
         , aProtocolo.CompetenciaID
-        , aProtocolo.Numero
         , MODO_OPERACAO[Ord(aModoLancamento)]
+        , aProtocolo.Numero
         , gUsuarioLogin
         , Now
         , True
@@ -6399,8 +6399,8 @@ begin
     else
       SetEventoESocial('S2400'
         , aProtocolo.CompetenciaID
-        , aProtocolo.Numero
         , MODO_OPERACAO[Ord(aModoLancamento)]
+        , aProtocolo.Numero
         , gUsuarioLogin
         , Now
         , True
@@ -6559,7 +6559,7 @@ begin
 
       cbxExibirErroSchema.Checked := Ini.ReadBool   ('Geral', 'ExibirErroSchema', True);
       edtFormatoAlerta.Text       := Ini.ReadString ('Geral', 'FormatoAlerta', 'TAG:%TAGNIVEL% ID:%ID%/%TAG%(%DESCRICAO%) - %MSG%.');
-      cbVersaoDF.ItemIndex        := Ini.ReadInteger('Geral', 'VersaoDF', 0);
+      cbVersaoDF.ItemIndex        := Ord(TVersaoeSocial.veS01_00_00); //Ini.ReadInteger('Geral', 'VersaoDF', 0);
       ckSalvar.Checked            := Ini.ReadBool('Geral', 'Salvar', True);
       cbxRetirarAcentos.Checked   := Ini.ReadBool('Geral', 'RetirarAcentos', True);
       edtIdEmpregador.Text        := Ini.ReadString ('Geral', 'IdEmpregador', Criptografa(Pesquisa('CONFIG_ORGAO', 'ID', '1', 'CNPJ',''), '2', 14));

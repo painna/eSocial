@@ -25,35 +25,30 @@ object frmConfigurarCertificado: TfrmConfigurarCertificado
     Top = 3
     Width = 339
     Height = 517
-    ActivePage = tbsCertificado
+    ActivePage = tbsGeral
     Align = alClient
     MultiLine = True
     TabOrder = 0
-    ExplicitWidth = 281
-    ExplicitHeight = 470
     object tbsGeral: TTabSheet
       Caption = 'Geral'
       ImageIndex = 1
-      ExplicitWidth = 273
-      ExplicitHeight = 442
       object GroupBox1: TGroupBox
         AlignWithMargins = True
         Left = 3
         Top = 3
         Width = 325
-        Height = 225
+        Height = 246
         Align = alTop
         Caption = 'Geral'
         TabOrder = 0
-        ExplicitWidth = 267
         DesignSize = (
           325
-          225)
+          246)
         object sbtnPathSalvar: TSpeedButton
-          Left = 291
-          Top = 156
+          Left = 290
+          Top = 163
           Width = 23
-          Height = 23
+          Height = 24
           Anchors = [akTop, akRight]
           Glyph.Data = {
             76010000424D7601000000000000760000002800000020000000100000000100
@@ -70,25 +65,39 @@ object frmConfigurarCertificado: TfrmConfigurarCertificado
             3BB33773333773333773B333333B3333333B7333333733333337}
           NumGlyphs = 2
           OnClick = sbtnPathSalvarClick
-          ExplicitLeft = 233
         end
         object Label3: TLabel
-          Left = 8
-          Top = 34
-          Width = 72
+          AlignWithMargins = True
+          Left = 12
+          Top = 38
+          Width = 301
           Height = 13
+          Margins.Left = 10
+          Margins.Right = 10
+          Align = alTop
           Caption = 'Formato Alerta'
+          ExplicitLeft = 8
+          ExplicitTop = 34
+          ExplicitWidth = 72
         end
         object Label4: TLabel
-          Left = 8
-          Top = 77
-          Width = 119
+          AlignWithMargins = True
+          Left = 12
+          Top = 78
+          Width = 301
           Height = 13
+          Margins.Left = 10
+          Margins.Right = 10
+          Align = alTop
           Caption = 'Vers'#227'o Documento Fiscal'
+          Enabled = False
+          ExplicitLeft = 8
+          ExplicitTop = 77
+          ExplicitWidth = 119
         end
         object spPathSchemas: TSpeedButton
-          Left = 291
-          Top = 193
+          Left = 290
+          Top = 207
           Width = 23
           Height = 23
           Anchors = [akTop, akRight]
@@ -107,29 +116,43 @@ object frmConfigurarCertificado: TfrmConfigurarCertificado
             3BB33773333773333773B333333B3333333B7333333733333337}
           NumGlyphs = 2
           OnClick = spPathSchemasClick
-          ExplicitLeft = 233
         end
         object Label1: TLabel
-          Left = 8
-          Top = 179
-          Width = 198
+          AlignWithMargins = True
+          Left = 12
+          Top = 192
+          Width = 301
           Height = 13
+          Margins.Left = 10
+          Margins.Right = 10
+          Align = alTop
           Caption = 'Diret'#243'rios com os arquivos XSD(Schemas)'
+          ExplicitLeft = 14
+          ExplicitTop = 186
         end
         object edtPathLogs: TEdit
-          Left = 8
-          Top = 157
-          Width = 284
+          AlignWithMargins = True
+          Left = 12
+          Top = 165
+          Width = 278
           Height = 21
-          Anchors = [akLeft, akTop, akRight]
+          Margins.Left = 10
+          Margins.Right = 33
+          Align = alTop
           TabOrder = 0
-          ExplicitWidth = 226
+          ExplicitLeft = 8
+          ExplicitTop = 157
+          ExplicitWidth = 284
         end
         object ckSalvar: TCheckBox
-          Left = 8
-          Top = 138
-          Width = 209
+          AlignWithMargins = True
+          Left = 12
+          Top = 144
+          Width = 301
           Height = 15
+          Margins.Left = 10
+          Margins.Right = 10
+          Align = alTop
           Caption = 'Salvar Arquivos de Envio e Resposta'
           Font.Charset = DEFAULT_CHARSET
           Font.Color = clWindowText
@@ -138,120 +161,191 @@ object frmConfigurarCertificado: TfrmConfigurarCertificado
           Font.Style = []
           ParentFont = False
           TabOrder = 1
+          ExplicitLeft = 8
+          ExplicitTop = 138
+          ExplicitWidth = 209
         end
         object cbxExibirErroSchema: TCheckBox
-          Left = 8
-          Top = 16
-          Width = 129
+          AlignWithMargins = True
+          Left = 12
+          Top = 18
+          Width = 301
           Height = 17
+          Margins.Left = 10
+          Margins.Right = 10
+          Margins.Bottom = 0
+          Align = alTop
           Caption = 'Exibir Erro Schema'
           TabOrder = 2
+          ExplicitLeft = 8
+          ExplicitTop = 16
+          ExplicitWidth = 129
         end
         object edtFormatoAlerta: TEdit
-          Left = 8
-          Top = 50
-          Width = 306
+          AlignWithMargins = True
+          Left = 12
+          Top = 54
+          Width = 301
           Height = 21
-          Anchors = [akLeft, akTop, akRight]
+          Margins.Left = 10
+          Margins.Top = 0
+          Margins.Right = 10
+          Margins.Bottom = 0
+          Align = alTop
           TabOrder = 3
-          ExplicitWidth = 248
+          ExplicitLeft = 8
+          ExplicitTop = 50
+          ExplicitWidth = 306
         end
         object cbxRetirarAcentos: TCheckBox
-          Left = 8
-          Top = 120
-          Width = 193
+          AlignWithMargins = True
+          Left = 12
+          Top = 121
+          Width = 301
           Height = 17
+          Margins.Left = 10
+          Margins.Right = 10
+          Align = alTop
           Caption = 'Retirar Acentos dos XMLs enviados'
           TabOrder = 4
+          ExplicitLeft = 8
+          ExplicitTop = 120
+          ExplicitWidth = 193
         end
         object cbVersaoDF: TComboBox
-          Left = 8
-          Top = 93
-          Width = 306
+          AlignWithMargins = True
+          Left = 12
+          Top = 94
+          Width = 301
           Height = 21
+          Margins.Left = 10
+          Margins.Top = 0
+          Margins.Right = 10
+          Align = alTop
           Style = csDropDownList
-          Anchors = [akLeft, akTop, akRight]
+          Enabled = False
           TabOrder = 5
-          ExplicitWidth = 248
+          ExplicitLeft = 8
+          ExplicitTop = 93
+          ExplicitWidth = 306
         end
         object edtPathSchemas: TEdit
-          Left = 8
-          Top = 194
-          Width = 284
+          AlignWithMargins = True
+          Left = 12
+          Top = 208
+          Width = 278
           Height = 21
-          Anchors = [akLeft, akTop, akRight]
+          Margins.Left = 10
+          Margins.Top = 0
+          Margins.Right = 33
+          Align = alTop
           TabOrder = 6
-          ExplicitWidth = 226
+          ExplicitLeft = 8
+          ExplicitTop = 194
+          ExplicitWidth = 284
         end
       end
       object gbDadosEmpresa: TGroupBox
         AlignWithMargins = True
         Left = 3
-        Top = 234
+        Top = 255
         Width = 325
-        Height = 167
+        Height = 162
         Align = alTop
         Caption = 'Dados Empresa'
         TabOrder = 1
-        ExplicitWidth = 267
-        DesignSize = (
-          325
-          167)
         object Label2: TLabel
-          Left = 8
+          AlignWithMargins = True
+          Left = 12
           Top = 18
-          Width = 101
+          Width = 301
           Height = 13
+          Margins.Left = 10
+          Margins.Right = 10
+          Align = alTop
           Caption = 'CNPJ do Empregador'
+          Enabled = False
+          ExplicitLeft = 8
+          ExplicitWidth = 101
         end
         object Label5: TLabel
-          Left = 8
-          Top = 58
-          Width = 123
+          AlignWithMargins = True
+          Left = 12
+          Top = 61
+          Width = 301
           Height = 13
+          Margins.Left = 10
+          Margins.Right = 10
+          Align = alTop
           Caption = 'CPF/CNPJ do Transmissor'
+          ExplicitLeft = 8
+          ExplicitTop = 58
+          ExplicitWidth = 123
         end
         object Label7: TLabel
-          Left = 8
-          Top = 101
-          Width = 96
+          AlignWithMargins = True
+          Left = 12
+          Top = 104
+          Width = 301
           Height = 13
+          Margins.Left = 10
+          Margins.Right = 10
+          Align = alTop
           Caption = 'Tipo de Empregador'
+          ExplicitLeft = 8
+          ExplicitTop = 101
+          ExplicitWidth = 96
         end
         object edtIdEmpregador: TEdit
-          Left = 7
+          AlignWithMargins = True
+          Left = 12
           Top = 34
-          Width = 306
+          Width = 301
           Height = 21
-          Anchors = [akLeft, akTop, akRight]
+          Margins.Left = 10
+          Margins.Top = 0
+          Margins.Right = 10
+          Align = alTop
+          Enabled = False
           TabOrder = 0
-          ExplicitWidth = 248
+          ExplicitLeft = 7
+          ExplicitWidth = 306
         end
         object edtIdTransmissor: TEdit
-          Left = 7
-          Top = 74
-          Width = 306
+          AlignWithMargins = True
+          Left = 12
+          Top = 77
+          Width = 301
           Height = 21
-          Anchors = [akLeft, akTop, akRight]
+          Margins.Left = 10
+          Margins.Top = 0
+          Margins.Right = 10
+          Align = alTop
           TabOrder = 1
-          ExplicitWidth = 248
+          ExplicitLeft = 7
+          ExplicitTop = 74
+          ExplicitWidth = 306
         end
         object cbTEmpregador: TComboBox
-          Left = 8
-          Top = 117
-          Width = 306
+          AlignWithMargins = True
+          Left = 12
+          Top = 120
+          Width = 301
           Height = 21
+          Margins.Left = 10
+          Margins.Top = 0
+          Margins.Right = 10
+          Align = alTop
           Style = csDropDownList
-          Anchors = [akLeft, akTop, akRight]
           TabOrder = 2
-          ExplicitWidth = 248
+          ExplicitLeft = 8
+          ExplicitTop = 117
+          ExplicitWidth = 306
         end
       end
     end
     object tbsCertificado: TTabSheet
       Caption = 'Certificado'
-      ExplicitWidth = 273
-      ExplicitHeight = 442
       DesignSize = (
         331
         489)
@@ -304,7 +398,6 @@ object frmConfigurarCertificado: TfrmConfigurarCertificado
         Anchors = [akLeft, akTop, akRight]
         Caption = 'Certificado'
         TabOrder = 0
-        ExplicitWidth = 263
         DesignSize = (
           321
           144)
@@ -382,7 +475,6 @@ object frmConfigurarCertificado: TfrmConfigurarCertificado
           Height = 21
           Anchors = [akLeft, akTop, akRight]
           TabOrder = 0
-          ExplicitWidth = 225
         end
         object edtSenha: TEdit
           Left = 8
@@ -392,7 +484,6 @@ object frmConfigurarCertificado: TfrmConfigurarCertificado
           Anchors = [akLeft, akTop, akRight]
           PasswordChar = '*'
           TabOrder = 1
-          ExplicitWidth = 247
         end
         object edtNumSerie: TEdit
           Left = 8
@@ -401,7 +492,6 @@ object frmConfigurarCertificado: TfrmConfigurarCertificado
           Height = 21
           Anchors = [akLeft, akTop, akRight]
           TabOrder = 2
-          ExplicitWidth = 225
         end
       end
       object btnValidadeData: TButton
@@ -470,7 +560,6 @@ object frmConfigurarCertificado: TfrmConfigurarCertificado
           Anchors = [akLeft, akTop, akRight]
           TabOrder = 0
           Text = '0548133600013704583493000190'
-          ExplicitWidth = 249
         end
         object btnSHA_RSA: TButton
           Left = 8
@@ -517,7 +606,6 @@ object frmConfigurarCertificado: TfrmConfigurarCertificado
         Style = csDropDownList
         Anchors = [akLeft, akTop, akRight]
         TabOrder = 9
-        ExplicitWidth = 177
       end
       object cbCryptLib: TComboBox
         Left = 80
@@ -527,7 +615,6 @@ object frmConfigurarCertificado: TfrmConfigurarCertificado
         Style = csDropDownList
         Anchors = [akLeft, akTop, akRight]
         TabOrder = 10
-        ExplicitWidth = 177
       end
       object cbHttpLib: TComboBox
         Left = 80
@@ -537,7 +624,6 @@ object frmConfigurarCertificado: TfrmConfigurarCertificado
         Style = csDropDownList
         Anchors = [akLeft, akTop, akRight]
         TabOrder = 11
-        ExplicitWidth = 177
       end
       object cbXmlSignLib: TComboBox
         Left = 80
@@ -547,14 +633,11 @@ object frmConfigurarCertificado: TfrmConfigurarCertificado
         Style = csDropDownList
         Anchors = [akLeft, akTop, akRight]
         TabOrder = 12
-        ExplicitWidth = 177
       end
     end
     object tbsWebService: TTabSheet
       Caption = 'WebService'
       ImageIndex = 2
-      ExplicitWidth = 273
-      ExplicitHeight = 442
       object GroupBox4: TGroupBox
         AlignWithMargins = True
         Left = 3
@@ -564,7 +647,6 @@ object frmConfigurarCertificado: TfrmConfigurarCertificado
         Align = alTop
         Caption = 'WebService'
         TabOrder = 0
-        ExplicitWidth = 267
         DesignSize = (
           325
           150)
@@ -617,7 +699,6 @@ object frmConfigurarCertificado: TfrmConfigurarCertificado
             'Produ'#231#227'o'
             'Homologa'#231#227'o')
           TabOrder = 1
-          ExplicitWidth = 257
         end
         object cbxSalvarSOAP: TCheckBox
           Left = 8
@@ -638,7 +719,6 @@ object frmConfigurarCertificado: TfrmConfigurarCertificado
           MinValue = 1000
           TabOrder = 3
           Value = 5000
-          ExplicitLeft = 191
         end
         object cbSSLType: TComboBox
           Left = 97
@@ -649,7 +729,6 @@ object frmConfigurarCertificado: TfrmConfigurarCertificado
           Style = csDropDownList
           Anchors = [akLeft, akTop, akRight]
           TabOrder = 4
-          ExplicitWidth = 160
         end
       end
       object GroupBox8: TGroupBox
@@ -661,7 +740,6 @@ object frmConfigurarCertificado: TfrmConfigurarCertificado
         Align = alTop
         Caption = 'Proxy'
         TabOrder = 1
-        ExplicitWidth = 267
         DesignSize = (
           325
           104)
@@ -702,7 +780,6 @@ object frmConfigurarCertificado: TfrmConfigurarCertificado
           Height = 21
           Anchors = [akLeft, akTop, akRight]
           TabOrder = 0
-          ExplicitWidth = 193
         end
         object edtProxyPorta: TEdit
           Left = 265
@@ -711,7 +788,6 @@ object frmConfigurarCertificado: TfrmConfigurarCertificado
           Height = 21
           Anchors = [akTop, akRight]
           TabOrder = 1
-          ExplicitLeft = 207
         end
         object edtProxyUser: TEdit
           Left = 8
@@ -728,7 +804,6 @@ object frmConfigurarCertificado: TfrmConfigurarCertificado
           Anchors = [akLeft, akTop, akRight]
           PasswordChar = '*'
           TabOrder = 3
-          ExplicitWidth = 123
         end
       end
       object GroupBox9: TGroupBox
@@ -740,7 +815,6 @@ object frmConfigurarCertificado: TfrmConfigurarCertificado
         Align = alTop
         Caption = 'Retorno de Envio do eSocial '
         TabOrder = 2
-        ExplicitWidth = 267
         object Label24: TLabel
           Left = 93
           Top = 31
@@ -802,8 +876,6 @@ object frmConfigurarCertificado: TfrmConfigurarCertificado
     object tbsArquivos: TTabSheet
       Caption = 'Arquivos'
       ImageIndex = 4
-      ExplicitWidth = 273
-      ExplicitHeight = 442
       DesignSize = (
         331
         489)
@@ -922,7 +994,6 @@ object frmConfigurarCertificado: TfrmConfigurarCertificado
         Height = 21
         Anchors = [akLeft, akTop, akRight]
         TabOrder = 6
-        ExplicitWidth = 235
       end
       object edtPathEvento: TEdit
         Left = 6
@@ -931,7 +1002,6 @@ object frmConfigurarCertificado: TfrmConfigurarCertificado
         Height = 21
         Anchors = [akLeft, akTop, akRight]
         TabOrder = 7
-        ExplicitWidth = 235
       end
     end
   end
@@ -959,8 +1029,6 @@ object frmConfigurarCertificado: TfrmConfigurarCertificado
     ModalResult = 1
     NumGlyphs = 2
     TabOrder = 1
-    ExplicitTop = 464
-    ExplicitWidth = 281
   end
   object opdAbrir: TOpenDialog
     DefaultExt = '*-nfe.XML'

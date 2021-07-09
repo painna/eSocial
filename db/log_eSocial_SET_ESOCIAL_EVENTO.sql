@@ -11,7 +11,27 @@ create or alter procedure SET_ESOCIAL_EVENTO (
     VALIDO SIM_NAO,
     PROTOCOLO "VARCHAR(30)")
 as
+declare variable LOTE "INTEGER";
 begin
+  lote = 1;
+
+  /* Tratar sequencia do lote de acordo com o evento */
+  if ( (coalesce(:evento, '') = 'S1005') or (coalesce(:evento, '') = 'S1010') ) then
+  begin
+    Select
+      max(e.lote)
+    from ESOCIAL_EVENTO e
+    where e.evento      = :evento
+      and e.competencia = :competencia
+      and e.operacao    = :operacao
+      and e.processado  = 'S'
+      and e.enviado     = 'S'
+    Into
+      lote;
+
+    lote = coalesce(:lote, 0) + 1;
+  end
+
   if (not exists(
     Select
       e.evento
@@ -19,12 +39,14 @@ begin
     where e.evento      = :evento
       and e.competencia = :competencia
       and e.operacao    = :operacao
+      and e.lote        = :lote
   )) then
   begin
     Insert Into ESOCIAL_EVENTO (
         evento
       , competencia
       , operacao
+      , lote
       , prazo_envio
       , protocolo_envio
       , processo_data
@@ -36,6 +58,7 @@ begin
         :evento
       , :competencia
       , :operacao
+      , :lote
       , null
       , :protocolo
       , :processo_data
@@ -56,7 +79,8 @@ begin
       , e.processo_usuario = :processo_usuario
     where e.evento      = :evento
       and e.competencia = :competencia
-      and e.operacao    = :operacao;
+      and e.operacao    = :operacao
+      and e.lote        = :lote;
   end 
 end^
 
@@ -79,11 +103,14 @@ Historico:
         - Remocao de objeto de banco
         * Modificacao no objeto de banco
 
-    16/09/2018 - IMR :
-        + Criacao da store procedure na base de dados.
+    08/07/2021 - IMR :
+        + Inclusao do campo LOTE.
 
     14/05/2021 - IMR :
-        + Inclusao do campo OPERACAO.';
+        + Inclusao do campo OPERACAO.
+
+    16/09/2018 - IMR :
+        + Criacao da store procedure na base de dados.';
 
 /* Following GRANT statetements are generated automatically */
 

@@ -159,8 +159,6 @@ begin
       .SQL('where (c.origem = 1)')
     .Open;
 
-    FConnection.DataSet.Last; // último registro que corresponde ao eSocial
-
     ReadFields;
   except
     on E : Exception do

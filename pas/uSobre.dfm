@@ -157,7 +157,6 @@ inherited frmSobre: TfrmSobre
         Font.Name = 'Tahoma'
         Font.Style = [fsBold]
         ParentFont = False
-        ExplicitTop = 112
         ExplicitWidth = 186
       end
       object btnOk: TBitBtn

@@ -42,7 +42,7 @@ inherited frmConfigurarESocial: TfrmConfigurarESocial
       ParentBackground = False
       ParentFont = False
       TabOrder = 1
-      Properties.ActivePage = tbsUNG
+      Properties.ActivePage = tbsResponsavel
       Properties.CustomButtons.Buttons = <>
       Properties.Options = [pcoAlwaysShowGoDialogButton, pcoGradient, pcoGradientClientArea, pcoRedrawOnResize, pcoSort]
       Properties.Style = 9
@@ -72,9 +72,9 @@ inherited frmConfigurarESocial: TfrmConfigurarESocial
           Properties.KeyFieldNames = 'ID'
           Properties.ListColumns = <
             item
-              Caption = 'Raz'#227'o Social'
+              Caption = 'Descri'#231#227'o'
               MinWidth = 320
-              FieldName = 'RAZAO_SOCIAL'
+              FieldName = 'FANTASIA'
             end
             item
               Fixed = True
@@ -194,7 +194,7 @@ inherited frmConfigurarESocial: TfrmConfigurarESocial
           DataBinding.DataField = 'SUBTETO_VENCTO_VALOR'
           DataBinding.DataSource = ds1
           ParentFont = False
-          Properties.DisplayFormat = '0.00;-,0.00'
+          Properties.DisplayFormat = ',0.00'
           Style.Font.Charset = DEFAULT_CHARSET
           Style.Font.Color = clDefault
           Style.Font.Height = -11
@@ -319,6 +319,7 @@ inherited frmConfigurarESocial: TfrmConfigurarESocial
           DataBinding.DataSource = ds1
           ParentFont = False
           Properties.EditMask = '000.000.000-00;0; '
+          Properties.OnValidate = ValidarNumeroCPF
           Style.Font.Charset = DEFAULT_CHARSET
           Style.Font.Color = clDefault
           Style.Font.Height = -11
@@ -346,6 +347,7 @@ inherited frmConfigurarESocial: TfrmConfigurarESocial
           DataBinding.DataSource = ds1
           ParentFont = False
           Properties.EditMask = '(00)0000-0000;0; '
+          Properties.OnValidate = ValidarFone
           Style.Font.Charset = DEFAULT_CHARSET
           Style.Font.Color = clDefault
           Style.Font.Height = -11
@@ -373,6 +375,7 @@ inherited frmConfigurarESocial: TfrmConfigurarESocial
           DataBinding.DataSource = ds1
           ParentFont = False
           Properties.EditMask = '(00)0000-0000;0; '
+          Properties.OnValidate = ValidarFone
           Style.Font.Charset = DEFAULT_CHARSET
           Style.Font.Color = clDefault
           Style.Font.Height = -11
@@ -458,6 +461,7 @@ inherited frmConfigurarESocial: TfrmConfigurarESocial
           DataBinding.DataSource = ds1
           ParentFont = False
           Properties.EditMask = '000.000.000-00;0; '
+          Properties.OnValidate = ValidarNumeroCPF
           Style.Font.Charset = DEFAULT_CHARSET
           Style.Font.Color = clDefault
           Style.Font.Height = -11
@@ -512,6 +516,7 @@ inherited frmConfigurarESocial: TfrmConfigurarESocial
           DataBinding.DataSource = ds1
           ParentFont = False
           Properties.EditMask = '(00)0000-0000;0; '
+          Properties.OnValidate = ValidarFone
           Style.Font.Charset = DEFAULT_CHARSET
           Style.Font.Color = clDefault
           Style.Font.Height = -11
@@ -901,6 +906,7 @@ inherited frmConfigurarESocial: TfrmConfigurarESocial
     end
   end
   inherited ds1: TDataSource
+    OnDataChange = ds1DataChange
     Left = 112
     Top = 320
   end
@@ -908,8 +914,8 @@ inherited frmConfigurarESocial: TfrmConfigurarESocial
     GetMetadata = False
     CommandText = 
       'Select'#13#10'    u.id'#13#10'  , coalesce(nullif(trim(u.razao_social), '#39#39'),' +
-      ' trim(u.descricao)) as razao_social'#13#10'  , u.cnpj'#13#10'from UNID_GESTO' +
-      'RA u'#13#10'order by'#13#10'  1'
+      ' trim(u.descricao)) as razao_social'#13#10'  , trim(u.descricao) as fa' +
+      'ntasia'#13#10'  , u.cnpj'#13#10'from UNID_GESTORA u'#13#10'order by'#13#10'  1'
     MaxBlobSize = 1
     Params = <>
     SQLConnection = dmPrincipal.SConPrincipal
@@ -934,6 +940,12 @@ inherited frmConfigurarESocial: TfrmConfigurarESocial
       end
       item
         Name = 'RAZAO_SOCIAL'
+        DataType = ftString
+        Size = 60
+      end
+      item
+        Name = 'FANTASIA'
+        Attributes = [faRequired]
         DataType = ftString
         Size = 60
       end
@@ -1043,5 +1055,69 @@ inherited frmConfigurarESocial: TfrmConfigurarESocial
     DataSet = cdsTipoTeto
     Left = 620
     Top = 368
+  end
+  object qryServidor: TSQLDataSet
+    GetMetadata = False
+    CommandText = 
+      'Select'#13#10'    g.id_servid_gestor as id_servidor'#13#10'  , s.matricula'#13#10 +
+      '  , p.nome'#13#10'  , p.cpf'#13#10'  , p.telefone'#13#10'  , null as celular'#13#10'  , ' +
+      'p.e_mail'#13#10'from UNID_GESTORA g'#13#10'  inner join SERVIDOR s on (s.id ' +
+      '= g.id_servid_gestor)'#13#10'  inner join PESSOA_FISICA p on (p.id = s' +
+      '.id_pessoa_fisica)'#13#10'where (g.id = :ug)'
+    MaxBlobSize = 1
+    Params = <
+      item
+        DataType = ftInteger
+        Name = 'ug'
+        ParamType = ptInput
+      end>
+    SQLConnection = dmPrincipal.SConPrincipal
+    Left = 488
+    Top = 223
+  end
+  object dspServidor: TDataSetProvider
+    DataSet = qryServidor
+    Exported = False
+    Options = [poAllowCommandText, poUseQuoteChar]
+    UpdateMode = upWhereKeyOnly
+    Left = 488
+    Top = 271
+  end
+  object cdsServidor: TClientDataSet
+    Aggregates = <>
+    FieldDefs = <
+      item
+        Name = 'ID'
+        Attributes = [faRequired]
+        DataType = ftInteger
+      end
+      item
+        Name = 'RAZAO_SOCIAL'
+        DataType = ftString
+        Size = 60
+      end
+      item
+        Name = 'FANTASIA'
+        Attributes = [faRequired]
+        DataType = ftString
+        Size = 60
+      end
+      item
+        Name = 'CNPJ'
+        Attributes = [faRequired]
+        DataType = ftString
+        Size = 14
+      end>
+    IndexDefs = <>
+    Params = <
+      item
+        DataType = ftInteger
+        Name = 'ug'
+        ParamType = ptInput
+      end>
+    ProviderName = 'dspServidor'
+    StoreDefs = True
+    Left = 488
+    Top = 319
   end
 end

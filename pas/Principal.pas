@@ -261,23 +261,37 @@ begin
 end;
 
 procedure TfrmPrincipal.imEventoTabelaClick(Sender: TObject);
+var
+  iConfiguracao : IControllerConfiguracao;
 begin
   if (MDIChildCount > 0) then
     Mensagem('Você precisa Fechar todas as Janelas deste Programa, ' + #13 +
              'antes de Executar essa Operação ...',
              'Aviso !!!', MB_ICONEXCLAMATION)
   else
-    try
-      Screen.Cursor := crSQLWait;
-      dmPrincipal.SConPrincipal.ExecuteDirect('execute procedure SP_ESOCIAL_EVENTOS_PEND_TABELAS');
-      Screen.Cursor := crDefault;
+  begin
+    iConfiguracao := TControllerFactory.Configuracao;
+    iConfiguracao.DAO.Get;
+    if not iConfiguracao.ValidarConfiguracao then
+      Mensagem('Verifique as pendências informadas a seguir:' + #13#13 +
+               iConfiguracao.Erros + #13 +
+               'Antes de Executar essa Operação verifique as configurações do sistema.',
+               'Validação', MB_ICONERROR)
+    else
+    begin
+      try
+        Screen.Cursor := crSQLWait;
+        dmPrincipal.SConPrincipal.ExecuteDirect('execute procedure SP_ESOCIAL_EVENTOS_PEND_TABELAS');
+        Screen.Cursor := crDefault;
 
-      frmEnvioEventoTabela := TfrmEnvioEventoTabela.Create(Self);
-      frmEnvioEventoTabela.ShowModal;
-    finally
-      Screen.Cursor := crDefault;
-      FreeAndNil(frmEnvioEventoTabela);
+        frmEnvioEventoTabela := TfrmEnvioEventoTabela.Create(Self);
+        frmEnvioEventoTabela.ShowModal;
+      finally
+        Screen.Cursor := crDefault;
+        FreeAndNil(frmEnvioEventoTabela);
+      end;
     end;
+  end;
 end;
 
 procedure TfrmPrincipal.FormActivate(Sender: TObject);
@@ -289,6 +303,8 @@ var
    iConta        : integer;
    iIdUsuarioSave: integer;
 begin
+  lSenhaOk := False;
+
   if not pv_lPrimeiraVez then
   begin
     if not dmPrincipal.SConPrincipal.Connected then
@@ -320,13 +336,35 @@ begin
   else
     glb_iIdOperLogado := 1;
 
-  frmLogin := TfrmLogin.Create(Self);
-  lSenhaOk := frmLogin.Executa;
+  // Validar o usuário passado por parâmetro
+  if (ParamCount = 1) then
+  begin
+    glb_iIdOperLogado := StrToIntDef(Trim(ParamStr(1)), 0);
+
+    if (UpperCase(Trim(Pesquisa('USUARIO', 'ID', glb_iIdOperLogado.ToString, 'ATIVO', ''))) = 'S') then
+      lSenhaOk := (UpperCase(Trim(Pesquisa('USUARIO', 'ID', glb_iIdOperLogado.ToString, 'ENVIA_ESOCIAL', ''))) = 'S');
+
+    if not lSenhaOk then
+      Mensagem('Usuário sem premissão para acessar este aplicativo', 'Aviso !!!', MB_ICONEXCLAMATION);
+  end;
+
+  if not lSenhaOk then
+  begin
+    frmLogin := TfrmLogin.Create(Self);
+    if frmLogin.Executa then
+    begin
+      // Verificar permissão para envio de arquivos do e-Social
+      lSenhaOk := (UpperCase(Trim(Pesquisa('USUARIO', 'ID', glb_iIdOperLogado.ToString, 'ENVIA_ESOCIAL', ''))) = 'S');
+      if not lSenhaOk then
+        Mensagem('Usuário sem premissão para acessar este aplicativo', 'Aviso !!!', MB_ICONEXCLAMATION);
+    end;
+  end;
 
   if (lSenhaOk) then
   begin
-    sNomeUsuario              := Pesquisa('USUARIO','ID',IntToStr(glb_iIdOperLogado),'NOME_CURTO','');
-    sNomeUsuario              := Criptografa(sNomeUsuario,'2',20);
+    sNomeUsuario  := Pesquisa('USUARIO','ID',IntToStr(glb_iIdOperLogado),'NOME_CURTO','');
+    sNomeUsuario  := Criptografa(sNomeUsuario,'2',20);
+    gUsuarioLogin := Trim(sNomeUsuario);
     stbInforme.Panels[2].Text := sNomeUsuario;
     pv_lPrimeiraVez           := False;
     HabilitaItensMenu;
@@ -401,6 +439,7 @@ var
 begin
    glb_iHeigthBarraTop := pnSubBarra.Height;
    glb_sBancoOrgao := '';
+
    //if not DelphiCarregado then
    //begin
       try

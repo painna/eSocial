@@ -39,7 +39,6 @@ begin
           , 'S'             as flag
           , 'Cadastro das unidades de orgaos publicos' as informacao
         from UNID_GESTORA ug
-          left join TAB_ALIQ_FAP fp on (fp.id_unid_gestora = ug.id)
         where ug.tipo_operacao != 'P'
         
         union
@@ -50,15 +49,6 @@ begin
           , 'S'             as flag
           , 'Cadastro de Eventos/Rubricas' as informacao
         from EVENTO e
-          left join (
-            Select
-                l.id_evento
-              , min(l.ano_mes) as ano_mes_min
-              , max(l.ano_mes) as ano_mes_max
-            from LANCTO_EVENTO_CALC l
-            group by
-                l.id_evento
-          ) x on (x.id_evento = e.id)
         where (coalesce(trim(e.nat_rubrica), '') != '')
           and (e.tipo_operacao != 'P')
         
@@ -120,9 +110,7 @@ GRANT EXECUTE ON PROCEDURE GET_ESOCIAL_COMPETENCIA_ATIVA TO PROCEDURE SP_ESOCIAL
 GRANT SELECT ON CONFIG_ORGAO TO PROCEDURE SP_ESOCIAL_EVENTOS_PEND_TABELAS;
 GRANT SELECT ON CONFIG_ESOCIAL TO PROCEDURE SP_ESOCIAL_EVENTOS_PEND_TABELAS;
 GRANT SELECT ON UNID_GESTORA TO PROCEDURE SP_ESOCIAL_EVENTOS_PEND_TABELAS;
-GRANT SELECT ON TAB_ALIQ_FAP TO PROCEDURE SP_ESOCIAL_EVENTOS_PEND_TABELAS;
 GRANT SELECT ON EVENTO TO PROCEDURE SP_ESOCIAL_EVENTOS_PEND_TABELAS;
-GRANT SELECT ON LANCTO_EVENTO_CALC TO PROCEDURE SP_ESOCIAL_EVENTOS_PEND_TABELAS;
 GRANT EXECUTE ON PROCEDURE SET_ESOCIAL_GERAR_EVENTOS TO PROCEDURE SP_ESOCIAL_EVENTOS_PEND_TABELAS;
 
 /* Existing privileges on this procedure */

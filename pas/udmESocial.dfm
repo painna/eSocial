@@ -754,6 +754,12 @@ object dmESocial: TdmESocial
         ParamType = ptInput
       end
       item
+        DataType = ftFixedChar
+        Precision = 1
+        Name = 'OPERACAO'
+        ParamType = ptInput
+      end
+      item
         DataType = ftDate
         Precision = 4
         Name = 'PROCESSO_DATA'

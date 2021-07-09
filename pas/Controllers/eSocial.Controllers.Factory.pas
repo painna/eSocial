@@ -5,7 +5,8 @@ interface
 uses
   eSocial.Controllers.Interfaces,
   eSocial.Controllers.Competencia,
-  eSocial.Controllers.Operacao;
+  eSocial.Controllers.Operacao,
+  eSocial.Controllers.Configuracao;
 
 type
   TControllerFactory = class
@@ -13,6 +14,7 @@ type
     public
       class function Competencia : IControllerCompetencia;
       class function Operacao : IControllerOperacao;
+      class function Configuracao : IControllerConfiguracao;
   end;
 
 implementation
@@ -27,6 +29,11 @@ end;
 class function TControllerFactory.Operacao: IControllerOperacao;
 begin
   Result := TControllerOperacao.GetInstance;
+end;
+
+class function TControllerFactory.Configuracao: IControllerConfiguracao;
+begin
+  Result := TControllerConfiguracao.GetInstance;
 end;
 
 end.

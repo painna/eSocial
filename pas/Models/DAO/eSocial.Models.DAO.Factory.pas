@@ -6,24 +6,28 @@ uses
   eSocial.Models.DAO.Interfaces,
   eSocial.Models.DAO.Competencia,
   eSocial.Models.DAO.Operacao,
+  eSocial.Models.DAO.Configuracao,
   eSocial.Models.Entities.Competencia,
-  eSocial.Models.Entities.Operacao;
+  eSocial.Models.Entities.Operacao,
+  eSocial.Models.Entities.Configuracao;
 
 type
   TModelDAOFactory = class
     strict private
       class var _instance : TModelDAOFactory;
     private
-      FCompetencia : iModelDAOEntity<TCompetencia>;
-      FOperacao    : iModelDAOEntity<TOperacao>;
+      FCompetencia  : iModelDAOEntity<TCompetencia>;
+      FOperacao     : iModelDAOEntity<TOperacao>;
+      FConfiguracao : iModelDAOEntity<TConfiguracao>;
     protected
       constructor Create;
     public
       destructor Destroy; override;
       class function GetInstance : TModelDAOFactory;
 
-      function Competencia : iModelDAOEntity<TCompetencia>;
-      function Operacao    : iModelDAOEntity<TOperacao>;
+      function Competencia  : iModelDAOEntity<TCompetencia>;
+      function Operacao     : iModelDAOEntity<TOperacao>;
+      function Configuracao : iModelDAOEntity<TConfiguracao>;
   end;
 
 var
@@ -41,6 +45,14 @@ end;
 destructor TModelDAOFactory.Destroy;
 begin
   inherited;
+end;
+
+function TModelDAOFactory.Configuracao: iModelDAOEntity<TConfiguracao>;
+begin
+  if not Assigned(FConfiguracao) then
+    FConfiguracao := TModelDAOConfiguracao.New;
+
+  Result := FConfiguracao;
 end;
 
 class function TModelDAOFactory.GetInstance: TModelDAOFactory;

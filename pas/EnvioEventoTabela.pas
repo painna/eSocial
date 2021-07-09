@@ -51,6 +51,7 @@ type
     procedure cmbAnoMesChange(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure gpbOperacaoClick(Sender: TObject);
+    procedure cbS1005Click(Sender: TObject);
   private
     { Private declarations }
     ICompetencia : IControllerCompetencia;
@@ -90,6 +91,23 @@ begin
   else
   if GeradoEnviado then
     ModalResult := mrOk;
+end;
+
+procedure TfrmEnvioEventoTabela.cbS1005Click(Sender: TObject);
+begin
+  if cbS1005.Checked then
+  begin
+    cbS1000.Checked := False;
+    cbS1010.Checked := False;
+    cbS1020.Checked := False;
+    cbS1030.Checked := False;
+    cbS1035.Checked := False;
+    cbS1040.Checked := False;
+    cbS1050.Checked := False;
+    cbS1060.Checked := False;
+    cbS1070.Checked := False;
+    cbS1080.Checked := False;
+  end;
 end;
 
 procedure TfrmEnvioEventoTabela.cbS1040Click(Sender: TObject);
@@ -285,6 +303,8 @@ begin
   cbS1005.Enabled := cbS1005.Checked;
   cbS1010.Enabled := cbS1010.Checked;
   cbS1020.Enabled := cbS1020.Checked;
+
+  cbS1005Click(cbS1005);
 end;
 
 procedure TfrmEnvioEventoTabela.VerificarOperacoes;

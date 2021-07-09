@@ -1125,14 +1125,14 @@ object frmPrincipal: TfrmPrincipal
       object N1: TMenuItem
         Caption = '-'
       end
-      object imConfigurarCertificado: TMenuItem
-        Caption = 'Configurar Certificado'
-        OnClick = imConfigurarCertificadoClick
-      end
       object imConfigurarESocial: TMenuItem
         Caption = 'Configurar eSocial'
         ImageIndex = 3
         OnClick = imConfigurarESocialClick
+      end
+      object imConfigurarCertificado: TMenuItem
+        Caption = 'Configurar Certificado'
+        OnClick = imConfigurarCertificadoClick
       end
     end
     object Ajuda1: TMenuItem
