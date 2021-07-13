@@ -18,6 +18,7 @@ uses
   Router4D.Props,
   Router4D.Interfaces,
   Bind4D,
+  Bind4D.Interfaces,
   Bind4D.Attributes,
   Bind4D.Types,
   eSocial.Classes.Events;

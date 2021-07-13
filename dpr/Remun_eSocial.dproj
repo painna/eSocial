@@ -239,6 +239,47 @@
             <Form>ViewEventoTabelaEnviar</Form>
             <FormType>dfm</FormType>
         </DCCReference>
+        <DCCReference Include="..\pas\Services\eSocial.Services.Utils.pas"/>
+        <RcItem Include="..\pas\Assets\icon-message-alert-32x32.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>icon_alert32</ResourceId>
+        </RcItem>
+        <RcItem Include="..\pas\Assets\icon-message-error-32x32.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>icon_error32</ResourceId>
+        </RcItem>
+        <RcItem Include="..\pas\Assets\icon-message-inform-32x32.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>icon_inform32</ResourceId>
+        </RcItem>
+        <RcItem Include="..\pas\Assets\icon-message-question-32x32.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>icon_question32</ResourceId>
+        </RcItem>
+        <RcItem Include="..\pas\Assets\icon-message-sucess-32x32.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>icon_success32</ResourceId>
+        </RcItem>
+        <RcItem Include="..\pas\Assets\icon-message-alert-24x24.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>icon_alert24</ResourceId>
+        </RcItem>
+        <RcItem Include="..\pas\Assets\icon-message-error-24x24.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>icon_error24</ResourceId>
+        </RcItem>
+        <RcItem Include="..\pas\Assets\icon-message-inform-24x24.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>icon_inform24</ResourceId>
+        </RcItem>
+        <RcItem Include="..\pas\Assets\icon-message-question-24x24.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>icon_question24</ResourceId>
+        </RcItem>
+        <RcItem Include="..\pas\Assets\icon-message-sucess-24x24.png">
+            <ResourceType>RCDATA</ResourceType>
+            <ResourceId>icon_success24</ResourceId>
+        </RcItem>
         <BuildConfiguration Include="Debug">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>
@@ -307,9 +348,45 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="..\exe\Win32\Debug\Remun_eSocial.exe" Configuration="Debug" Class="ProjectOutput">
+                <DeployFile LocalName="..\pas\Assets\icon-message-inform-24x24.png" Configuration="Debug" Class="ProjectFile">
                     <Platform Name="Win32">
-                        <RemoteName>Remun_eSocial.exe</RemoteName>
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="..\pas\Assets\icon-message-error-24x24.png" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="..\pas\Assets\icon-message-question-24x24.png" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="..\pas\Assets\icon-message-question-32x32.png" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="..\pas\Assets\icon-message-alert-24x24.png" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="..\pas\Assets\icon-message-sucess-32x32.png" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="..\pas\Assets\icon-message-inform-32x32.png" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
@@ -320,16 +397,40 @@
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
+                <DeployFile LocalName="..\doc\img\esocial_vertical_44x44.png" Configuration="Debug" Class="UWP_DelphiLogo44">
+                    <Platform Name="Win32">
+                        <RemoteDir>Assets\</RemoteDir>
+                        <RemoteName>Logo44x44.png</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="..\pas\Assets\icon-message-error-32x32.png" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="..\pas\Assets\icon-message-alert-32x32.png" Configuration="Debug" Class="ProjectFile">
+                    <Platform Name="Win32">
+                        <RemoteDir>.\</RemoteDir>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
+                <DeployFile LocalName="..\exe\Win32\Debug\Remun_eSocial.exe" Configuration="Debug" Class="ProjectOutput">
+                    <Platform Name="Win32">
+                        <RemoteName>Remun_eSocial.exe</RemoteName>
+                        <Overwrite>true</Overwrite>
+                    </Platform>
+                </DeployFile>
                 <DeployFile LocalName="..\exe\Win32\Release\Remun_eSocial.exe" Configuration="Release" Class="ProjectOutput">
                     <Platform Name="Win32">
                         <RemoteName>Remun_eSocial.exe</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="..\doc\img\esocial_vertical_44x44.png" Configuration="Debug" Class="UWP_DelphiLogo44">
+                <DeployFile LocalName="..\pas\Assets\icon-message-sucess-24x24.png" Configuration="Debug" Class="ProjectFile">
                     <Platform Name="Win32">
-                        <RemoteDir>Assets\</RemoteDir>
-                        <RemoteName>Logo44x44.png</RemoteName>
+                        <RemoteDir>.\</RemoteDir>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>

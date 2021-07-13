@@ -1,5 +1,7 @@
 program Remun_eSocial;
 
+{$R *.dres}
+
 uses
   Forms,
   Principal in '..\pas\Principal.pas' {frmPrincipal},
@@ -50,7 +52,8 @@ uses
   eSocial.Views.Styles in '..\pas\Views\eSocial.Views.Styles.pas',
   eSocial.Views.Styles.Colors in '..\pas\Views\eSocial.Views.Styles.Colors.pas',
   eSocial.Classes.Events in '..\pas\Classes\eSocial.Classes.Events.pas',
-  eSocial.Views.ViewEventoTabelaEnviar in '..\pas\Views\eSocial.Views.ViewEventoTabelaEnviar.pas' {ViewEventoTabelaEnviar};
+  eSocial.Views.ViewEventoTabelaEnviar in '..\pas\Views\eSocial.Views.ViewEventoTabelaEnviar.pas' {ViewEventoTabelaEnviar},
+  eSocial.Services.Utils in '..\pas\Services\eSocial.Services.Utils.pas';
 
 {$R *.res}
 

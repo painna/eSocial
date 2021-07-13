@@ -285,7 +285,7 @@ begin
                'Validação', MB_ICONERROR)
     else
     begin
-      ViewEventoTabelaEnviar(Self);
+      EventoTabelaEnviar(Self);
 //      try
 //        Screen.Cursor := crSQLWait;
 //        dmPrincipal.SConPrincipal.ExecuteDirect('execute procedure SP_ESOCIAL_EVENTOS_PEND_TABELAS');
