@@ -19,15 +19,15 @@ uses
   Vcl.DBGrids,
   Vcl.DBCtrls,
   Vcl.Samples.Gauges,
-  //Data.DB,
-  //Datasnap.DBClient,
   Bind4D,
   Bind4D.Attributes,
   Bind4D.Types,
   eSocial.Views.Styles,
   eSocial.Views.Styles.Colors,
   eSocial.Views.Default,
-  eSocial.Controllers.Interfaces;
+  eSocial.Controllers.Interfaces,
+  ACBreSocial,
+  pcesConversaoeSocial;
 
 type
   [FormDefault('Tabela de Eventos')]
@@ -96,20 +96,24 @@ type
     procedure FormCreate(Sender: TObject);
     procedure gpbOperacaoClick(Sender: TObject);
     procedure FormShow(Sender: TObject);
-    procedure cmbCompetenciaChange(Sender: TObject);private
+    procedure cmbCompetenciaChange(Sender: TObject);
+  private
     { Private declarations }
     ICompetencia : IControllerCompetencia;
+    FStep : String;
 
     procedure ApplyStyleLocal;
     procedure LoadImagesDefault;
-    procedure CreateTables;
-    procedure CreateFields;
-    procedure SaveRegisters;
 
     procedure LimparPainelProcesso(aVisualizar : Boolean);
     procedure CarregarDados;
     procedure VerificarOperacoes;
     procedure VerificarEventos;
+    procedure GerarEnviarEventos;
+    procedure ProcessarRetorno(Sender: TObject);
+
+    function EventoSelecionado : Boolean;
+    function eSocial : TACBreSocial;
   public
     { Public declarations }
   end;
@@ -125,6 +129,7 @@ implementation
 
 uses
   System.StrUtils,
+  gsLib,
   udmPrincipal,
   udmESocial,
   eSocial.Controllers.Factory,
@@ -144,12 +149,38 @@ begin
 end;
 
 procedure TViewEventoTabelaEnviar.btnConfirmarClick(Sender: TObject);
+var
+  aRetorno : Boolean;
+  aThread  : TThread;
 begin
-  // Bloquear botões...
-  btnConfirmar.Enabled := False;
-  btnFechar.Enabled    := False;
-  // Iniciar thread para geração e envio dos eventos...
-  
+  if (gpbOperacao.ItemIndex = -1) then
+    Mensagem('Nenhum tipo de operação foi selecionado', 'Alerta!', MB_ICONWARNING)
+  else
+  if not EventoSelecionado then
+    Mensagem('Nenhum evento possui registros pendentes para geração/envio dos aquivos XML', 'Alerta!', MB_ICONWARNING)
+  else
+  if not dmESocial.CertificadoInstalado then
+    Mensagem('Certificado não instalado/configurado', 'Alerta!', MB_ICONEXCLAMATION)
+  else
+  if not dmESocial.CertificadoValido then
+    Mensagem('Certificado inválido', 'Alerta!', MB_ICONEXCLAMATION)
+  else
+  if Confirma('Eventos de Tabela', 'Você confirma a geração e envio dos eventos para o portal e-Social?') then
+  begin
+    LimparPainelProcesso(True);
+
+    // Bloquear botões...
+    btnConfirmar.Enabled := False;
+    btnFechar.Enabled    := False;
+    Screen.Cursor        := crSQLWait;
+
+    FStep := EmptyStr;
+
+    // Iniciar thread para geração e envio dos eventos...
+    aThread := TThread.CreateAnonymousThread( GerarEnviarEventos );
+    aThread.OnTerminate := ProcessarRetorno;
+    aThread.Start;
+  end;
 end;
 
 procedure TViewEventoTabelaEnviar.btnFecharClick(Sender: TObject);
@@ -175,29 +206,23 @@ begin
   VerificarEventos;
 end;
 
-procedure TViewEventoTabelaEnviar.CreateFields;
+function TViewEventoTabelaEnviar.eSocial: TACBreSocial;
 begin
-//  if not _ConexaoDB.ThereIsFieldTable(TDatabaseExecution.deSourceDB, 'TAB_SERVICO', 'classe_servico') then
-//    _ConexaoDB.CreateFieldTable(TDatabaseExecution.deSourceDB, 'TAB_SERVICO', 'classe_servico', 'DM_SMALLINT');
+  Result := dmESocial.ACBrESocial;
 end;
 
-procedure TViewEventoTabelaEnviar.CreateTables;
-//var
-//  aTabela : TStringList;
+function TViewEventoTabelaEnviar.EventoSelecionado: Boolean;
+var
+  I : Integer;
 begin
-//  aTabela := TStringList.Create;
-//  try
-//    aTabela.Clear;
-//    aTabela.Add('CREATE TABLE ACQUADUTUS_CLASSE_SERVICO (');
-//    aTabela.Add('   CODIGO     DM_SMALLINT NOT NULL      ');
-//    aTabela.Add(' , DESCRICAO  DM_VARCHAR_50             ');
-//    aTabela.Add(');                                      ');
-//
-//    _ConexaoDB.CreateDomains(TDatabaseExecution.deSourceDB);
-//    _ConexaoDB.CreateTable(TDatabaseExecution.deSourceDB, 'ACQUADUTUS_CLASSE_SERVICO', 'CODIGO', aTabela);
-//  finally
-//    aTabela.DisposeOf;
-//  end;
+  I := 0;
+
+  if (imgS1000.Tag = 1) then Inc(I);
+  if (imgS1005.Tag = 1) then Inc(I);
+  if (imgS1010.Tag = 1) then Inc(I);
+  if (imgS1020.Tag = 1) then Inc(I);
+
+  Result := (I > 0);
 end;
 
 procedure TViewEventoTabelaEnviar.FormCreate(Sender: TObject);
@@ -220,6 +245,212 @@ begin
 //  Checb_ZeraBase.Visible := dmESocial.AmbienteWebServiceHomologacao;
 end;
 
+procedure TViewEventoTabelaEnviar.GerarEnviarEventos;
+var
+  aCompetencia,
+  aOperacao   : String;
+  IOperacao   : IControllerOperacao;
+  aContinuar  : Boolean;
+  aProtocolo  : TProtocoloESocial;
+  aModoLancamento : TModoLancamento;
+begin
+  aCompetencia := StringReplace(cmbCompetencia.Text, '-', '', [rfReplaceAll]);
+  IOperacao  := TControllerFactory.Operacao;
+  aContinuar := True;
+
+  aModoLancamento := TModoLancamento(gpbOperacao.ItemIndex); //eSStrToModoLancamento(ok, IntToStr(gpbOperacao.ItemIndex));
+
+  case gpbOperacao.ItemIndex of
+    0 : aOperacao := 'I';
+    1 : aOperacao := 'A';
+    2 : aOperacao := 'E';
+  end;
+
+  // Gerar e enviar evento S1000 : ---
+  FStep := 'S1000';
+  try
+    aProtocolo := TProtocoloESocial.Create(EmptyStr);
+    aProtocolo.CompetenciaID := IntToStr(TCompetencia(cmbCompetencia.Items.Objects[cmbCompetencia.ItemIndex]).ID);
+
+    TThread.Synchronize(nil, procedure
+    begin
+      TServiceUtils.ImageResource('icon_question24', imgS1000);
+    end);
+
+    // 1. Varrer os registros pendente de envio
+    while aContinuar and IOperacao.DAO.Get([aCompetencia, FStep, aOperacao]).This.Processar do
+    begin
+      eSocial.Eventos.Clear;
+      dmESocial.LerConfiguracao;
+
+      // 2. Gerar e enviar arquivo XML
+      aContinuar := dmESocial.Gerar_eSocial1000(cmbCompetencia.Text, False, aModoLancamento, lblProcesso, gagProcesso, aProtocolo);
+      if aContinuar then
+        aContinuar := dmESocial.EventoEnviado_eSocial(TeSocialGrupo.egIniciais, cmbCompetencia.Text, lblProcesso, gagProcesso, aProtocolo);
+
+      // 3. Gravar protocolo e atualizar registros enviados
+      if aContinuar then
+      begin
+        dmESocial.GravarProtocoloRetorno(aProtocolo);
+        dmESocial.AtualizarOperacoes(aModoLancamento, aProtocolo, TCompetencia(cmbCompetencia.Items.Objects[cmbCompetencia.ItemIndex]));
+        // 4. Verificar novas pendentes
+        dmPrincipal.SConPrincipal.ExecuteDirect('execute procedure SP_ESOCIAL_EVENTOS_PEND_TABELAS');
+      end
+      else
+      if (dmESocial.MensagemRetorno.Count > 0) then
+        raise Exception.Create(dmESocial.MensagemRetorno.Text);
+    end;
+
+    // 5. Atualizar ícone na tela
+    if aContinuar then
+      TThread.Synchronize(nil, procedure
+      begin
+        TServiceUtils.ImageResource('icon_success24', imgS1000);
+      end);
+  finally
+    aProtocolo.DisposeOf;
+    Sleep(500);
+  end;
+
+  // Gerar e enviar evento S1005 : ---
+  FStep := 'S1005';
+  try
+    aProtocolo := TProtocoloESocial.Create(EmptyStr);
+    aProtocolo.CompetenciaID := IntToStr(TCompetencia(cmbCompetencia.Items.Objects[cmbCompetencia.ItemIndex]).ID);
+
+    TThread.Synchronize(nil, procedure
+    begin
+      TServiceUtils.ImageResource('icon_question24', imgS1005);
+    end);
+
+    // 1. Varrer os registros pendente de envio
+    while aContinuar and IOperacao.DAO.Get([aCompetencia, FStep, aOperacao]).This.Processar do
+    begin
+      eSocial.Eventos.Clear;
+      dmESocial.LerConfiguracao;
+
+      // 2. Gerar e enviar arquivo XML
+      aContinuar := dmESocial.Gerar_eSocial1005(cmbCompetencia.Text, False, aModoLancamento, lblProcesso, gagProcesso, aProtocolo);
+      if aContinuar then
+        aContinuar := dmESocial.EventoEnviado_eSocial(TeSocialGrupo.egIniciais, cmbCompetencia.Text, lblProcesso, gagProcesso, aProtocolo);
+
+      // 3. Gravar protocolo e atualizar registros enviados
+      if aContinuar then
+      begin
+        dmESocial.GravarProtocoloRetorno(aProtocolo);
+        dmESocial.AtualizarOperacoes(aModoLancamento, aProtocolo, TCompetencia(cmbCompetencia.Items.Objects[cmbCompetencia.ItemIndex]));
+        // 4. Verificar novas pendentes
+        dmPrincipal.SConPrincipal.ExecuteDirect('execute procedure SP_ESOCIAL_EVENTOS_PEND_TABELAS');
+      end
+      else
+      if (dmESocial.MensagemRetorno.Count > 0) then
+        raise Exception.Create(dmESocial.MensagemRetorno.Text);
+    end;
+
+    // 5. Atualizar ícone na tela
+    if aContinuar then
+      TThread.Synchronize(nil, procedure
+      begin
+        TServiceUtils.ImageResource('icon_success24', imgS1005);
+      end);
+  finally
+    aProtocolo.DisposeOf;
+    Sleep(500);
+  end;
+
+  // Gerar e enviar evento S1010 : ---
+  FStep := 'S1010';
+  try
+    aProtocolo := TProtocoloESocial.Create(EmptyStr);
+    aProtocolo.CompetenciaID := IntToStr(TCompetencia(cmbCompetencia.Items.Objects[cmbCompetencia.ItemIndex]).ID);
+
+    TThread.Synchronize(nil, procedure
+    begin
+      TServiceUtils.ImageResource('icon_question24', imgS1010);
+    end);
+
+    // 1. Varrer os registros pendente de envio
+    while aContinuar and IOperacao.DAO.Get([aCompetencia, FStep, aOperacao]).This.Processar do
+    begin
+      eSocial.Eventos.Clear;
+      dmESocial.LerConfiguracao;
+
+      // 2. Gerar e enviar arquivo XML
+      aContinuar := dmESocial.Gerar_eSocial1010(cmbCompetencia.Text, False, aModoLancamento, lblProcesso, gagProcesso, aProtocolo);
+      if aContinuar then
+        aContinuar := dmESocial.EventoEnviado_eSocial(TeSocialGrupo.egIniciais, cmbCompetencia.Text, lblProcesso, gagProcesso, aProtocolo);
+
+      // 3. Gravar protocolo e atualizar registros enviados
+      if aContinuar then
+      begin
+        dmESocial.GravarProtocoloRetorno(aProtocolo);
+        dmESocial.AtualizarOperacoes(aModoLancamento, aProtocolo, TCompetencia(cmbCompetencia.Items.Objects[cmbCompetencia.ItemIndex]));
+        // 4. Verificar novas pendentes
+        dmPrincipal.SConPrincipal.ExecuteDirect('execute procedure SP_ESOCIAL_EVENTOS_PEND_TABELAS');
+      end
+      else
+      if (dmESocial.MensagemRetorno.Count > 0) then
+        raise Exception.Create(dmESocial.MensagemRetorno.Text);
+    end;
+
+    // 5. Atualizar ícone na tela
+    if aContinuar then
+      TThread.Synchronize(nil, procedure
+      begin
+        TServiceUtils.ImageResource('icon_success24', imgS1010);
+      end);
+  finally
+    aProtocolo.DisposeOf;
+    Sleep(500);
+  end;
+
+  // Gerar e enviar evento S1020 : ---
+  FStep := 'S1020';
+  try
+    aProtocolo := TProtocoloESocial.Create(EmptyStr);
+    aProtocolo.CompetenciaID := IntToStr(TCompetencia(cmbCompetencia.Items.Objects[cmbCompetencia.ItemIndex]).ID);
+
+    TThread.Synchronize(nil, procedure
+    begin
+      TServiceUtils.ImageResource('icon_question24', imgS1020);
+    end);
+
+    // 1. Varrer os registros pendente de envio
+    while aContinuar and IOperacao.DAO.Get([aCompetencia, FStep, aOperacao]).This.Processar do
+    begin
+      eSocial.Eventos.Clear;
+      dmESocial.LerConfiguracao;
+
+      // 2. Gerar e enviar arquivo XML
+      aContinuar := dmESocial.Gerar_eSocial1020(cmbCompetencia.Text, False, aModoLancamento, lblProcesso, gagProcesso, aProtocolo);
+      if aContinuar then
+        aContinuar := dmESocial.EventoEnviado_eSocial(TeSocialGrupo.egIniciais, cmbCompetencia.Text, lblProcesso, gagProcesso, aProtocolo);
+
+      // 3. Gravar protocolo e atualizar registros enviados
+      if aContinuar then
+      begin
+        dmESocial.GravarProtocoloRetorno(aProtocolo);
+        dmESocial.AtualizarOperacoes(aModoLancamento, aProtocolo, TCompetencia(cmbCompetencia.Items.Objects[cmbCompetencia.ItemIndex]));
+        // 4. Verificar novas pendentes
+        dmPrincipal.SConPrincipal.ExecuteDirect('execute procedure SP_ESOCIAL_EVENTOS_PEND_TABELAS');
+      end
+      else
+      if (dmESocial.MensagemRetorno.Count > 0) then
+        raise Exception.Create(dmESocial.MensagemRetorno.Text);
+    end;
+
+    // 5. Atualizar ícone na tela
+    if aContinuar then
+      TThread.Synchronize(nil, procedure
+      begin
+        TServiceUtils.ImageResource('icon_success24', imgS1020);
+      end);
+  finally
+    aProtocolo.DisposeOf;
+    Sleep(500);
+  end;
+end;
+
 procedure TViewEventoTabelaEnviar.gpbOperacaoClick(Sender: TObject);
 begin
   VerificarEventos;
@@ -228,7 +459,7 @@ end;
 procedure TViewEventoTabelaEnviar.LimparPainelProcesso(aVisualizar: Boolean);
 begin
   pnlProcesso.Visible  := aVisualizar;
-  lblProcesso.Caption  := EmptyStr;
+  lblProcesso.Caption  := 'Iniciando processo...';
   gagProcesso.Progress := 0;
 end;
 
@@ -245,44 +476,38 @@ begin
   TServiceUtils.ImageResource('icon_question24', imgS1020);
 end;
 
-procedure TViewEventoTabelaEnviar.SaveRegisters;
-//var
-//  I : Integer;
-//  aScripts : TStringList;
+procedure TViewEventoTabelaEnviar.ProcessarRetorno(Sender: TObject);
 begin
-//  aScripts := TStringList.Create;
-//  try
-//    for I := Low(CLASSE_CODIGO) to High(CLASSE_CODIGO) do
-//    begin
-//      aScripts.BeginUpdate;
-//      aScripts.Clear;
-//      aScripts.Add('UPDATE OR INSERT INTO ACQUADUTUS_CLASSE_SERVICO (');
-//      aScripts.Add('    codigo    ');
-//      aScripts.Add('  , descricao ');
-//      aScripts.Add(') values (    ');
-//      aScripts.Add('    ' + CLASSE_CODIGO[I].ToString );
-//      aScripts.Add('  , ' + CLASSE_DESCRICAO[I].QuotedString );
-//      aScripts.Add(') MATCHING (  ');
-//      aScripts.Add('    codigo    ');
-//      aScripts.Add(');            ');
-//      aScripts.EndUpdate;
-//
-//      _ConexaoDB.ExecuteStriptDB(TDatabaseExecution.deSourceDB, aScripts);
-//
-//      if not cdsClasses.Active then
-//        cdsClasses.CreateDataSet;
-//
-//      if not cdsClasses.Locate('codigo', CLASSE_CODIGO[I], [])  then
-//      begin
-//        cdsClasses.Append;
-//        cdsClasses.FieldByName('codigo').AsInteger   := CLASSE_CODIGO[I];
-//        cdsClasses.FieldByName('descricao').AsString := CLASSE_DESCRICAO[I];
-//        cdsClasses.Post;
-//      end;
-//    end;
-//  finally
-//    aScripts.DisposeOf;
-//  end;
+  try
+    if Sender is Exception then
+    begin
+      if FStep.Equals('S1000') then
+        TServiceUtils.ImageResource('icon_error24', imgS1000)
+      else
+      if FStep.Equals('S1005') then
+        TServiceUtils.ImageResource('icon_error24', imgS1005)
+      else
+      if FStep.Equals('S1010') then
+        TServiceUtils.ImageResource('icon_error24', imgS1010)
+      else
+      if FStep.Equals('S1020') then
+        TServiceUtils.ImageResource('icon_error24', imgS1020);
+
+      Mensagem('Evento ' + FStep + ':' + #13#13 + Exception(Sender).Message, 'Erro', MB_ICONERROR);
+    end
+    else
+    begin
+      VerificarOperacoes;
+      VerificarEventos;
+      gagProcesso.Progress := gagProcesso.MaxValue;
+      Mensagem('Arquivo(s) de evento(s) gerado(s) e enviado(s) com sucesso.', 'Sucesso!', MB_ICONINFORMATION);
+    end;
+  finally
+    LimparPainelProcesso(False);
+    btnConfirmar.Enabled := True;
+    btnFechar.Enabled    := True;
+    Screen.Cursor        := crDefault;
+  end;
 end;
 
 procedure TViewEventoTabelaEnviar.VerificarEventos;
@@ -339,7 +564,6 @@ begin
 
   gpbOperacao.Enabled   := not ICompetencia.DAO.This.Encerrado; // Liberar apenas se algum evento estiver pendente de envio
   gpbOperacao.ItemIndex := -1;
-  btnConfirmar.Enabled  := gpbOperacao.Enabled;
 
   gpbOperacao.Controls[0].Enabled := IOperacao.DAO.This.Insercao;
   gpbOperacao.Controls[1].Enabled := IOperacao.DAO.This.Alteracao;
@@ -353,6 +577,8 @@ begin
   else
   if gpbOperacao.Controls[2].Enabled then
     gpbOperacao.ItemIndex := 2;
+
+  btnConfirmar.Enabled := (gpbOperacao.ItemIndex > -1);
 end;
 
 end.

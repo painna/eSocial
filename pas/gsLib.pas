@@ -16,7 +16,8 @@ Function RTrim(sString: String): String;
 Function LTrim(sString: String): String;
 Function CharEspeciais(sString: String): Boolean;
 Procedure Mensagem(sTexto: String; sCaption: String; iFlags: Integer);
-Function Confirma(sTexto: String): Boolean;
+Function Confirma(sTexto: String): Boolean; overload;
+Function Confirma(sTitulo, sTexto: String): Boolean; overload;
 Function IncMesAno(sMesAno: String): String;
 Function DecMesAno(sMesAno,sMMAAAA: String): String;
 Function IncDecAno(sAno,sOpcao: String): String;
@@ -248,6 +249,13 @@ Begin
  Else
   Result := False;
 End;
+
+Function Confirma(sTitulo, sTexto: String): Boolean; overload;
+begin
+  Result := (Application.MessageBox(PChar(sTexto)
+    , PChar(sTitulo)
+    , MB_ICONQUESTION + MB_DEFBUTTON2 + MB_YESNO) = ID_YES);
+end;
 
 Function IncMesAno(sMesAno: String): String;
 Var

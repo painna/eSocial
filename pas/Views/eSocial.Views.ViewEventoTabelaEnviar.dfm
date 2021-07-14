@@ -38,7 +38,6 @@ inherited ViewEventoTabelaEnviar: TViewEventoTabelaEnviar
           Align = alClient
           BevelOuter = bvNone
           TabOrder = 0
-          ExplicitTop = 4
           DesignSize = (
             740
             286)

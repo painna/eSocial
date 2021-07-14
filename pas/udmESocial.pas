@@ -266,6 +266,7 @@ type
     procedure SetSQL_Geral(aSQL : TStringList);
 
     procedure CorrigirCidadeNascimento;
+    procedure BarraProcesso(aLabel : TLabel; aProcesso : TGauge; aInforme : String; aPosicao, aMaximo : Integer);
 
     function GetMensagemRetorno : TStringList;
     function ProximaCompetencia(aCompetencia : String) : String;
@@ -673,6 +674,23 @@ begin
     end;
 end;
 
+procedure TdmESocial.BarraProcesso(aLabel: TLabel; aProcesso: TGauge; aInforme: String; aPosicao, aMaximo: Integer);
+begin
+  TThread.Synchronize(nil, procedure
+  begin
+    if Assigned(aLabel) then
+      aLabel.Caption := aInforme;
+
+    if Assigned(aProcesso) then
+    begin
+      if (aMaximo > 0) then
+        aProcesso.MaxValue := aMaximo;
+
+      aProcesso.Progress := aPosicao;
+    end;
+  end);
+end;
+
 function ValidarCPF(aCPF : String) : Boolean;
 var
   sCpf : String;
@@ -869,9 +887,19 @@ var
 begin
   aRetorno := False;
   try
-    aLabel.Caption     := 'Validando dados...';
-    aProcesso.Progress := aProcesso.MaxValue - 1;
-    Application.ProcessMessages;
+    if Assigned(aLabel) or Assigned(aProcesso) then
+    begin
+      TThread.Synchronize(nil, procedure
+      begin
+        if Assigned(aLabel) then
+          aLabel.Caption     := 'Validando dados...';
+
+        if Assigned(aProcesso) then
+          aProcesso.Progress := aProcesso.MaxValue - 1;
+
+        Application.ProcessMessages;
+      end);
+    end;
 
     ACBrESocial.Eventos.TipoEmpregador := ACBrESocial.Configuracoes.Geral.TipoEmpregador;
     ACBrESocial.Eventos.GerarXMLs;
@@ -884,10 +912,16 @@ begin
       ACBrESocial.Eventos.NaoPeriodicos.Count;
 
     if (I = 0) then
-      Mensagem('Sem dados para envio!', 'Aviso', MB_ICONINFORMATION)
+      raise Exception.Create('Sem dados para envio!')
     else
     begin
-      aLabel.Caption := 'Enviando...';
+      if Assigned(aLabel) then
+      begin
+        TThread.Synchronize(nil, procedure
+        begin
+          aLabel.Caption := 'Enviando evento(s)...';
+        end);
+      end;
 
       aDataHoraInicial := Now - StrToTime('00:00:05');       // Retorceder 5 segundos
 
@@ -932,9 +966,19 @@ begin
               aDataHoraTemp := aDataHoraTemp + StrToTime('00:00:01');
             end;
 
-            aLabel.Caption     := 'Envio realizado com sucesso...';
-            aProcesso.Progress := aProcesso.MaxValue;
-            Application.ProcessMessages;
+            if Assigned(aLabel) and Assigned(aProcesso) then
+            begin
+              TThread.Synchronize(nil, procedure
+              begin
+                if Assigned(aLabel) then
+                  aLabel.Caption := 'Envio realizado com sucesso...';
+
+                if Assigned(aProcesso) then
+                  aProcesso.Progress := aProcesso.MaxValue;
+
+                Application.ProcessMessages;
+              end);
+            end;
           end
           else
           begin
@@ -977,6 +1021,7 @@ var
   ok   : Boolean;
   aEventoID,
   I    : Integer;
+  aInforme      ,
   aMainTable    ,
   aFileProcesso : String;
 begin
@@ -1096,10 +1141,10 @@ begin
     SetSQL(aSQL);
 
     I := 1;
+    aInforme := 'Gerando evento S1000...';
 
-    aProcesso.MaxValue := cdsTabela.RecordCount;
-    aProcesso.Progress := 0;
-    Application.ProcessMessages;
+    // Atualizar componentes em tela
+    BarraProcesso(aLabel, aProcesso, aInforme, I, cdsTabela.RecordCount);
 
     if not cdsTabela.IsEmpty then
       aEventoID := StrToInt(IncrementGenerator('GEN_ESOCIAL_EVENTO_S1000', 1));
@@ -1111,11 +1156,6 @@ begin
       begin
         evtInfoEmpregador.Sequencial := aEventoID;
 
-//        if AmbienteWebServiceProducao then
-//          evtInfoEmpregador.IdeEvento.TpAmb := TpTpAmb(0) //taProducao
-//        else
-//          evtInfoEmpregador.IdeEvento.TpAmb := taProducaoRestrita;
-//
         evtInfoEmpregador.IdeEvento.ProcEmi := peAplicEmpregador;
         evtInfoEmpregador.IdeEvento.VerProc := Versao_Executavel(ParamStr(0));
 
@@ -1201,9 +1241,9 @@ begin
         evtInfoEmpregador.InfoEmpregador.NovaValidade.FimValid := '2099-12';
       end;
 
-      aLabel.Caption     := Trim(cdsTabela.FieldByName('ENTE_FERERATIVO').AsString);
-      aProcesso.Progress := I;
-      Application.ProcessMessages;
+      aInforme := Trim(cdsTabela.FieldByName('ENTE_FERERATIVO').AsString);
+      BarraProcesso(aLabel, aProcesso, aInforme, I, 0);
+
       Inc(I);
 
       Writeln(flOperacao_eS1000, 'S1000|' + aMainTable + '|' + MODO_OPERACAO[Ord(aModoLancamento)] + '|' + FormatFloat('0000000000', cdsTabela.FieldByName('ID').AsInteger) + '|ID_CONFIG_ORGAO');
@@ -1241,6 +1281,7 @@ var
   aEventoID,
   I    : Integer;
   aDataImplantacao : TDateTime;
+  aInforme      ,
   aMainTable    ,
   aFileProcesso : String;
 begin
@@ -1296,10 +1337,10 @@ begin
     SetSQL(aSQL);
 
     I := 1;
+    aInforme := 'Gerando evento S1005...';
 
-    aProcesso.MaxValue := cdsTabela.RecordCount;
-    aProcesso.Progress := 0;
-    Application.ProcessMessages;
+    // Atualizar componentes em tela
+    BarraProcesso(aLabel, aProcesso, aInforme, I, cdsTabela.RecordCount);
 
     cdsTabela.First;
     while not cdsTabela.Eof do
@@ -1313,11 +1354,6 @@ begin
           Sequencial     := aEventoID;
           ModoLancamento := aModoLancamento;
 
-//          if AmbienteWebServiceProducao then
-//            IdeEvento.TpAmb := TpTpAmb(0) //taProducao
-//          else
-//            IdeEvento.TpAmb := taProducaoRestrita;
-//
           IdeEvento.ProcEmi := peAplicEmpregador;
           IdeEvento.VerProc := Versao_Executavel(ParamStr(0));
 
@@ -1387,9 +1423,9 @@ begin
         end;
       end;
 
-      aLabel.Caption     := Trim(cdsTabela.FieldByName('RAZAO_SOCIAL').AsString);
-      aProcesso.Progress := I;
-      Application.ProcessMessages;
+      aInforme := Trim(cdsTabela.FieldByName('RAZAO_SOCIAL').AsString);
+      BarraProcesso(aLabel, aProcesso, aInforme, I, 0);
+
       Inc(I);
 
       Writeln(flOperacao_eS1005, 'S1005|' + aMainTable + '|' + MODO_OPERACAO[Ord(aModoLancamento)] + '|' + FormatFloat('0000000000', cdsTabela.FieldByName('ID').AsInteger) + '|ID');
@@ -1426,9 +1462,10 @@ var
   ok   : Boolean;
   aEventoID,
   I    : Integer;
-  aCnpj  ,
-  aInicio,
-  aFim   : String;
+  aInforme,
+  aCnpj   ,
+  aInicio ,
+  aFim    : String;
   aMainTable    ,
   aFileProcesso : String;
 begin
@@ -1447,8 +1484,6 @@ begin
     aSQL.Add('    e.*');
     aSQL.Add('  , x.ano_mes_min');
     aSQL.Add('  , x.ano_mes_max');
-//    aSQL.Add('  , ' + QuotedStr(FLAG_NAO) + ' as INCIDE_FGTS'); // Campo já presentes na tabela EVENTOS
-//    aSQL.Add('  , ' + QuotedStr(FLAG_NAO) + ' as INCIDE_SIND'); // Campo já presentes na tabela EVENTOS
     aSQL.Add('from EVENTO e');
     aSQL.Add('  left join (');
     aSQL.Add('    Select');
@@ -1472,13 +1507,10 @@ begin
     SetSQL(aSQL);
 
     I := 1;
+    aInforme := 'Gerando evento S1010...';
 
-    aProcesso.MaxValue := cdsTabela.RecordCount;
-    aProcesso.Progress := 0;
-    Application.ProcessMessages;
-
-//    if not cdsTabela.IsEmpty then
-//      aEventoID := StrToInt(IncrementGenerator('GEN_ESOCIAL_EVENTO_S1010', 1));
+    // Atualizar componentes em tela
+    BarraProcesso(aLabel, aProcesso, aInforme, I, cdsTabela.RecordCount);
 
     aCnpj := Criptografa(Pesquisa('CONFIG_ORGAO', 'ID', '1', 'CNPJ', ''),'2', 14);
 
@@ -1490,11 +1522,6 @@ begin
         aEventoID := StrToInt(IncrementGenerator('GEN_ESOCIAL_EVENTO_S1010', 1));
         evtTabRubrica.Sequencial := aEventoID;
 
-//        if AmbienteWebServiceProducao then
-//          evtTabRubrica.IdeEvento.TpAmb := TpTpAmb(0) //taProducao
-//        else
-//          evtTabRubrica.IdeEvento.TpAmb := taProducaoRestrita;
-//
         evtTabRubrica.IdeEvento.ProcEmi := peAplicEmpregador;
         evtTabRubrica.IdeEvento.VerProc := Versao_Executavel(ParamStr(0));
 
@@ -1594,9 +1621,9 @@ begin
 
       end;
 
-      aLabel.Caption     := Trim(cdsTabela.FieldByName('DESCRICAO').AsString);
-      aProcesso.Progress := I;
-      Application.ProcessMessages;
+      aInforme := Trim(cdsTabela.FieldByName('DESCRICAO').AsString);
+      BarraProcesso(aLabel, aProcesso, aInforme, I, 0);
+
       Inc(I);
 
       Writeln(flOperacao_eS1010, 'S1010|' + aMainTable + '|' + MODO_OPERACAO[Ord(aModoLancamento)] + '|' + FormatFloat('0000000000', cdsTabela.FieldByName('ID').AsInteger) + '|ID');
@@ -1633,6 +1660,7 @@ var
   ok   : Boolean;
   aEventoID,
   I    : Integer;
+  aInforme      ,
   aMainTable    ,
   aFileProcesso : String;
 begin
@@ -1667,14 +1695,13 @@ begin
     SetSQL(aSQL);
 
     I := 1;
+    aInforme := 'Gerando evento S1010...';
 
-    aProcesso.MaxValue := cdsTabela.RecordCount;
-    aProcesso.Progress := 0;
-    Application.ProcessMessages;
+    // Atualizar componentes em tela
+    BarraProcesso(aLabel, aProcesso, aInforme, I, cdsTabela.RecordCount);
 
     if not cdsTabela.IsEmpty then
       aEventoID := StrToInt(IncrementGenerator('GEN_ESOCIAL_EVENTO_S1020', 1));
-
 
     cdsTabela.First;
     while not cdsTabela.Eof do
@@ -1685,11 +1712,6 @@ begin
         begin
           Sequencial := aEventoID;
 
-//          if AmbienteWebServiceProducao then
-//            IdeEvento.TpAmb := TpTpAmb(0) //taProducao
-//          else
-//            IdeEvento.TpAmb := taProducaoRestrita;
-//
           IdeEvento.ProcEmi := peAplicEmpregador;
           IdeEvento.VerProc := Versao_Executavel(ParamStr(0));
 
@@ -1748,9 +1770,9 @@ begin
         end;
       end;
 
-      aLabel.Caption     := Trim(cdsTabela.FieldByName('ENTE_FERERATIVO').AsString);
-      aProcesso.Progress := I;
-      Application.ProcessMessages;
+      aInforme := Trim(cdsTabela.FieldByName('ENTE_FERERATIVO').AsString);
+      BarraProcesso(aLabel, aProcesso, aInforme, I, 0);
+
       Inc(I);
 
       Writeln(flOperacao_eS1020, 'S1020|' + aMainTable + '|' + MODO_OPERACAO[Ord(aModoLancamento)] + '|' + FormatFloat('0000000000', cdsTabela.FieldByName('ID').AsInteger) + '|ID');
