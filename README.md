@@ -1,2 +1,2 @@
 # eSocial
-Sistema de Gestão de dados para o eSocial
+Sistema para a gestão da transmissão de dados para o eSocial.
