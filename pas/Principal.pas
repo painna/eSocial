@@ -181,7 +181,6 @@ uses
 
   udmESocial,
   ConfigurarESocial,
-  EnvioEventoTabela,
   EnvioEventoNaoPeriodico,
   EnvioEventoPeriodico,
   eSocial.Views.Esmaecer,
@@ -546,12 +545,11 @@ begin
 
    Self.Caption := glb_sSistema+' - [VER. '+glb_sVersao+']';
 
-//   try
-//      glb_sDescrMesAnoTrab := Maiusculas(NomeMes(StrToInt(RightStr(glb_sAnoMesTrab,2))))+' / '+LeftStr(glb_sAnoMesTrab,4);
-//   except
-//      Mensagem('Ano/Mês atual: '+glb_sAnoMesTrab,'ERRO !!!',MB_OK+MB_ICONERROR);
-//      glb_sDescrMesAnoTrab := 'DEZEMBRO / 1901';
-//   end;
+  Application.ProcessMessages;
+
+  // Forçar a verificação de dados pendentes para envio e com isso a leitura de competências
+  dmPrincipal.SConPrincipal.ExecuteDirect('execute procedure SP_ESOCIAL_EVENTOS_PEND_TABELAS');
+
   ICompetencia := TControllerFactory.Competencia;
   ICompetencia.DAO.Get;
 

@@ -101,6 +101,7 @@ type
     { Private declarations }
     ICompetencia : IControllerCompetencia;
     FStep : String;
+    FSucesso : Smallint;
 
     procedure ApplyStyleLocal;
     procedure LoadImagesDefault;
@@ -174,7 +175,8 @@ begin
     btnFechar.Enabled    := False;
     Screen.Cursor        := crSQLWait;
 
-    FStep := EmptyStr;
+    FStep    := EmptyStr;
+    FSucesso := 0;
 
     // Iniciar thread para geração e envio dos eventos...
     aThread := TThread.CreateAnonymousThread( GerarEnviarEventos );
@@ -240,9 +242,17 @@ begin
 
   VerificarOperacoes;
   VerificarEventos;
-//
-//  cbS1035.Enabled := (Pesquisa('CONFIG_ESOCIAL', 'ID_CONFIG_ORGAO', '1', 'POSSUI_TABELA_CARREIRA', '') = FLAG_SIM);
-//  Checb_ZeraBase.Visible := dmESocial.AmbienteWebServiceHomologacao;
+
+  try
+    eSocial.SSL.CarregarCertificadoSeNecessario;
+  except
+    On E : Exception do
+    begin
+      btnConfirmar.Enabled := False;
+      btnFechar.Enabled    := False;
+      Mensagem('Certificado não selecionado.' + #13#13 + E.Message, 'Erro', MB_ICONERROR);
+    end;
+  end;
 end;
 
 procedure TViewEventoTabelaEnviar.GerarEnviarEventos;
@@ -253,6 +263,7 @@ var
   aContinuar  : Boolean;
   aProtocolo  : TProtocoloESocial;
   aModoLancamento : TModoLancamento;
+  aEventoOK : Boolean;
 begin
   aCompetencia := StringReplace(cmbCompetencia.Text, '-', '', [rfReplaceAll]);
   IOperacao  := TControllerFactory.Operacao;
@@ -269,13 +280,15 @@ begin
   // Gerar e enviar evento S1000 : ---
   FStep := 'S1000';
   try
+    aEventoOK  := False;
     aProtocolo := TProtocoloESocial.Create(EmptyStr);
     aProtocolo.CompetenciaID := IntToStr(TCompetencia(cmbCompetencia.Items.Objects[cmbCompetencia.ItemIndex]).ID);
 
-    TThread.Synchronize(nil, procedure
-    begin
-      TServiceUtils.ImageResource('icon_question24', imgS1000);
-    end);
+    if (imgS1000.Tag = 1) then
+      TThread.Synchronize(nil, procedure
+      begin
+        TServiceUtils.ImageResource('icon_question24', imgS1000);
+      end);
 
     // 1. Varrer os registros pendente de envio
     while aContinuar and IOperacao.DAO.Get([aCompetencia, FStep, aOperacao]).This.Processar do
@@ -293,16 +306,22 @@ begin
       begin
         dmESocial.GravarProtocoloRetorno(aProtocolo);
         dmESocial.AtualizarOperacoes(aModoLancamento, aProtocolo, TCompetencia(cmbCompetencia.Items.Objects[cmbCompetencia.ItemIndex]));
+        Inc(FSucesso);
+        aEventoOK := True;
+
         // 4. Verificar novas pendentes
         dmPrincipal.SConPrincipal.ExecuteDirect('execute procedure SP_ESOCIAL_EVENTOS_PEND_TABELAS');
       end
+      else
+      if (eSocial.Eventos.Iniciais.Count = 0) then
+        raise Exception.Create('Nenhum evento foi gerado.' + #13 + 'Entre em contato com suporte!')
       else
       if (dmESocial.MensagemRetorno.Count > 0) then
         raise Exception.Create(dmESocial.MensagemRetorno.Text);
     end;
 
     // 5. Atualizar ícone na tela
-    if aContinuar then
+    if aContinuar and aEventoOK then
       TThread.Synchronize(nil, procedure
       begin
         TServiceUtils.ImageResource('icon_success24', imgS1000);
@@ -315,13 +334,15 @@ begin
   // Gerar e enviar evento S1005 : ---
   FStep := 'S1005';
   try
+    aEventoOK  := False;
     aProtocolo := TProtocoloESocial.Create(EmptyStr);
     aProtocolo.CompetenciaID := IntToStr(TCompetencia(cmbCompetencia.Items.Objects[cmbCompetencia.ItemIndex]).ID);
 
-    TThread.Synchronize(nil, procedure
-    begin
-      TServiceUtils.ImageResource('icon_question24', imgS1005);
-    end);
+    if (imgS1005.Tag = 1) then
+      TThread.Synchronize(nil, procedure
+      begin
+        TServiceUtils.ImageResource('icon_question24', imgS1005);
+      end);
 
     // 1. Varrer os registros pendente de envio
     while aContinuar and IOperacao.DAO.Get([aCompetencia, FStep, aOperacao]).This.Processar do
@@ -339,16 +360,22 @@ begin
       begin
         dmESocial.GravarProtocoloRetorno(aProtocolo);
         dmESocial.AtualizarOperacoes(aModoLancamento, aProtocolo, TCompetencia(cmbCompetencia.Items.Objects[cmbCompetencia.ItemIndex]));
+        Inc(FSucesso);
+        aEventoOK := True;
+
         // 4. Verificar novas pendentes
         dmPrincipal.SConPrincipal.ExecuteDirect('execute procedure SP_ESOCIAL_EVENTOS_PEND_TABELAS');
       end
+      else
+      if (eSocial.Eventos.Iniciais.Count = 0) then
+        raise Exception.Create('Nenhum evento foi gerado.' + #13 + 'Entre em contato com suporte!')
       else
       if (dmESocial.MensagemRetorno.Count > 0) then
         raise Exception.Create(dmESocial.MensagemRetorno.Text);
     end;
 
     // 5. Atualizar ícone na tela
-    if aContinuar then
+    if aContinuar and aEventoOK then
       TThread.Synchronize(nil, procedure
       begin
         TServiceUtils.ImageResource('icon_success24', imgS1005);
@@ -361,13 +388,15 @@ begin
   // Gerar e enviar evento S1010 : ---
   FStep := 'S1010';
   try
+    aEventoOK  := False;
     aProtocolo := TProtocoloESocial.Create(EmptyStr);
     aProtocolo.CompetenciaID := IntToStr(TCompetencia(cmbCompetencia.Items.Objects[cmbCompetencia.ItemIndex]).ID);
 
-    TThread.Synchronize(nil, procedure
-    begin
-      TServiceUtils.ImageResource('icon_question24', imgS1010);
-    end);
+    if (imgS1010.Tag = 1) then
+      TThread.Synchronize(nil, procedure
+      begin
+        TServiceUtils.ImageResource('icon_question24', imgS1010);
+      end);
 
     // 1. Varrer os registros pendente de envio
     while aContinuar and IOperacao.DAO.Get([aCompetencia, FStep, aOperacao]).This.Processar do
@@ -385,16 +414,22 @@ begin
       begin
         dmESocial.GravarProtocoloRetorno(aProtocolo);
         dmESocial.AtualizarOperacoes(aModoLancamento, aProtocolo, TCompetencia(cmbCompetencia.Items.Objects[cmbCompetencia.ItemIndex]));
+        Inc(FSucesso);
+        aEventoOK := True;
+
         // 4. Verificar novas pendentes
         dmPrincipal.SConPrincipal.ExecuteDirect('execute procedure SP_ESOCIAL_EVENTOS_PEND_TABELAS');
       end
+      else
+      if (eSocial.Eventos.Iniciais.Count = 0) then
+        raise Exception.Create('Nenhum evento foi gerado.' + #13 + 'Entre em contato com suporte!')
       else
       if (dmESocial.MensagemRetorno.Count > 0) then
         raise Exception.Create(dmESocial.MensagemRetorno.Text);
     end;
 
     // 5. Atualizar ícone na tela
-    if aContinuar then
+    if aContinuar and aEventoOK then
       TThread.Synchronize(nil, procedure
       begin
         TServiceUtils.ImageResource('icon_success24', imgS1010);
@@ -407,13 +442,15 @@ begin
   // Gerar e enviar evento S1020 : ---
   FStep := 'S1020';
   try
+    aEventoOK  := False;
     aProtocolo := TProtocoloESocial.Create(EmptyStr);
     aProtocolo.CompetenciaID := IntToStr(TCompetencia(cmbCompetencia.Items.Objects[cmbCompetencia.ItemIndex]).ID);
 
-    TThread.Synchronize(nil, procedure
-    begin
-      TServiceUtils.ImageResource('icon_question24', imgS1020);
-    end);
+    if (imgS1020.Tag = 1) then
+      TThread.Synchronize(nil, procedure
+      begin
+        TServiceUtils.ImageResource('icon_question24', imgS1020);
+      end);
 
     // 1. Varrer os registros pendente de envio
     while aContinuar and IOperacao.DAO.Get([aCompetencia, FStep, aOperacao]).This.Processar do
@@ -431,16 +468,22 @@ begin
       begin
         dmESocial.GravarProtocoloRetorno(aProtocolo);
         dmESocial.AtualizarOperacoes(aModoLancamento, aProtocolo, TCompetencia(cmbCompetencia.Items.Objects[cmbCompetencia.ItemIndex]));
+        Inc(FSucesso);
+        aEventoOK := True;
+
         // 4. Verificar novas pendentes
         dmPrincipal.SConPrincipal.ExecuteDirect('execute procedure SP_ESOCIAL_EVENTOS_PEND_TABELAS');
       end
+      else
+      if (eSocial.Eventos.Iniciais.Count = 0) then
+        raise Exception.Create('Nenhum evento foi gerado.' + #13 + 'Entre em contato com suporte!')
       else
       if (dmESocial.MensagemRetorno.Count > 0) then
         raise Exception.Create(dmESocial.MensagemRetorno.Text);
     end;
 
     // 5. Atualizar ícone na tela
-    if aContinuar then
+    if aContinuar and aEventoOK then
       TThread.Synchronize(nil, procedure
       begin
         TServiceUtils.ImageResource('icon_success24', imgS1020);
@@ -477,9 +520,16 @@ begin
 end;
 
 procedure TViewEventoTabelaEnviar.ProcessarRetorno(Sender: TObject);
+var
+  aError : Boolean;
 begin
   try
-    if Sender is Exception then
+    aError := False;
+
+    if Sender is TThread then
+      aError := Assigned(TThread(Sender).FatalException);
+
+    if aError then
     begin
       if FStep.Equals('S1000') then
         TServiceUtils.ImageResource('icon_error24', imgS1000)
@@ -493,14 +543,18 @@ begin
       if FStep.Equals('S1020') then
         TServiceUtils.ImageResource('icon_error24', imgS1020);
 
-      Mensagem('Evento ' + FStep + ':' + #13#13 + Exception(Sender).Message, 'Erro', MB_ICONERROR);
+      Mensagem('Evento ' + FStep + ':' + #13#13 + Exception(TThread(Sender).FatalException).Message, 'Erro', MB_ICONERROR);
     end
     else
     begin
       VerificarOperacoes;
       VerificarEventos;
       gagProcesso.Progress := gagProcesso.MaxValue;
-      Mensagem('Arquivo(s) de evento(s) gerado(s) e enviado(s) com sucesso.', 'Sucesso!', MB_ICONINFORMATION);
+
+      if (FSucesso = 0) then
+        Mensagem('Nenhum evento foi gerado.' + #13 + 'Informe ao suporte para que este analise os dados da base', 'Erro!', MB_ICONERROR)
+      else
+        Mensagem('Arquivo(s) de evento(s) gerado(s) e enviado(s) com sucesso.', 'Sucesso!', MB_ICONINFORMATION);
     end;
   finally
     LimparPainelProcesso(False);

@@ -17,6 +17,7 @@ uses
   ACBreSocialWebServices,
   ACBrIntegrador,
   pcesConversaoeSocial,
+  pcesGerador,
   pcnConversao,
 
   TypInfo,
@@ -1161,6 +1162,7 @@ begin
 
         evtInfoEmpregador.IdeEmpregador.TpInsc := tiCNPJ;
         evtInfoEmpregador.IdeEmpregador.NrInsc := Criptografa(cdsTabela.FieldByName('CNPJ').AsString, '2', 14);
+        //evtInfoEmpregador.Id := TeSocialEvento(evtInfoEmpregador).GerarChaveEsocial(now, evtInfoEmpregador.ideEmpregador.NrInsc, evtInfoEmpregador.Sequencial);
 
         with ACBrESocial.Configuracoes do
           Geral.IdEmpregador := evtInfoEmpregador.IdeEmpregador.NrInsc;
@@ -1246,7 +1248,12 @@ begin
 
       Inc(I);
 
-      Writeln(flOperacao_eS1000, 'S1000|' + aMainTable + '|' + MODO_OPERACAO[Ord(aModoLancamento)] + '|' + FormatFloat('0000000000', cdsTabela.FieldByName('ID').AsInteger) + '|ID_CONFIG_ORGAO');
+      Writeln(flOperacao_eS1000,
+            'S1000|'
+          + aMainTable + '|'
+          + MODO_OPERACAO[Ord(aModoLancamento)] + '|'
+          + FormatFloat('0000000000', cdsTabela.FieldByName('ID').AsInteger) + '|'
+          + 'ID_CONFIG_ORGAO');
       cdsTabela.Next;
     end;
 
@@ -1359,6 +1366,7 @@ begin
 
           IdeEmpregador.TpInsc := tiCNPJ;
           IdeEmpregador.NrInsc := cdsTabela.FieldByName('CNPJ_PRINCIPAL').AsString;
+          //evtTabEstab.Id := TeSocialEvento(evtTabEstab).GerarChaveEsocial(now, evtTabEstab.ideEmpregador.NrInsc, evtTabEstab.Sequencial);
 
           with ACBrESocial.Configuracoes do
             Geral.IdEmpregador := IdeEmpregador.NrInsc;
@@ -1428,7 +1436,12 @@ begin
 
       Inc(I);
 
-      Writeln(flOperacao_eS1005, 'S1005|' + aMainTable + '|' + MODO_OPERACAO[Ord(aModoLancamento)] + '|' + FormatFloat('0000000000', cdsTabela.FieldByName('ID').AsInteger) + '|ID');
+      Writeln(flOperacao_eS1005,
+          'S1005|'
+        + aMainTable + '|'
+        + MODO_OPERACAO[Ord(aModoLancamento)] + '|'
+        + FormatFloat('0000000000', cdsTabela.FieldByName('ID').AsInteger) + '|'
+        + 'ID');
       cdsTabela.Next;
     end;
 
@@ -1527,6 +1540,7 @@ begin
 
         evtTabRubrica.IdeEmpregador.TpInsc := tiCNPJ;
         evtTabRubrica.IdeEmpregador.NrInsc := aCnpj;
+        //evtTabRubrica.Id := TeSocialEvento(evtTabRubrica).GerarChaveEsocial(now, evtTabRubrica.ideEmpregador.NrInsc, evtTabRubrica.Sequencial);
 
         with ACBrESocial.Configuracoes do
           Geral.IdEmpregador := evtTabRubrica.IdeEmpregador.NrInsc;
@@ -1626,7 +1640,12 @@ begin
 
       Inc(I);
 
-      Writeln(flOperacao_eS1010, 'S1010|' + aMainTable + '|' + MODO_OPERACAO[Ord(aModoLancamento)] + '|' + FormatFloat('0000000000', cdsTabela.FieldByName('ID').AsInteger) + '|ID');
+      Writeln(flOperacao_eS1010,
+          'S1010|'
+        + aMainTable + '|'
+        + MODO_OPERACAO[Ord(aModoLancamento)] + '|'
+        + FormatFloat('0000000000', cdsTabela.FieldByName('ID').AsInteger) + '|'
+        + 'ID');
       cdsTabela.Next;
     end;
 
@@ -1717,6 +1736,7 @@ begin
 
           IdeEmpregador.TpInsc := tiCNPJ;
           IdeEmpregador.NrInsc := Criptografa(cdsTabela.FieldByName('CNPJ').AsString, '2', 14);
+          //EvtTabLotacao.Id := TeSocialEvento(EvtTabLotacao).GerarChaveEsocial(now, EvtTabLotacao.ideEmpregador.NrInsc, EvtTabLotacao.Sequencial);
 
           with ACBrESocial.Configuracoes do
             Geral.IdEmpregador := EvtTabLotacao.IdeEmpregador.NrInsc;
@@ -1775,7 +1795,12 @@ begin
 
       Inc(I);
 
-      Writeln(flOperacao_eS1020, 'S1020|' + aMainTable + '|' + MODO_OPERACAO[Ord(aModoLancamento)] + '|' + FormatFloat('0000000000', cdsTabela.FieldByName('ID').AsInteger) + '|ID');
+      Writeln(flOperacao_eS1020,
+          'S1020|'
+        + aMainTable + '|'
+        + MODO_OPERACAO[Ord(aModoLancamento)] + '|'
+        + FormatFloat('0000000000', cdsTabela.FieldByName('ID').AsInteger) + '|'
+        + 'ID');
       cdsTabela.Next;
     end;
 (*
@@ -1909,9 +1934,6 @@ begin
     aProcesso.Progress := 0;
     Application.ProcessMessages;
 
-//    if not cdsTabela.IsEmpty then
-//      aEventoID := StrToInt(IncrementGenerator('GEN_ESOCIAL_EVENTO_S1030', 1));
-
     cdsTabela.First;
     while not cdsTabela.Eof do
     begin
@@ -1920,16 +1942,12 @@ begin
         aEventoID := StrToInt(IncrementGenerator('GEN_ESOCIAL_EVENTO_S1030', 1));
         evtTabCargo.Sequencial := aEventoID;
 
-//        if AmbienteWebServiceProducao then
-//          evtTabCargo.IdeEvento.TpAmb := TpTpAmb(0) //taProducao
-//        else
-//          evtTabCargo.IdeEvento.TpAmb := taProducaoRestrita;
-//
         evtTabCargo.IdeEvento.ProcEmi := peAplicEmpregador;
         evtTabCargo.IdeEvento.VerProc := Versao_Executavel(ParamStr(0));
 
         evtTabCargo.IdeEmpregador.TpInsc := tiCNPJ;
         evtTabCargo.IdeEmpregador.NrInsc := Criptografa(cdsTabela.FieldByName('CNPJ').AsString, '2', 14);
+        //evtTabCargo.Id := TeSocialEvento(evtTabCargo).GerarChaveEsocial(now, evtTabCargo.ideEmpregador.NrInsc, evtTabCargo.Sequencial);
 
         with ACBrESocial.Configuracoes do
           Geral.IdEmpregador := evtTabCargo.IdeEmpregador.NrInsc;
@@ -1972,7 +1990,12 @@ begin
       Application.ProcessMessages;
       Inc(I);
 
-      Writeln(flOperacao_eS1030, 'S1030|' + aMainTable + '|' + MODO_OPERACAO[Ord(aModoLancamento)] + '|' + FormatFloat('0000000000', cdsTabela.FieldByName('ID').AsInteger) + '|ID');
+      Writeln(flOperacao_eS1030,
+          'S1030|'
+        + aMainTable + '|'
+        + MODO_OPERACAO[Ord(aModoLancamento)] + '|'
+        + FormatFloat('0000000000', cdsTabela.FieldByName('ID').AsInteger) + '|'
+        + 'ID');
       cdsTabela.Next;
     end;
 
@@ -2077,16 +2100,12 @@ begin
         aEventoID := StrToInt(IncrementGenerator('GEN_ESOCIAL_EVENTO_S1040', 1));
         EvtTabFuncao.Sequencial := aEventoID;
 
-//        if AmbienteWebServiceProducao then
-//          IdeEvento.TpAmb := TpTpAmb(0) //taProducao
-//        else
-//          IdeEvento.TpAmb := taProducaoRestrita;
-//
         IdeEvento.ProcEmi := peAplicEmpregador;
         IdeEvento.VerProc := Versao_Executavel(ParamStr(0));
 
         IdeEmpregador.TpInsc := tiCNPJ;
         IdeEmpregador.NrInsc := Criptografa(cdsTabela.FieldByName('CNPJ').AsString, '2', 14);
+        //EvtTabFuncao.Id := TeSocialEvento(EvtTabFuncao).GerarChaveEsocial(now, EvtTabFuncao.ideEmpregador.NrInsc, EvtTabFuncao.Sequencial);
 
         with ACBrESocial.Configuracoes do
           Geral.IdEmpregador := EvtTabFuncao.IdeEmpregador.NrInsc;
@@ -2109,7 +2128,12 @@ begin
       Application.ProcessMessages;
       Inc(I);
 
-      Writeln(flOperacao_eS1040, 'S1040|' + aMainTable + '|' + MODO_OPERACAO[Ord(aModoLancamento)] + '|' + FormatFloat('0000000000', cdsTabela.FieldByName('ID').AsInteger) + '|ID');
+      Writeln(flOperacao_eS1040,
+          'S1040|'
+        + aMainTable + '|'
+        + MODO_OPERACAO[Ord(aModoLancamento)] + '|'
+        + FormatFloat('0000000000', cdsTabela.FieldByName('ID').AsInteger) + '|'
+        + 'ID');
       cdsTabela.Next;
     end;
 
@@ -2196,16 +2220,12 @@ begin
         aEventoID := StrToInt(IncrementGenerator('GEN_ESOCIAL_EVENTO_S1050', 1));
         Sequencial:= aEventoID;
 
-//        if AmbienteWebServiceProducao then
-//          IdeEvento.TpAmb := TpTpAmb(0) //taProducao
-//        else
-//          IdeEvento.TpAmb := taProducaoRestrita;
-//
         IdeEvento.ProcEmi := peAplicEmpregador;
         IdeEvento.VerProc := Versao_Executavel(ParamStr(0));
 
         IdeEmpregador.TpInsc := tiCNPJ;
         IdeEmpregador.NrInsc := Criptografa(cdsTabela.FieldByName('CNPJ').AsString, '2', 14);
+        //EvtTabHorContratual.Id := TeSocialEvento(EvtTabHorContratual).GerarChaveEsocial(now, EvtTabHorContratual.ideEmpregador.NrInsc, EvtTabHorContratual.Sequencial);
 
         with ACBrESocial.Configuracoes do
           Geral.IdEmpregador := EvtTabHorContratual.IdeEmpregador.NrInsc;
@@ -2244,7 +2264,12 @@ begin
       Application.ProcessMessages;
       Inc(I);
 
-      Writeln(flOperacao_eS1050, 'S1050|' + aMainTable + '|' + MODO_OPERACAO[Ord(aModoLancamento)] + '|' + FormatFloat('0000000000', cdsTabela.FieldByName('ID').AsInteger) + '|ID');
+      Writeln(flOperacao_eS1050,
+          'S1050|'
+        + aMainTable + '|'
+        + MODO_OPERACAO[Ord(aModoLancamento)] + '|'
+        + FormatFloat('0000000000', cdsTabela.FieldByName('ID').AsInteger) + '|'
+        + 'ID');
       cdsTabela.Next;
     end;
 
@@ -2324,16 +2349,12 @@ begin
         aEventoID := StrToInt(IncrementGenerator('GEN_ESOCIAL_EVENTO_S1060', 1));
         Sequencial:= aEventoID;
 
-//        if AmbienteWebServiceProducao then
-//          IdeEvento.TpAmb := TpTpAmb(0) //taProducao
-//        else
-//          IdeEvento.TpAmb := taProducaoRestrita;
-//
         IdeEvento.ProcEmi := peAplicEmpregador;
         IdeEvento.VerProc := Versao_Executavel(ParamStr(0));
 
         IdeEmpregador.TpInsc := tiCNPJ;
         IdeEmpregador.NrInsc := Criptografa(cdsTabela.FieldByName('CNPJ').AsString, '2', 14);
+        //EvtTabAmbiente.Id := TeSocialEvento(EvtTabAmbiente).GerarChaveEsocial(now, EvtTabAmbiente.ideEmpregador.NrInsc, EvtTabAmbiente.Sequencial);
 
         with ACBrESocial.Configuracoes do
           Geral.IdEmpregador := EvtTabAmbiente.IdeEmpregador.NrInsc;
@@ -2396,7 +2417,12 @@ begin
       Application.ProcessMessages;
       Inc(I);
 
-      Writeln(flOperacao_eS1060, 'S1060|' + aMainTable + '|' + MODO_OPERACAO[Ord(aModoLancamento)] + '|' + FormatFloat('0000000000', cdsTabela.FieldByName('ID').AsInteger) + '|ID');
+      Writeln(flOperacao_eS1060,
+          'S1060|'
+        + aMainTable + '|'
+        + MODO_OPERACAO[Ord(aModoLancamento)] + '|'
+        + FormatFloat('0000000000', cdsTabela.FieldByName('ID').AsInteger) + '|'
+        + 'ID');
       cdsTabela.Next;
     end;
 
@@ -2518,11 +2544,6 @@ begin
           aEventoID := StrToInt(IncrementGenerator('GEN_ESOCIAL_EVENTO_S1200', 1));
           Sequencial:= aEventoID;
 
-//          if AmbienteWebServiceProducao then
-//            IdeEvento.TpAmb := TpTpAmb(0) //taProducao
-//          else
-//            IdeEvento.TpAmb := taProducaoRestrita;
-//
           IdeEvento.indRetif := ireOriginal; // (ireOriginal, ireRetificacao);
 
           if (IdeEvento.indRetif = ireRetificacao) then
@@ -2542,6 +2563,7 @@ begin
 
           IdeEmpregador.TpInsc := tiCNPJ;
           IdeEmpregador.NrInsc := Criptografa(Pesquisa('CONFIG_ORGAO', 'ID', '1', 'CNPJ', ''),'2', 14); //Criptografa(cdsTabela.FieldByName('CNPJ').AsString, '2', 14);
+          //EvtRemun.Id := TeSocialEvento(EvtRemun).GerarChaveEsocial(now, EvtRemun.ideEmpregador.NrInsc, EvtRemun.Sequencial);
 
           with ACBrESocial.Configuracoes do
             Geral.IdEmpregador := EvtRemun.IdeEmpregador.NrInsc;
@@ -2758,7 +2780,12 @@ begin
       Application.ProcessMessages;
       Inc(I);
 
-      Writeln(flOperacao_eS1200, 'S1200|' + aMainTable + '|' + MODO_OPERACAO[Ord(aModoLancamento)] + '|' + cdsTabela.FieldByName('ANO_MES').AsString + ';' + FormatFloat('0000000000', cdsTabela.FieldByName('ID_SERVIDOR').AsInteger) + '|ANO_MES;ID_SERVIDOR');
+      Writeln(flOperacao_eS1200,
+          'S1200|'
+        + aMainTable + '|'
+        + MODO_OPERACAO[Ord(aModoLancamento)] + '|'
+        + cdsTabela.FieldByName('ANO_MES').AsString + ';' + FormatFloat('0000000000', cdsTabela.FieldByName('ID_SERVIDOR').AsInteger) + '|'
+        + 'ANO_MES;ID_SERVIDOR');
       cdsTabela.Next;
     end;
 
@@ -2886,11 +2913,6 @@ begin
           aEventoID := StrToInt(IncrementGenerator('GEN_ESOCIAL_EVENTO_S1200', 1));
           Sequencial:= aEventoID;
 
-//          if AmbienteWebServiceProducao then
-//            IdeEvento.TpAmb := TpTpAmb(0) //taProducao
-//          else
-//            IdeEvento.TpAmb := taProducaoRestrita;
-//
           IdeEvento.indRetif := ireOriginal; // (ireOriginal, ireRetificacao);
 
           if (IdeEvento.indRetif = ireRetificacao) then
@@ -2910,6 +2932,7 @@ begin
 
           IdeEmpregador.TpInsc := tiCNPJ;
           IdeEmpregador.NrInsc := Criptografa(Pesquisa('CONFIG_ORGAO', 'ID', '1', 'CNPJ', ''),'2', 14); //Criptografa(cdsTabela.FieldByName('CNPJ').AsString, '2', 14);
+          //EvtRmnRPPS.Id := TeSocialEvento(EvtRmnRPPS).GerarChaveEsocial(now, EvtRmnRPPS.ideEmpregador.NrInsc, EvtRmnRPPS.Sequencial);
 
           with ACBrESocial.Configuracoes do
             Geral.IdEmpregador := evtRmnRPPS.IdeEmpregador.NrInsc;
@@ -3076,7 +3099,12 @@ begin
       Application.ProcessMessages;
       Inc(I);
 
-      Writeln(flOperacao_eS1202, 'S1202|' + aMainTable + '|' + MODO_OPERACAO[Ord(aModoLancamento)] + '|' + cdsTabela.FieldByName('ANO_MES').AsString + ';' + FormatFloat('0000000000', cdsTabela.FieldByName('ID_SERVIDOR').AsInteger) + '|ANO_MES;ID_SERVIDOR');
+      Writeln(flOperacao_eS1202,
+          'S1202|'
+        + aMainTable + '|'
+        + MODO_OPERACAO[Ord(aModoLancamento)] + '|'
+        + cdsTabela.FieldByName('ANO_MES').AsString + ';' + FormatFloat('0000000000', cdsTabela.FieldByName('ID_SERVIDOR').AsInteger) + '|'
+        + 'ANO_MES;ID_SERVIDOR');
       cdsTabela.Next;
     end;
 
@@ -3205,11 +3233,6 @@ begin
           aEventoID := StrToInt(IncrementGenerator('GEN_ESOCIAL_EVENTO_S1207', 1));
           Sequencial:= aEventoID;
 
-//          if AmbienteWebServiceProducao then
-//            IdeEvento.TpAmb := TpTpAmb(0) //taProducao
-//          else
-//            IdeEvento.TpAmb := taProducaoRestrita;
-//
           IdeEvento.indRetif := ireOriginal; // (ireOriginal, ireRetificacao);
 
           if (IdeEvento.indRetif = ireRetificacao) then
@@ -3229,6 +3252,7 @@ begin
 
           IdeEmpregador.TpInsc := tiCNPJ;
           IdeEmpregador.NrInsc := Criptografa(Pesquisa('CONFIG_ORGAO', 'ID', '1', 'CNPJ', ''),'2', 14); //Criptografa(cdsTabela.FieldByName('CNPJ').AsString, '2', 14);
+          //EvtBenPrRP.Id := TeSocialEvento(EvtBenPrRP).GerarChaveEsocial(now, EvtBenPrRP.ideEmpregador.NrInsc, EvtBenPrRP.Sequencial);
 
           with ACBrESocial.Configuracoes do
             Geral.IdEmpregador := evtBenPrRP.IdeEmpregador.NrInsc;
@@ -3284,7 +3308,12 @@ begin
       Application.ProcessMessages;
       Inc(I);
 
-      Writeln(flOperacao_eS1207, 'S1207|' + aMainTable + '|' + MODO_OPERACAO[Ord(aModoLancamento)] + '|' + cdsTabela.FieldByName('ANO_MES').AsString + ';' + FormatFloat('0000000000', cdsTabela.FieldByName('ID_SERVIDOR').AsInteger) + '|ANO_MES;ID_SERVIDOR');
+      Writeln(flOperacao_eS1207,
+          'S1207|'
+        + aMainTable + '|'
+        + MODO_OPERACAO[Ord(aModoLancamento)] + '|'
+        + cdsTabela.FieldByName('ANO_MES').AsString + ';' + FormatFloat('0000000000', cdsTabela.FieldByName('ID_SERVIDOR').AsInteger) + '|'
+        + 'ANO_MES;ID_SERVIDOR');
       cdsTabela.Next;
     end;
 
@@ -3410,11 +3439,6 @@ begin
           aEventoID := StrToInt(IncrementGenerator('GEN_ESOCIAL_EVENTO_S1210', 1));
           Sequencial:= aEventoID;
 
-//          if AmbienteWebServiceProducao then
-//            IdeEvento.TpAmb := TpTpAmb(0) //taProducao
-//          else
-//            IdeEvento.TpAmb := taProducaoRestrita;
-//
           IdeEvento.indRetif := ireOriginal; // (ireOriginal, ireRetificacao);
 
           if (IdeEvento.indRetif = ireRetificacao) then
@@ -3434,6 +3458,7 @@ begin
 
           IdeEmpregador.TpInsc := tiCNPJ;
           IdeEmpregador.NrInsc := Criptografa(Pesquisa('CONFIG_ORGAO', 'ID', '1', 'CNPJ', ''),'2', 14); //Criptografa(cdsTabela.FieldByName('CNPJ').AsString, '2', 14);
+          //EvtPgtos.Id := TeSocialEvento(EvtPgtos).GerarChaveEsocial(now, EvtPgtos.ideEmpregador.NrInsc, EvtPgtos.Sequencial);
 
           with ACBrESocial.Configuracoes do
             Geral.IdEmpregador := evtPgtos.IdeEmpregador.NrInsc;
@@ -3711,7 +3736,12 @@ begin
       Application.ProcessMessages;
       Inc(I);
 
-      Writeln(flOperacao_eS1210, 'S1210|' + aMainTable + '|' + MODO_OPERACAO[Ord(aModoLancamento)] + '|' + cdsTabela.FieldByName('ANO_MES').AsString + ';' + FormatFloat('0000000000', cdsTabela.FieldByName('ID_SERVIDOR').AsInteger) + '|ANO_MES;ID_SERVIDOR');
+      Writeln(flOperacao_eS1210,
+          'S1210|'
+        + aMainTable + '|'
+        + MODO_OPERACAO[Ord(aModoLancamento)] + '|'
+        + cdsTabela.FieldByName('ANO_MES').AsString + ';' + FormatFloat('0000000000', cdsTabela.FieldByName('ID_SERVIDOR').AsInteger) + '|'
+        + 'ANO_MES;ID_SERVIDOR');
       cdsTabela.Next;
     end;
 
@@ -3795,11 +3825,6 @@ begin
     begin
       with ACBrESocial.Eventos.Periodicos.S1295.New, evtTotConting do
       begin
-//        if AmbienteWebServiceProducao then
-//          IdeEvento.TpAmb := TpTpAmb(0) //taProducao
-//        else
-//          IdeEvento.TpAmb := taProducaoRestrita;
-//
         IdeEvento.indRetif := ireOriginal; // (ireOriginal, ireRetificacao);
 
         if (IdeEvento.indRetif = ireRetificacao) then
@@ -3819,6 +3844,7 @@ begin
 
         IdeEmpregador.TpInsc := tiCNPJ;
         IdeEmpregador.NrInsc := Criptografa(Pesquisa('CONFIG_ORGAO', 'ID', '1', 'CNPJ', ''),'2', 14); //Criptografa(cdsTabela.FieldByName('CNPJ').AsString, '2', 14);
+        //EvtTotConting.Id := TeSocialEvento(EvtTotConting).GerarChaveEsocial(now, EvtTotConting.ideEmpregador.NrInsc, EvtTotConting.Sequencial);
 
         with ACBrESocial.Configuracoes do
           Geral.IdEmpregador := evtTotConting.IdeEmpregador.NrInsc;
@@ -3838,7 +3864,12 @@ begin
       aProcesso.Progress := aProcesso.MaxValue;
       Application.ProcessMessages;
 
-      Writeln(flOperacao_eS1295, 'S1295|' + aMainTable + '|' + MODO_OPERACAO[Ord(aModoLancamento)] + '|' + FormatFloat('0000000000', cdsTabela.FieldByName('ID_CONFIG_ORGAO').AsInteger) + '|ID_CONFIG_ORGAO');
+      Writeln(flOperacao_eS1295,
+          'S1295|'
+        + aMainTable + '|'
+        + MODO_OPERACAO[Ord(aModoLancamento)] + '|'
+        + FormatFloat('0000000000', cdsTabela.FieldByName('ID_CONFIG_ORGAO').AsInteger) + '|'
+        + 'ID_CONFIG_ORGAO');
       cdsTabela.Next;
     end;
 
@@ -3922,11 +3953,6 @@ begin
     begin
       with ACBrESocial.Eventos.Periodicos.S1298.New, EvtReabreEvPer do
       begin
-//        if AmbienteWebServiceProducao then
-//          IdeEvento.TpAmb := TpTpAmb(0) //taProducao
-//        else
-//          IdeEvento.TpAmb := taProducaoRestrita;
-//
         IdeEvento.ProcEmi := peAplicEmpregador;
         IdeEvento.VerProc := Versao_Executavel(ParamStr(0));
 
@@ -3939,6 +3965,7 @@ begin
 
         IdeEmpregador.TpInsc := tiCNPJ;
         IdeEmpregador.NrInsc := Criptografa(Pesquisa('CONFIG_ORGAO', 'ID', '1', 'CNPJ', ''),'2', 14); //Criptografa(cdsTabela.FieldByName('CNPJ').AsString, '2', 14);
+        //EvtReabreEvPer.Id := TeSocialEvento(EvtReabreEvPer).GerarChaveEsocial(now, EvtReabreEvPer.ideEmpregador.NrInsc, EvtReabreEvPer.Sequencial);
 
         with ACBrESocial.Configuracoes do
           Geral.IdEmpregador := EvtReabreEvPer.IdeEmpregador.NrInsc;
@@ -3948,7 +3975,12 @@ begin
       aProcesso.Progress := aProcesso.MaxValue;
       Application.ProcessMessages;
 
-      Writeln(flOperacao_eS1298, 'S1298|' + aMainTable + '|' + MODO_OPERACAO[Ord(aModoLancamento)] + '|' + FormatFloat('0000000000', cdsTabela.FieldByName('ID_CONFIG_ORGAO').AsInteger) + '|ID_CONFIG_ORGAO');
+      Writeln(flOperacao_eS1298,
+          'S1298|'
+        + aMainTable + '|'
+        + MODO_OPERACAO[Ord(aModoLancamento)] + '|'
+        + FormatFloat('0000000000', cdsTabela.FieldByName('ID_CONFIG_ORGAO').AsInteger) + '|'
+        + 'ID_CONFIG_ORGAO');
       cdsTabela.Next;
     end;
 
@@ -4133,11 +4165,6 @@ begin
     begin
       with ACBrESocial.Eventos.Periodicos.S1299.New, EvtFechaEvPer do
       begin
-//        if AmbienteWebServiceProducao then
-//          IdeEvento.TpAmb := TpTpAmb(0) //taProducao
-//        else
-//          IdeEvento.TpAmb := taProducaoRestrita;
-//
         IdeEvento.ProcEmi := peAplicEmpregador;
         IdeEvento.VerProc := Versao_Executavel(ParamStr(0));
 
@@ -4150,6 +4177,7 @@ begin
 
         IdeEmpregador.TpInsc := tiCNPJ;
         IdeEmpregador.NrInsc := Criptografa(Pesquisa('CONFIG_ORGAO', 'ID', '1', 'CNPJ', ''),'2', 14); //Criptografa(cdsTabela.FieldByName('CNPJ').AsString, '2', 14);
+        //EvtFechaEvPer.Id := TeSocialEvento(EvtFechaEvPer).GerarChaveEsocial(now, EvtFechaEvPer.ideEmpregador.NrInsc, EvtFechaEvPer.Sequencial);
 
         with ACBrESocial.Configuracoes do
           Geral.IdEmpregador := EvtFechaEvPer.IdeEmpregador.NrInsc;
@@ -4180,7 +4208,12 @@ begin
       aProcesso.Progress := aProcesso.MaxValue;
       Application.ProcessMessages;
 
-      Writeln(flOperacao_eS1299, 'S1299|' + aMainTable + '|' + MODO_OPERACAO[Ord(aModoLancamento)] + '|' + FormatFloat('0000000000', cdsTabela.FieldByName('ID_CONFIG_ORGAO').AsInteger) + '|ID_CONFIG_ORGAO');
+      Writeln(flOperacao_eS1299,
+          'S1299|'
+        + aMainTable + '|'
+        + MODO_OPERACAO[Ord(aModoLancamento)] + '|'
+        + FormatFloat('0000000000', cdsTabela.FieldByName('ID_CONFIG_ORGAO').AsInteger) + '|'
+        + 'ID_CONFIG_ORGAO');
       cdsTabela.Next;
     end;
 
@@ -4369,11 +4402,6 @@ begin
         aEventoID := StrToInt(IncrementGenerator('GEN_ESOCIAL_EVENTO_S2200', 1));
         Sequencial:= aEventoID;
 
-//        if AmbienteWebServiceProducao then
-//          IdeEvento.TpAmb := TpTpAmb(0) //taProducao
-//        else
-//          IdeEvento.TpAmb := taProducaoRestrita;
-//
         IdeEvento.indRetif := ireOriginal; // (ireOriginal, ireRetificacao);
 
         if (IdeEvento.indRetif = ireRetificacao) then
@@ -4386,6 +4414,7 @@ begin
 
         IdeEmpregador.TpInsc := tiCNPJ;
         IdeEmpregador.NrInsc := Criptografa(Pesquisa('CONFIG_ORGAO', 'ID', '1', 'CNPJ', ''),'2', 14); //Criptografa(cdsTabela.FieldByName('CNPJ').AsString, '2', 14);
+        //EvtAdmissao.Id := TeSocialEvento(EvtAdmissao).GerarChaveEsocial(now, EvtAdmissao.ideEmpregador.NrInsc, EvtAdmissao.Sequencial);
 
         with ACBrESocial.Configuracoes do
           Geral.IdEmpregador := EvtAdmissao.IdeEmpregador.NrInsc;
@@ -4772,7 +4801,12 @@ begin
       Application.ProcessMessages;
       Inc(I);
 
-      Writeln(flOperacao_eS2200, 'S2200|' + aMainTable + '|' + MODO_OPERACAO[Ord(aModoLancamento)] + '|' + FormatFloat('0000000000', cdsTabela.FieldByName('ID_SERVIDOR').AsInteger) + '|ID');
+      Writeln(flOperacao_eS2200,
+          'S2200|'
+        + aMainTable + '|'
+        + MODO_OPERACAO[Ord(aModoLancamento)] + '|'
+        + FormatFloat('0000000000', cdsTabela.FieldByName('ID_SERVIDOR').AsInteger) + '|'
+        + 'ID');
       cdsTabela.Next;
     end;
 
@@ -4928,11 +4962,6 @@ begin
         Sequencial  := aEventoID;
         dtAlteracao := Now;
 
-//        if AmbienteWebServiceProducao then
-//          IdeEvento.TpAmb := TpTpAmb(0) //taProducao
-//        else
-//          IdeEvento.TpAmb := taProducaoRestrita;
-//
         IdeEvento.indRetif := ireOriginal; // (ireOriginal, ireRetificacao);
 
         if (IdeEvento.indRetif = ireRetificacao) then
@@ -4945,6 +4974,7 @@ begin
 
         IdeEmpregador.TpInsc := tiCNPJ;
         IdeEmpregador.NrInsc := Criptografa(Pesquisa('CONFIG_ORGAO', 'ID', '1', 'CNPJ', ''),'2', 14); //Criptografa(cdsTabela.FieldByName('CNPJ').AsString, '2', 14);
+        //EvtAltCadastral.Id := TeSocialEvento(EvtAltCadastral).GerarChaveEsocial(now, EvtAltCadastral.ideEmpregador.NrInsc, EvtAltCadastral.Sequencial);
 
         with ACBrESocial.Configuracoes do
           Geral.IdEmpregador := EvtAltCadastral.IdeEmpregador.NrInsc;
@@ -5131,7 +5161,12 @@ begin
       Application.ProcessMessages;
       Inc(I);
 
-      Writeln(flOperacao_eS2205, 'S2205|' + aMainTable + '|' + MODO_OPERACAO[Ord(aModoLancamento)] + '|' + FormatFloat('0000000000', cdsTabela.FieldByName('ID').AsInteger) + '|ID');
+      Writeln(flOperacao_eS2205,
+          'S2205|'
+        + aMainTable + '|'
+        + MODO_OPERACAO[Ord(aModoLancamento)] + '|'
+        + FormatFloat('0000000000', cdsTabela.FieldByName('ID').AsInteger) + '|'
+        + 'ID');
       cdsTabela.Next;
     end;
 
@@ -5289,11 +5324,6 @@ begin
         AltContratual.dtEf        := Now;
         AltContratual.dscAlt      := 'ALTERAÇÕES CONTRATUAIS DE ' + aCompetencia.Descricao;
 
-//        if AmbienteWebServiceProducao then
-//          IdeEvento.TpAmb := TpTpAmb(0) //taProducao
-//        else
-//          IdeEvento.TpAmb := taProducaoRestrita;
-//
         IdeEvento.indRetif := ireOriginal; // (ireOriginal, ireRetificacao);
 
         if (IdeEvento.indRetif = ireRetificacao) then
@@ -5306,6 +5336,7 @@ begin
 
         IdeEmpregador.TpInsc := tiCNPJ;
         IdeEmpregador.NrInsc := Criptografa(Pesquisa('CONFIG_ORGAO', 'ID', '1', 'CNPJ', ''),'2', 14); //Criptografa(cdsTabela.FieldByName('CNPJ').AsString, '2', 14);
+        //EvtAltContratual.Id  := TeSocialEvento(EvtAltContratual).GerarChaveEsocial(now, EvtAltContratual.ideEmpregador.NrInsc, EvtAltContratual.Sequencial);
 
         IdeVinculo.cpfTrab   := OnlyNumber(Trim(cdsTabela.FieldByName('cpf').AsString));
         IdeVinculo.Matricula := Trim(cdsTabela.FieldByName('matricula').AsString);
@@ -5474,7 +5505,12 @@ begin
       Application.ProcessMessages;
       Inc(I);
 
-      Writeln(flOperacao_eS2206, 'S2206|' + aMainTable + '|' + MODO_OPERACAO[Ord(aModoLancamento)] + '|' + FormatFloat('0000000000', cdsTabela.FieldByName('ID_SERVIDOR').AsInteger) + '|ID');
+      Writeln(flOperacao_eS2206,
+          'S2206|'
+        + aMainTable + '|'
+        + MODO_OPERACAO[Ord(aModoLancamento)] + '|'
+        + FormatFloat('0000000000', cdsTabela.FieldByName('ID_SERVIDOR').AsInteger) + '|'
+        + 'ID');
       cdsTabela.Next;
     end;
 
@@ -5606,11 +5642,6 @@ begin
         aEventoID := StrToInt(IncrementGenerator('GEN_ESOCIAL_EVENTO_S2240', 1));
         Sequencial:= aEventoID;
 
-//        if AmbienteWebServiceProducao then
-//          IdeEvento.TpAmb := TpTpAmb(0) //taProducao
-//        else
-//          IdeEvento.TpAmb := taProducaoRestrita;
-//
         IdeEvento.indRetif := ireOriginal; // (ireOriginal, ireRetificacao);
 
         if (IdeEvento.indRetif = ireRetificacao) then
@@ -5623,6 +5654,7 @@ begin
 
         IdeEmpregador.TpInsc := tiCNPJ;
         IdeEmpregador.NrInsc := Criptografa(Pesquisa('CONFIG_ORGAO', 'ID', '1', 'CNPJ', ''),'2', 14); //Criptografa(cdsTabela.FieldByName('CNPJ').AsString, '2', 14);
+        //EvtExpRisco.Id := TeSocialEvento(EvtExpRisco).GerarChaveEsocial(now, EvtExpRisco.ideEmpregador.NrInsc, EvtExpRisco.Sequencial);
 
         IdeVinculo.cpfTrab   := OnlyNumber(Trim(cdsTabela.FieldByName('cpf').AsString));
         IdeVinculo.Matricula := Trim(cdsTabela.FieldByName('matricula').AsString);
@@ -5826,7 +5858,12 @@ begin
       Application.ProcessMessages;
       Inc(I);
 
-      Writeln(flOperacao_eS2240, 'S2240|' + aMainTable + '|' + MODO_OPERACAO[Ord(aModoLancamento)] + '|' + FormatFloat('0000000000', cdsTabela.FieldByName('ID_SERVIDOR').AsInteger) + '|ID');
+      Writeln(flOperacao_eS2240,
+          'S2240|'
+        + aMainTable + '|'
+        + MODO_OPERACAO[Ord(aModoLancamento)] + '|'
+        + FormatFloat('0000000000', cdsTabela.FieldByName('ID_SERVIDOR').AsInteger) + '|'
+        + 'ID');
       cdsTabela.Next;
     end;
 
@@ -6298,11 +6335,6 @@ begin
         aEventoID := StrToInt(IncrementGenerator('GEN_ESOCIAL_EVENTO_S2400', 1));
         Sequencial:= aEventoID;
 
-//        if AmbienteWebServiceProducao then
-//          IdeEvento.TpAmb := TpTpAmb(0) //taProducao
-//        else
-//          IdeEvento.TpAmb := taProducaoRestrita;
-//
         IdeEvento.indRetif := ireOriginal; // (ireOriginal, ireRetificacao);
 
         if (IdeEvento.indRetif = ireRetificacao) then
@@ -6315,6 +6347,7 @@ begin
 
         IdeEmpregador.TpInsc := tiCNPJ;
         IdeEmpregador.NrInsc := Criptografa(Pesquisa('CONFIG_ORGAO', 'ID', '1', 'CNPJ', ''),'2', 14); //Criptografa(cdsTabela.FieldByName('CNPJ').AsString, '2', 14);
+        //EvtCdBenPrRP.Id := TeSocialEvento(EvtCdBenPrRP).GerarChaveEsocial(now, EvtCdBenPrRP.ideEmpregador.NrInsc, EvtCdBenPrRP.Sequencial);
 
         with ACBrESocial.Configuracoes do
           Geral.IdEmpregador := evtCdBenPrRP.IdeEmpregador.NrInsc;
@@ -6408,7 +6441,12 @@ begin
       Application.ProcessMessages;
       Inc(I);
 
-      Writeln(flOperacao_eS2400, 'S2400|' + aMainTable + '|' + MODO_OPERACAO[Ord(aModoLancamento)] + '|' + FormatFloat('0000000000', cdsTabela.FieldByName('ID_SERVIDOR').AsInteger) + '|ID');
+      Writeln(flOperacao_eS2400,
+          'S2400|'
+        + aMainTable + '|'
+        + MODO_OPERACAO[Ord(aModoLancamento)] + '|'
+        + FormatFloat('0000000000', cdsTabela.FieldByName('ID_SERVIDOR').AsInteger) + '|'
+        + 'ID');
       cdsTabela.Next;
     end;
 
@@ -6556,6 +6594,8 @@ var
   aUF       ,
   aSufixo   : String;
   Ini : TIniFile;
+  aPathSalvar  ,
+  aPathSchemas : String;
 begin
   Screen.Cursor := crHourGlass;
 
@@ -6588,8 +6628,8 @@ begin
       edtIdTransmissor.Text       := Ini.ReadString ('Geral', 'IdTransmissor', '');
       cbTEmpregador.ItemIndex     := Ini.ReadInteger('Geral', 'TipoEmpregador', 0);
 
-      if (Trim(edtIdEmpregador.Text) = EmptyStr) then
-        edtIdEmpregador.Text := Criptografa(Pesquisa('CONFIG_ORGAO', 'ID', '1', 'CNPJ',''), '2', 14);
+      // Sempre definir como empregador o CNPJ da Unidade Gestora Principal
+      edtIdEmpregador.Text := Criptografa(Pesquisa('CONFIG_ORGAO', 'ID', '1', 'CNPJ',''), '2', 14);
 
       ACBrESocial.SSL.DescarregarCertificado;
 
@@ -6663,6 +6703,9 @@ begin
 
       ACBrESocial.SSL.SSLType := TSSLType(cbSSLType.ItemIndex);
 
+      aPathSalvar  := PathWithDelim(ExtractFilePath(ParamStr(0))) + 'logs';
+      aPathSchemas := PathWithDelim(ExtractFilePath(ParamStr(0))) + 'schema_xds\' + GetEnumName(TypeInfo(TVersaoeSocial), Integer(cbVersaoDF.ItemIndex));
+
       cbxSalvarArqs.Checked         := Ini.ReadBool('Arquivos', 'Salvar', False);
       cbxPastaMensal.Checked        := Ini.ReadBool('Arquivos', 'PastaMensal', False);
       cbxAdicionaLiteral.Checked    := Ini.ReadBool('Arquivos', 'AddLiteral', False);
@@ -6670,9 +6713,9 @@ begin
       cbxSalvaPathEvento.Checked    := Ini.ReadBool('Arquivos', 'SalvarPathEvento', False);
       cbxSepararPorCNPJ.Checked     := Ini.ReadBool('Arquivos', 'SepararPorCNPJ', False);
       edtPatheSocial.Text := Ini.ReadString('Arquivos', 'PatheSocial', '');
-      edtPathEvento.Text  := Ini.ReadString('Arquivos', 'PathEvento', '');
-      edtPathLogs.Text    := Ini.ReadString('Geral', 'PathSalvar', PathWithDelim(ExtractFilePath(ParamStr(0))) + 'Logs');
-      edtPathSchemas.Text := Ini.ReadString('Geral', 'PathSchemas', PathWithDelim(ExtractFilePath(ParamStr(0))) + 'Schemas\' + GetEnumName(TypeInfo(TVersaoeSocial), Integer(cbVersaoDF.ItemIndex)));
+      edtPathEvento.Text  := Ini.ReadString('Arquivos', 'PathEvento',  '');
+      edtPathLogs.Text    := Ini.ReadString('Geral', 'PathSalvar',  aPathSalvar);
+      edtPathSchemas.Text := Ini.ReadString('Geral', 'PathSchemas', aPathSchemas);
 
       with ACBrESocial.Configuracoes.Arquivos do
       begin

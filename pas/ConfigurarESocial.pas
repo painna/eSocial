@@ -114,6 +114,8 @@ type
     qryServidor: TSQLDataSet;
     dspServidor: TDataSetProvider;
     cdsServidor: TClientDataSet;
+    btnAbrirNavegador: TcxButton;
+    cxLabel6: TcxLabel;
     procedure ValidarFone(Sender: TObject; var DisplayValue: Variant;
       var ErrorText: TCaption; var Error: Boolean);
     procedure ValidarNumeroCPF(Sender: TObject; var DisplayValue: Variant;
@@ -124,6 +126,7 @@ type
     procedure cds1BeforePost(DataSet: TDataSet);
     procedure btnGravarClick(Sender: TObject);
     procedure ds1DataChange(Sender: TObject; Field: TField);
+    procedure btnAbrirNavegadorClick(Sender: TObject);
   private
     { Private declarations }
     procedure ServidorGestorUG(const aUG : Integer);
@@ -140,7 +143,20 @@ implementation
 
 {$R *.dfm}
 
-uses udmESocial, udmPrincipal, gsLib, UtilsDb;
+uses
+  Winapi.ShellAPI,
+  udmESocial,
+  udmPrincipal,
+  gsLib,
+  UtilsDb;
+
+procedure TfrmConfigurarESocial.btnAbrirNavegadorClick(Sender: TObject);
+Var
+  aLink : string;
+begin
+  aLink := 'http://www.contaspublicas.gov.br/atualizalinks.asp';
+  ShellExecute(0, nil, PChar(aLink), nil, nil, 1);
+end;
 
 procedure TfrmConfigurarESocial.btnGravarClick(Sender: TObject);
 begin
@@ -176,6 +192,7 @@ begin
   if cds1.State = dsInsert then
     cds1TIPO_OPERACAO.AsString := FLAG_OPERACAO_INSERIR
   else
+  if (cds1TIPO_OPERACAO.AsString = FLAG_OPERACAO_ENVIADO) then
     cds1TIPO_OPERACAO.AsString := FLAG_OPERACAO_ALTERAR;
 end;
 

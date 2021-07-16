@@ -250,6 +250,7 @@ begin
   SConPrincipal.Connected := False;
 
   glb_sMultiOrgao := ini_le_secao('Multi_Orgao');
+
   if Trim(glb_sMultiOrgao) = '' then
      glb_sMultiOrgao := 'N';
 

@@ -1,6 +1,106 @@
+
+
+
+/*------ GERASYS.TI 15/07/2021 14:00:58 --------*/
+
+COMMENT ON COLUMN CONFIG_ESOCIAL.DATA_IMPLANTACAO IS
+'eSocial - Data de implantacao do na instituicao';
+
+
+
+
+/*------ GERASYS.TI 15/07/2021 14:23:55 --------*/
+
 SET TERM ^ ;
 
-create or alter procedure SP_ESOCIAL_EVENTOS_PEND_TABELAS
+CREATE OR ALTER procedure GET_ESOCIAL_PENDENCIA (
+    EVENTO "VARCHAR(10)",
+    OPERACAO "CHAR(1)")
+returns (
+    PENDENCIAS "INTEGER")
+as
+begin
+  pendencias = 0;
+  operacao   = coalesce(:operacao, 'X');
+
+  if (coalesce(:evento, '') = 'S1000') then
+  begin
+    Select
+      count(c.id)
+    from CONFIG_ORGAO c
+      inner join CONFIG_ESOCIAL e on (e.ID_CONFIG_ORGAO = c.ID)
+      inner join UNID_GESTORA   u on (u.ID = e.ID_UNID_GESTORA)
+    where e.tipo_operacao = :operacao
+    Into
+      pendencias;
+  end
+  else
+  if (coalesce(:evento, '') = 'S1005') then
+  begin
+    Select
+      count(ug.id)
+    from UNID_GESTORA ug
+    where ug.tipo_operacao = :operacao
+    Into
+      pendencias;
+  end
+  else
+  if (coalesce(:evento, '') = 'S1010') then
+  begin
+    Select
+      count(e.id)
+    from EVENTO e
+    where e.tipo_operacao = :operacao
+      and e.nat_rubrica is not null
+    Into
+      pendencias;
+  end
+  else
+  if (coalesce(:evento, '') = 'S1020') then
+  begin
+    Select
+      count(c.id)
+    from CONFIG_ORGAO c
+      inner join CONFIG_ESOCIAL e on (e.id_config_orgao = c.id)
+      inner join UNID_GESTORA   u on (u.id = e.id_unid_gestora and u.id = 1)
+    where c.tipo_operacao = :operacao
+    Into
+      pendencias;
+  end
+
+  pendencias = coalesce(:pendencias, 0);
+  suspend;
+end^
+
+SET TERM ; ^
+
+
+
+
+/*------ GERASYS.TI 15/07/2021 15:19:09 --------*/
+
+ALTER TABLE ESOCIAL_LOG_EVENTO
+    ADD ID_EVENTO "VARCHAR(40)";
+
+COMMENT ON COLUMN ESOCIAL_LOG_EVENTO.ID_EVENTO IS
+'ID do registro no Portal e-Social';
+
+
+
+
+/*------ GERASYS.TI 15/07/2021 15:19:39 --------*/
+
+CREATE INDEX IDX_ESOCIAL_LOG_EVENTO_IDEVENT
+ON ESOCIAL_LOG_EVENTO (ID_EVENTO);
+
+
+
+
+/*------ GERASYS.TI 15/07/2021 18:01:44 --------*/
+
+SET TERM ^ ;
+
+CREATE OR ALTER procedure SP_ESOCIAL_EVENTOS_PEND_TABELAS
 as
 declare variable COMPETENCIA "CHAR(6)";
 declare variable EVENTO "VARCHAR(10)";
@@ -83,37 +183,3 @@ end^
 
 SET TERM ; ^
 
-COMMENT ON PROCEDURE SP_ESOCIAL_EVENTOS_PEND_TABELAS IS
-'Procedure SP Gerar Eventos Pedentes (Eventos de Tabelas)
-
-    Autor   :   Isaque Marinho Ribeiro
-    Data    :   07/07/2021
-
-Stored procedure responsavel verificar a pendencia de envio dos eventos de tabela
-no eSocial de acordo com os dados que ainda não foram enviados e assim sinalizar
-ao sistema a necessidade de envio dos eventos de tabela 1000, 1005, 1010 e 1020.
-
-
-Historico:
-
-    Legendas:
-        + Novo objeto de banco (Campos, Triggers)
-        - Remocao de objeto de banco
-        * Modificacao no objeto de banco
-
-    07/07/2021 - IMR :
-        + Criacao da store procedure na base de dados.';
-
-/* Following GRANT statetements are generated automatically */
-
-GRANT EXECUTE ON PROCEDURE GET_ESOCIAL_COMPETENCIA_ATIVA TO PROCEDURE SP_ESOCIAL_EVENTOS_PEND_TABELAS;
-GRANT SELECT ON CONFIG_ORGAO TO PROCEDURE SP_ESOCIAL_EVENTOS_PEND_TABELAS;
-GRANT SELECT ON CONFIG_ESOCIAL TO PROCEDURE SP_ESOCIAL_EVENTOS_PEND_TABELAS;
-GRANT SELECT ON UNID_GESTORA TO PROCEDURE SP_ESOCIAL_EVENTOS_PEND_TABELAS;
-GRANT SELECT ON EVENTO TO PROCEDURE SP_ESOCIAL_EVENTOS_PEND_TABELAS;
-GRANT EXECUTE ON PROCEDURE SET_ESOCIAL_GERAR_EVENTOS TO PROCEDURE SP_ESOCIAL_EVENTOS_PEND_TABELAS;
-
-/* Existing privileges on this procedure */
-
-GRANT EXECUTE ON PROCEDURE SP_ESOCIAL_EVENTOS_PEND_TABELAS TO "GERASYS.TI";
-GRANT EXECUTE ON PROCEDURE SP_ESOCIAL_EVENTOS_PEND_TABELAS TO "PUBLIC";

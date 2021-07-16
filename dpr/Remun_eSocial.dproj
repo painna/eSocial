@@ -189,10 +189,6 @@
             <Form>frmDialogoPadrao</Form>
             <FormType>dfm</FormType>
         </DCCReference>
-        <DCCReference Include="..\pas\EnvioEventoTabela.pas">
-            <Form>frmEnvioEventoTabela</Form>
-            <FormType>dfm</FormType>
-        </DCCReference>
         <DCCReference Include="..\pas\ConfigurarESocial.pas">
             <Form>frmConfigurarESocial</Form>
             <FormType>dfm</FormType>

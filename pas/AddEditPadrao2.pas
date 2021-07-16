@@ -74,7 +74,7 @@ Var
 begin
   if (cds1.State in [dsInsert,dsEdit]) then
   begin
-     if Not Confirma('Gravar '+iIf(CDS1.State=dsInsert,pb_sNovoNova+pb_sTitJanela,'Alterações')+' ?') then exit;
+     if Not Confirma('Gravar '+iIf(CDS1.State=dsInsert,pb_sNovoNova + ' ' + pb_sTitJanela,'Alterações')+' ?') then exit;
      BeforePostClient(cds1);
      SalvaTransacao(cds1);
      //iIdAddEdit := cds1.FieldByName(g_sNomeCampoPK).Value;

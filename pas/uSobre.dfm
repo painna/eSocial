@@ -30,9 +30,9 @@ inherited frmSobre: TfrmSobre
       TabOrder = 0
       object Label1: TLabel
         AlignWithMargins = True
-        Left = 10
+        Left = 392
         Top = 3
-        Width = 656
+        Width = 274
         Height = 23
         Margins.Left = 10
         Margins.Right = 10
@@ -45,14 +45,12 @@ inherited frmSobre: TfrmSobre
         Font.Name = 'Tahoma'
         Font.Style = [fsBold]
         ParentFont = False
-        ExplicitLeft = 392
-        ExplicitWidth = 274
       end
       object lblCelular1: TLabel
         AlignWithMargins = True
-        Left = 10
+        Left = 564
         Top = 45
-        Width = 656
+        Width = 102
         Height = 16
         Margins.Left = 10
         Margins.Top = 0
@@ -67,8 +65,6 @@ inherited frmSobre: TfrmSobre
         Font.Name = 'Tahoma'
         Font.Style = [fsBold]
         ParentFont = False
-        ExplicitLeft = 564
-        ExplicitWidth = 102
       end
       object lblCopyright: TLabel
         AlignWithMargins = True
@@ -99,9 +95,9 @@ inherited frmSobre: TfrmSobre
       end
       object lblCelular2: TLabel
         AlignWithMargins = True
-        Left = 10
+        Left = 564
         Top = 61
-        Width = 656
+        Width = 102
         Height = 16
         Margins.Left = 10
         Margins.Top = 0
@@ -116,14 +112,12 @@ inherited frmSobre: TfrmSobre
         Font.Name = 'Tahoma'
         Font.Style = [fsBold]
         ParentFont = False
-        ExplicitLeft = 564
-        ExplicitWidth = 102
       end
       object lblTelFixo: TLabel
         AlignWithMargins = True
-        Left = 10
+        Left = 493
         Top = 29
-        Width = 656
+        Width = 173
         Height = 16
         Margins.Left = 10
         Margins.Top = 0
@@ -138,14 +132,12 @@ inherited frmSobre: TfrmSobre
         Font.Name = 'Tahoma'
         Font.Style = [fsBold]
         ParentFont = False
-        ExplicitLeft = 493
-        ExplicitWidth = 173
       end
       object lblAguarde: TLabel
         AlignWithMargins = True
         Left = 10
         Top = 131
-        Width = 656
+        Width = 186
         Height = 16
         Margins.Left = 10
         Margins.Right = 10
@@ -157,7 +149,6 @@ inherited frmSobre: TfrmSobre
         Font.Name = 'Tahoma'
         Font.Style = [fsBold]
         ParentFont = False
-        ExplicitWidth = 186
       end
       object btnOk: TBitBtn
         Left = 584

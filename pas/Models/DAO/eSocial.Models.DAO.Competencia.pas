@@ -129,16 +129,13 @@ end;
 
 procedure TModelDAOCompetencia.ReadFields;
 begin
-  with FDataSet.DataSet do
-  begin
-    FEntity
-      .Ano( FieldByName('ano').AsString )
-      .Codigo( FieldByName('competencia').AsString )
-      .Descricao( FieldByName('descricao').AsString )
-      .Encerrado( FieldByName('encerrado').AsString )
-      .Mes( FieldByName('mes').AsString )
-      .Origem( TOrigemDados(FieldByName('origem').AsInteger) );
-  end;
+  FEntity
+    .Ano( FDataSet.DataSet.FieldByName('ano').AsString )
+    .Codigo( FDataSet.DataSet.FieldByName('competencia').AsString )
+    .Descricao( FDataSet.DataSet.FieldByName('descricao').AsString )
+    .Encerrado( FDataSet.DataSet.FieldByName('encerrado').AsString )
+    .Mes( FDataSet.DataSet.FieldByName('mes').AsString )
+    .Origem( TOrigemDados(FDataSet.DataSet.FieldByName('origem').AsInteger) );
 end;
 
 function TModelDAOCompetencia.Get: iModelDAOEntity<TCompetencia>;
@@ -158,6 +155,21 @@ begin
       .SQL('  inner join GET_ESOCIAL_COMPETENCIA_ATIVA g on (g.competencia = c.competencia)')
       .SQL('where (c.origem = 1)')
     .Open;
+
+    if (FDataSet.DataSet.RecordCount = 0) then
+      FConnection
+        .SQLClear
+        .SQL('Select')
+        .SQL('    c.competencia')
+        .SQL('  , c.ano')
+        .SQL('  , c.mes')
+        .SQL('  , c.descricao')
+        .SQL('  , c.encerrado')
+        .SQL('  , c.origem')
+        .SQL('from VW_ESOCIAL_COMPETENCIA c')
+        .SQL('  inner join GET_ESOCIAL_COMPETENCIA_ATIVA g on (g.competencia = c.competencia)')
+        .SQL('where (c.origem = 0)')
+      .Open;
 
     ReadFields;
   except

@@ -146,7 +146,7 @@ begin
   sUltimaVersao := GetUltmaVersao('BACKUP');
   if sUltimaVersao <> '' then
   begin
-     if StrToInt(ExtraiPonto(sUltimaVersao)) > StrToInt(ExtraiPonto(sVersaoBackup)) then
+     if StrToIntDef(ExtraiPonto(sUltimaVersao), 0) > StrToIntDef(ExtraiPonto(sVersaoBackup), 0) then
      begin
         if Confirma('Foi dectada uma Nova Versão do Programa de Backup.'+#13+
                  'Deseja fazer a Atualização do mesmo agora ?') then
@@ -175,7 +175,7 @@ begin
      Exit;
   end;
 
-  if StrToInt(ExtraiPonto(sUltimaVersao)) > StrToInt(ExtraiPonto(glb_sVersao)) then
+  if StrToIntDef(ExtraiPonto(sUltimaVersao), 0) > StrToIntDef(ExtraiPonto(glb_sVersao), 0) then
   begin
      Mensagem('Foi dectada uma Nova Versão deste Programa. '+#13+
               'O mesmo será fecahado para que seja feita a atualização automática ...',

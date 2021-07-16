@@ -42,7 +42,7 @@ inherited frmConfigurarESocial: TfrmConfigurarESocial
       ParentBackground = False
       ParentFont = False
       TabOrder = 1
-      Properties.ActivePage = tbsResponsavel
+      Properties.ActivePage = tbsUNG
       Properties.CustomButtons.Buttons = <>
       Properties.Options = [pcoAlwaysShowGoDialogButton, pcoGradient, pcoGradientClientArea, pcoRedrawOnResize, pcoSort]
       Properties.Style = 9
@@ -87,7 +87,7 @@ inherited frmConfigurarESocial: TfrmConfigurarESocial
           Style.Font.Name = 'Arial'
           Style.Font.Style = [fsBold]
           Style.IsFontAssigned = True
-          TabOrder = 3
+          TabOrder = 4
           Width = 431
         end
         object lblNAT_JURIDICA: TcxLabel
@@ -126,7 +126,7 @@ inherited frmConfigurarESocial: TfrmConfigurarESocial
           Style.Font.Name = 'Arial'
           Style.Font.Style = [fsBold]
           Style.IsFontAssigned = True
-          TabOrder = 5
+          TabOrder = 6
           Width = 431
         end
         object dbeNRO_SIAFI: TcxDBTextEdit
@@ -185,7 +185,7 @@ inherited frmConfigurarESocial: TfrmConfigurarESocial
           Style.Font.Name = 'Arial'
           Style.Font.Style = [fsBold]
           Style.IsFontAssigned = True
-          TabOrder = 7
+          TabOrder = 8
           Width = 431
         end
         object dbeSUBTETO_VENCTO_VALOR: TcxDBCurrencyEdit
@@ -201,7 +201,7 @@ inherited frmConfigurarESocial: TfrmConfigurarESocial
           Style.Font.Name = 'Arial'
           Style.Font.Style = [fsBold]
           Style.IsFontAssigned = True
-          TabOrder = 9
+          TabOrder = 10
           Width = 121
         end
         object lblSUBTETO_VENCTO_TIPO: TcxLabel
@@ -230,7 +230,7 @@ inherited frmConfigurarESocial: TfrmConfigurarESocial
           Style.Font.Name = 'Arial'
           Style.Font.Style = [fsBold]
           Style.IsFontAssigned = True
-          TabOrder = 10
+          TabOrder = 11
           Transparent = True
         end
         object dbeDATA_IMPLANTACAO: TcxDBDateEdit
@@ -238,7 +238,7 @@ inherited frmConfigurarESocial: TfrmConfigurarESocial
           Top = 191
           DataBinding.DataField = 'DATA_IMPLANTACAO'
           DataBinding.DataSource = ds1
-          TabOrder = 13
+          TabOrder = 14
           Width = 121
         end
         object lblDATA_IMPLANTACAO: TcxLabel
@@ -267,7 +267,40 @@ inherited frmConfigurarESocial: TfrmConfigurarESocial
           Style.Font.Name = 'Arial'
           Style.Font.Style = [fsBold]
           Style.IsFontAssigned = True
-          TabOrder = 11
+          TabOrder = 12
+          Transparent = True
+        end
+        object btnAbrirNavegador: TcxButton
+          Left = 475
+          Top = 14
+          Width = 108
+          Height = 24
+          Caption = 'Pesquisar'
+          TabOrder = 2
+          TabStop = False
+          Font.Charset = DEFAULT_CHARSET
+          Font.Color = clDefault
+          Font.Height = -11
+          Font.Name = 'Arial'
+          Font.Style = [fsBold]
+          ParentFont = False
+          OnClick = btnAbrirNavegadorClick
+        end
+        object cxLabel6: TcxLabel
+          Left = 279
+          Top = 17
+          Caption = 'Pesquise pelo CNPJ da Institui'#231#227'o'
+          ParentFont = False
+          Style.Font.Charset = DEFAULT_CHARSET
+          Style.Font.Color = clWhite
+          Style.Font.Height = -11
+          Style.Font.Name = 'Arial'
+          Style.Font.Style = [fsBold]
+          Style.StyleController = dmPrincipal.cxLabelStyleNormal
+          Style.TextColor = 10454867
+          Style.TextStyle = [fsBold]
+          Style.IsFontAssigned = True
+          Properties.Alignment.Horz = taLeftJustify
           Transparent = True
         end
       end
@@ -374,7 +407,7 @@ inherited frmConfigurarESocial: TfrmConfigurarESocial
           DataBinding.DataField = 'RESPONSAVEL_FONECELULAR'
           DataBinding.DataSource = ds1
           ParentFont = False
-          Properties.EditMask = '(00)0000-0000;0; '
+          Properties.EditMask = '(00)00000-0000;0; '
           Properties.OnValidate = ValidarFone
           Style.Font.Charset = DEFAULT_CHARSET
           Style.Font.Color = clDefault

@@ -17,7 +17,7 @@ begin
     from CONFIG_ORGAO c
       inner join CONFIG_ESOCIAL e on (e.ID_CONFIG_ORGAO = c.ID)
       inner join UNID_GESTORA   u on (u.ID = e.ID_UNID_GESTORA)
-    where c.tipo_operacao = :operacao
+    where e.tipo_operacao = :operacao
     Into
       pendencias;
   end

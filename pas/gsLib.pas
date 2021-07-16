@@ -1708,7 +1708,8 @@ Var
 Begin
 
   sServidor := '';
-  if LeftStr(glb_sMultiOrgao,1) = 'S' then
+
+  if LeftStr(glb_sMultiOrgao, 1) = 'S' then
      sBaseDados := ini_le_secao('Ult_orgao');
 
   sPahtAplicacao := ExtractFilePath(ParamStr(0));
