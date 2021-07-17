@@ -184,7 +184,9 @@ uses
   EnvioEventoNaoPeriodico,
   EnvioEventoPeriodico,
   eSocial.Views.Esmaecer,
-  eSocial.Views.ViewEventoTabelaEnviar;
+  eSocial.Views.ViewEventoTabelaEnviar,
+  eSocial.Views.ViewEventoNaoPeriodicoEnviar,
+  eSocial.Views.ViewEventoPeriodicoEnviar;
 
 {$R *.dfm}
 
@@ -256,7 +258,14 @@ begin
              'antes de Executar essa Operação ...',
              'Aviso !!!', MB_ICONEXCLAMATION)
   else
-    Mensagem('Rotina ainda não disponível nesta versão!' + #13 + 'Recurso em homologação.', 'Informação', MB_ICONINFORMATION);
+      Mensagem('Rotina ainda não disponível nesta versão!' + #13 + 'Recurso em homologação.', 'Informação', MB_ICONINFORMATION);
+//    begin
+//      Screen.Cursor := crSQLWait;
+//      dmPrincipal.SConPrincipal.ExecuteDirect('execute procedure SP_ESOCIAL_EVENTOS_PEND_PERIODICO');
+//      Screen.Cursor := crDefault;
+//
+//      EventoPeriodicoEnviar(Self);
+//    end;
 //    try
 //      frmEnvioEventoPeriodico := TfrmEnvioEventoPeriodico.Create(Self);
 //      frmEnvioEventoPeriodico.ShowModal;

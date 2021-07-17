@@ -251,7 +251,7 @@ inherited frmEnvioEventoNaoPeriodico: TfrmEnvioEventoNaoPeriodico
       Top = 231
       Width = 145
       Height = 17
-      Caption = 'S-2250 - Aviso Pr'#233'vio'
+      Caption = 'S-2250 - Aviso Pr'#233'vio *'
       Ctl3D = False
       Enabled = False
       ParentCtl3D = False
@@ -276,7 +276,7 @@ inherited frmEnvioEventoNaoPeriodico: TfrmEnvioEventoNaoPeriodico
       Top = 24
       Width = 300
       Height = 17
-      Caption = 'S-2260 - Convoca'#231#227'o para Trabalho Intermitente'
+      Caption = 'S-2260 - Convoca'#231#227'o para Trabalho Intermitente *'
       Enabled = False
       TabOrder = 12
     end

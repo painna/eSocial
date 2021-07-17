@@ -52,6 +52,9 @@ inherited frmConfigurarESocial: TfrmConfigurarESocial
       object tbsUNG: TcxTabSheet
         Caption = '&1 - Ente Federativo'
         ImageIndex = 0
+        DesignSize = (
+          668
+          341)
         object lblID_UNID_GESTORA: TcxLabel
           Left = 17
           Top = 41
@@ -275,6 +278,7 @@ inherited frmConfigurarESocial: TfrmConfigurarESocial
           Top = 14
           Width = 108
           Height = 24
+          Anchors = [akTop, akRight]
           Caption = 'Pesquisar'
           TabOrder = 2
           TabStop = False
@@ -287,9 +291,11 @@ inherited frmConfigurarESocial: TfrmConfigurarESocial
           OnClick = btnAbrirNavegadorClick
         end
         object cxLabel6: TcxLabel
-          Left = 279
-          Top = 17
-          Caption = 'Pesquise pelo CNPJ da Institui'#231#227'o'
+          Left = 281
+          Top = 8
+          Anchors = [akTop, akRight]
+          AutoSize = False
+          Caption = 'Decubra o n'#250'mero SIAFI pelo CNPJ da Institui'#231#227'o'
           ParentFont = False
           Style.Font.Charset = DEFAULT_CHARSET
           Style.Font.Color = clWhite
@@ -300,8 +306,12 @@ inherited frmConfigurarESocial: TfrmConfigurarESocial
           Style.TextColor = 10454867
           Style.TextStyle = [fsBold]
           Style.IsFontAssigned = True
-          Properties.Alignment.Horz = taLeftJustify
+          Properties.Alignment.Horz = taRightJustify
+          Properties.WordWrap = True
           Transparent = True
+          Height = 32
+          Width = 190
+          AnchorX = 471
         end
       end
       object tbsResponsavel: TcxTabSheet

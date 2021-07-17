@@ -236,6 +236,14 @@
             <FormType>dfm</FormType>
         </DCCReference>
         <DCCReference Include="..\pas\Services\eSocial.Services.Utils.pas"/>
+        <DCCReference Include="..\pas\Views\eSocial.Views.ViewEventoPeriodicoEnviar.pas">
+            <Form>ViewEventoPeriodicoEnviar</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="..\pas\Views\eSocial.Views.ViewEventoNaoPeriodicoEnviar.pas">
+            <Form>ViewEventoNaoPeriodicoEnviar</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
         <RcItem Include="..\pas\Assets\icon-message-alert-32x32.png">
             <ResourceType>RCDATA</ResourceType>
             <ResourceId>icon_alert32</ResourceId>

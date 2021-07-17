@@ -4283,6 +4283,7 @@ var
   I    : Integer;
   aDataInicial,
   aDataFinal  : TDateTime;
+  aInforme      ,
   aMainTable    ,
   aFileProcesso : String;
 begin
@@ -4300,7 +4301,7 @@ begin
   try
     aSQL.BeginUpdate;
     aSQL.Clear;
-    aSQL.Add('Select ' + IfThen(not AmbienteWebServiceProducao, 'First 20', '') );
+    aSQL.Add('Select First 20');
     aSQL.Add('    p.* ');
     aSQL.Add('  , s.id as id_servidor ');
     aSQL.Add('  , coalesce(p.cnh_categ, ''B'') as cnh_categoria');
@@ -4387,10 +4388,10 @@ begin
     SetSQL(aSQL);
 
     I := 1;
+    aInforme := 'Gerando evento S2200...';
 
-    aProcesso.MaxValue := cdsTabela.RecordCount;
-    aProcesso.Progress := 0;
-    Application.ProcessMessages;
+    // Atualizar componentes em tela
+    BarraProcesso(aLabel, aProcesso, aInforme, I, cdsTabela.RecordCount);
 
     ACBrESocial.Eventos.NaoPeriodicos.S2200.Clear;
 
@@ -4414,7 +4415,7 @@ begin
 
         IdeEmpregador.TpInsc := tiCNPJ;
         IdeEmpregador.NrInsc := Criptografa(Pesquisa('CONFIG_ORGAO', 'ID', '1', 'CNPJ', ''),'2', 14); //Criptografa(cdsTabela.FieldByName('CNPJ').AsString, '2', 14);
-        //EvtAdmissao.Id := TeSocialEvento(EvtAdmissao).GerarChaveEsocial(now, EvtAdmissao.ideEmpregador.NrInsc, EvtAdmissao.Sequencial);
+        EvtAdmissao.Id := TeSocialEvento(EvtAdmissao).GerarChaveEsocial(now, EvtAdmissao.ideEmpregador.NrInsc, EvtAdmissao.Sequencial);
 
         with ACBrESocial.Configuracoes do
           Geral.IdEmpregador := EvtAdmissao.IdeEmpregador.NrInsc;
@@ -4603,19 +4604,19 @@ begin
         with Vinculo do
         begin
           Matricula      := Trim(cdsTabela.FieldByName('matricula').AsString);
-          TpRegTrab      := trEstatutario; // Servidor Público
+          TpRegTrab      := tpTpRegTrab.trEstatutario; // Servidor Público
 
           if (StrToIntDef(Trim(cdsTabela.FieldByName('tipo_previd').AsString), 0) < 2) then
-            TpRegPrev    := rpRGPS  // Regime Geral da Previdência Social - RGPS
+            TpRegPrev    := tpTpRegPrev.rpRGPS  // Regime Geral da Previdência Social - RGPS
           else
-            TpRegPrev    := rpRPPS; // Regime Próprio de Previdência Social - RPPS
+            TpRegPrev    := tpTpRegPrev.rpRPPS; // Regime Próprio de Previdência Social - RPPS
 
           NrRecInfPrelim := EmptyStr;
 
           if ( StrToIntDef(OnlyNumber(aCompetencia.Codigo), 0) < (StrToInt(FormatDateTime('YYYYMM', Date)) - 1) ) then
-            cadIni := tpSim
+            cadIni := tpSimNao.tpSim
           else
-            cadIni := tpNao;
+            cadIni := tpSimNao.tpNao;
 
           with InfoRegimeTrab do
           begin
@@ -4629,7 +4630,7 @@ begin
               dtBase            := 01;               // JANEIRO
               cnpjSindCategProf := Trim(cdsTabela.FieldByName('cnpj_sindicato').AsString);
 
-              FGTS.OpcFGTS   := ofNaoOptante;
+              FGTS.OpcFGTS   := tpOpcFGTS.ofNaoOptante;
               FGTS.DtOpcFGTS := StrToDate(EMPTY_DATE);
 
 //              with TrabTemporario do
@@ -4667,7 +4668,7 @@ begin
                 20..35:
                   TpProv := tpTpProv.tpNomeacaoCargoEfetivo;
                 else
-                  TpProv := tpTpProv.tpOutros; //tpOutros;
+                  TpProv := tpTpProv.tpOutros;
               end;
 
               DtNomeacao  := cdsTabela.FieldByName('dt_nomeacao').AsDateTime;  // StrToDate(EMPTY_DATE);
@@ -4794,19 +4795,21 @@ begin
 //
 //          Desligamento.DtDeslig := StrToDate(EMPTY_DATE);
         end;
+
+        aInforme := Trim(cdsTabela.FieldByName('nome').AsString);
+        BarraProcesso(aLabel, aProcesso, aInforme, I, 0);
+
+        Inc(I);
+
+        Writeln(flOperacao_eS2200,
+            'S2200|'
+          + aMainTable + '|'
+          + MODO_OPERACAO[Ord(aModoLancamento)] + '|'
+          + FormatFloat('0000000000', cdsTabela.FieldByName('ID_SERVIDOR').AsInteger) + '|'
+          + 'ID|'
+          + EvtAdmissao.Id);
       end;
 
-      aLabel.Caption     := Trim(cdsTabela.FieldByName('nome').AsString);
-      aProcesso.Progress := I;
-      Application.ProcessMessages;
-      Inc(I);
-
-      Writeln(flOperacao_eS2200,
-          'S2200|'
-        + aMainTable + '|'
-        + MODO_OPERACAO[Ord(aModoLancamento)] + '|'
-        + FormatFloat('0000000000', cdsTabela.FieldByName('ID_SERVIDOR').AsInteger) + '|'
-        + 'ID');
       cdsTabela.Next;
     end;
 
@@ -4842,6 +4845,7 @@ var
   I    : Integer;
   aDataInicial,
   aDataFinal  : TDateTime;
+  aInforme      ,
   aMainTable    ,
   aFileProcesso : String;
 begin
@@ -4946,10 +4950,10 @@ begin
     SetSQL(aSQL);
 
     I := 1;
+    aInforme := 'Gerando evento S2205...';
 
-    aProcesso.MaxValue := cdsTabela.RecordCount;
-    aProcesso.Progress := 0;
-    Application.ProcessMessages;
+    // Atualizar componentes em tela
+    BarraProcesso(aLabel, aProcesso, aInforme, I, cdsTabela.RecordCount);
 
     ACBrESocial.Eventos.NaoPeriodicos.S2205.Clear;
 
@@ -4974,7 +4978,7 @@ begin
 
         IdeEmpregador.TpInsc := tiCNPJ;
         IdeEmpregador.NrInsc := Criptografa(Pesquisa('CONFIG_ORGAO', 'ID', '1', 'CNPJ', ''),'2', 14); //Criptografa(cdsTabela.FieldByName('CNPJ').AsString, '2', 14);
-        //EvtAltCadastral.Id := TeSocialEvento(EvtAltCadastral).GerarChaveEsocial(now, EvtAltCadastral.ideEmpregador.NrInsc, EvtAltCadastral.Sequencial);
+        EvtAltCadastral.Id   := TeSocialEvento(EvtAltCadastral).GerarChaveEsocial(now, EvtAltCadastral.ideEmpregador.NrInsc, EvtAltCadastral.Sequencial);
 
         with ACBrESocial.Configuracoes do
           Geral.IdEmpregador := EvtAltCadastral.IdeEmpregador.NrInsc;
@@ -5154,19 +5158,21 @@ begin
             EmailAlternat := EmptyStr
           end;
         end;
+
+        aInforme := Trim(cdsTabela.FieldByName('nome').AsString);
+        BarraProcesso(aLabel, aProcesso, aInforme, I, 0);
+
+        Inc(I);
+
+        Writeln(flOperacao_eS2205,
+            'S2205|'
+          + aMainTable + '|'
+          + MODO_OPERACAO[Ord(aModoLancamento)] + '|'
+          + FormatFloat('0000000000', cdsTabela.FieldByName('ID').AsInteger) + '|'
+          + 'ID|'
+          + EvtAltCadastral.Id);
       end;
 
-      aLabel.Caption     := Trim(cdsTabela.FieldByName('nome').AsString);
-      aProcesso.Progress := I;
-      Application.ProcessMessages;
-      Inc(I);
-
-      Writeln(flOperacao_eS2205,
-          'S2205|'
-        + aMainTable + '|'
-        + MODO_OPERACAO[Ord(aModoLancamento)] + '|'
-        + FormatFloat('0000000000', cdsTabela.FieldByName('ID').AsInteger) + '|'
-        + 'ID');
       cdsTabela.Next;
     end;
 
@@ -5202,6 +5208,7 @@ var
   I    : Integer;
   aDataInicial,
   aDataFinal  : TDateTime;
+  aInforme      ,
   aMainTable    ,
   aFileProcesso : String;
 begin
@@ -5305,10 +5312,10 @@ begin
     SetSQL(aSQL);
 
     I := 1;
+    aInforme := 'Gerando evento S2206...';
 
-    aProcesso.MaxValue := cdsTabela.RecordCount;
-    aProcesso.Progress := 0;
-    Application.ProcessMessages;
+    // Atualizar componentes em tela
+    BarraProcesso(aLabel, aProcesso, aInforme, I, cdsTabela.RecordCount);
 
     ACBrESocial.Eventos.NaoPeriodicos.S2206.Clear;
 
@@ -5336,7 +5343,7 @@ begin
 
         IdeEmpregador.TpInsc := tiCNPJ;
         IdeEmpregador.NrInsc := Criptografa(Pesquisa('CONFIG_ORGAO', 'ID', '1', 'CNPJ', ''),'2', 14); //Criptografa(cdsTabela.FieldByName('CNPJ').AsString, '2', 14);
-        //EvtAltContratual.Id  := TeSocialEvento(EvtAltContratual).GerarChaveEsocial(now, EvtAltContratual.ideEmpregador.NrInsc, EvtAltContratual.Sequencial);
+        EvtAltContratual.Id  := TeSocialEvento(EvtAltContratual).GerarChaveEsocial(now, EvtAltContratual.ideEmpregador.NrInsc, EvtAltContratual.Sequencial);
 
         IdeVinculo.cpfTrab   := OnlyNumber(Trim(cdsTabela.FieldByName('cpf').AsString));
         IdeVinculo.Matricula := Trim(cdsTabela.FieldByName('matricula').AsString);
@@ -5406,7 +5413,7 @@ begin
               20..35:
                 TpProv := tpTpProv.tpNomeacaoCargoEfetivo;
               else
-                TpProv := tpTpProv.tpOutros; //tpOutros;
+                TpProv := tpTpProv.tpOutros;
             end;
 
             DtNomeacao  := cdsTabela.FieldByName('dt_nomeacao').AsDateTime;  // StrToDate(EMPTY_DATE);
@@ -5498,19 +5505,20 @@ begin
           servPubl.mtvAlter := maOutros;
         end;
 
+        aInforme := Trim(cdsTabela.FieldByName('nome').AsString);
+        BarraProcesso(aLabel, aProcesso, aInforme, I, 0);
+
+        Inc(I);
+
+        Writeln(flOperacao_eS2206,
+            'S2206|'
+          + aMainTable + '|'
+          + MODO_OPERACAO[Ord(aModoLancamento)] + '|'
+          + FormatFloat('0000000000', cdsTabela.FieldByName('ID_SERVIDOR').AsInteger) + '|'
+          + 'ID|'
+          + EvtAltContratual.Id);
       end;
 
-      aLabel.Caption     := Trim(cdsTabela.FieldByName('nome').AsString);
-      aProcesso.Progress := I;
-      Application.ProcessMessages;
-      Inc(I);
-
-      Writeln(flOperacao_eS2206,
-          'S2206|'
-        + aMainTable + '|'
-        + MODO_OPERACAO[Ord(aModoLancamento)] + '|'
-        + FormatFloat('0000000000', cdsTabela.FieldByName('ID_SERVIDOR').AsInteger) + '|'
-        + 'ID');
       cdsTabela.Next;
     end;
 

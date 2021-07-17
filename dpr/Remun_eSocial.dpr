@@ -52,7 +52,9 @@ uses
   eSocial.Views.Styles.Colors in '..\pas\Views\eSocial.Views.Styles.Colors.pas',
   eSocial.Classes.Events in '..\pas\Classes\eSocial.Classes.Events.pas',
   eSocial.Views.ViewEventoTabelaEnviar in '..\pas\Views\eSocial.Views.ViewEventoTabelaEnviar.pas' {ViewEventoTabelaEnviar},
-  eSocial.Services.Utils in '..\pas\Services\eSocial.Services.Utils.pas';
+  eSocial.Services.Utils in '..\pas\Services\eSocial.Services.Utils.pas',
+  eSocial.Views.ViewEventoPeriodicoEnviar in '..\pas\Views\eSocial.Views.ViewEventoPeriodicoEnviar.pas' {ViewEventoPeriodicoEnviar},
+  eSocial.Views.ViewEventoNaoPeriodicoEnviar in '..\pas\Views\eSocial.Views.ViewEventoNaoPeriodicoEnviar.pas' {ViewEventoNaoPeriodicoEnviar};
 
 {$R *.res}
 
