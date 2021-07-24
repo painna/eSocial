@@ -119,7 +119,7 @@ type
     { Public declarations }
   end;
 
-  procedure EventoPeriodicoEnviar(const aOwner  : TComponent);
+  procedure EventoNaoPeriodicoEnviar(const aOwner  : TComponent);
 
 var
   ViewEventoNaoPeriodicoEnviar : TViewEventoNaoPeriodicoEnviar;
@@ -137,7 +137,7 @@ uses
   eSocial.Controllers.Factory,
   eSocial.Services.Utils;
 
-procedure EventoPeriodicoEnviar(const aOwner  : TComponent);
+procedure EventoNaoPeriodicoEnviar(const aOwner  : TComponent);
 begin
   if not Assigned(ViewEventoNaoPeriodicoEnviar) then
     ViewEventoNaoPeriodicoEnviar := TViewEventoNaoPeriodicoEnviar.Create(aOwner);
@@ -311,7 +311,7 @@ begin
         aEventoOK := True;
 
         // 4. Verificar novas pendentes
-        dmPrincipal.SConPrincipal.ExecuteDirect('execute procedure SP_ESOCIAL_EVENTOS_PEND_PERIODICO');
+        dmPrincipal.SConPrincipal.ExecuteDirect('execute procedure SP_ESOCIAL_EVENTOS_PEND_NAO_PER');
       end
       else
       if (eSocial.Eventos.Iniciais.Count = 0) then
@@ -365,7 +365,7 @@ begin
         aEventoOK := True;
 
         // 4. Verificar novas pendentes
-        dmPrincipal.SConPrincipal.ExecuteDirect('execute procedure SP_ESOCIAL_EVENTOS_PEND_PERIODICO');
+        dmPrincipal.SConPrincipal.ExecuteDirect('execute procedure SP_ESOCIAL_EVENTOS_PEND_NAO_PER');
       end
       else
       if (eSocial.Eventos.Iniciais.Count = 0) then
@@ -548,14 +548,15 @@ begin
     end
     else
     begin
-      VerificarOperacoes;
-      VerificarEventos;
       gagProcesso.Progress := gagProcesso.MaxValue;
 
       if (FSucesso = 0) then
         Mensagem('Nenhum evento foi gerado.' + #13 + 'Informe ao suporte para que este analise os dados da base', 'Erro!', MB_ICONERROR)
       else
         Mensagem('Arquivo(s) de evento(s) gerado(s) e enviado(s) com sucesso.', 'Sucesso!', MB_ICONINFORMATION);
+
+      VerificarOperacoes;
+      VerificarEventos;
     end;
   finally
     LimparPainelProcesso(False);

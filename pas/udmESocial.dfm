@@ -718,6 +718,12 @@ object dmESocial: TdmESocial
         Precision = 30
         Name = 'PROTOCOLO'
         ParamType = ptInput
+      end
+      item
+        DataType = ftString
+        Precision = 40
+        Name = 'ID_EVENTO'
+        ParamType = ptInput
       end>
     SQLConnection = dmPrincipal.SConPrincipal
     StoredProcName = 'SET_ESOCIAL_LOG_EVENTO'

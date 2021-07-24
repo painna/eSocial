@@ -236,6 +236,38 @@ begin
 end;
 
 procedure TfrmPrincipal.imEventoNaoPeriodicoClick(Sender: TObject);
+var
+  iConfiguracao : IControllerConfiguracao;
+begin
+  if (MDIChildCount > 0) then
+    Mensagem('Você precisa Fechar todas as Janelas deste Programa, ' + #13 +
+             'antes de Executar essa Operação ...',
+             'Aviso !!!', MB_ICONEXCLAMATION)
+  else
+//    Mensagem('Rotina ainda não disponível nesta versão!' + #13 + 'Recurso em homologação.', 'Informação', MB_ICONINFORMATION);
+  begin
+    iConfiguracao := TControllerFactory.Configuracao;
+    iConfiguracao.DAO.Get;
+
+    if not iConfiguracao.ValidarConfiguracao then
+      Mensagem('Verifique as pendências informadas a seguir:' + #13#13 +
+               iConfiguracao.Erros + #13 +
+               'Antes de Executar essa Operação verifique as configurações do sistema.',
+               'Validação', MB_ICONERROR)
+    else
+    begin
+      Screen.Cursor := crSQLWait;
+      dmPrincipal.SConPrincipal.ExecuteDirect('execute procedure SP_ESOCIAL_EVENTOS_PEND_NAO_PER');
+      Screen.Cursor := crDefault;
+
+      EventoNaoPeriodicoEnviar(Self);
+    end;
+  end;
+end;
+
+procedure TfrmPrincipal.imEventoPeriodicoClick(Sender: TObject);
+var
+  iConfiguracao : IControllerConfiguracao;
 begin
   if (MDIChildCount > 0) then
     Mensagem('Você precisa Fechar todas as Janelas deste Programa, ' + #13 +
@@ -243,35 +275,24 @@ begin
              'Aviso !!!', MB_ICONEXCLAMATION)
   else
     Mensagem('Rotina ainda não disponível nesta versão!' + #13 + 'Recurso em homologação.', 'Informação', MB_ICONINFORMATION);
-//    try
-//      frmEnvioEventoNaoPeriodico := TfrmEnvioEventoNaoPeriodico.Create(Self);
-//      frmEnvioEventoNaoPeriodico.ShowModal;
-//    finally
-//      FreeAndNil(frmEnvioEventoNaoPeriodico);
-//    end;
-end;
-
-procedure TfrmPrincipal.imEventoPeriodicoClick(Sender: TObject);
-begin
-  if (MDIChildCount > 0) then
-    Mensagem('Você precisa Fechar todas as Janelas deste Programa, ' + #13 +
-             'antes de Executar essa Operação ...',
-             'Aviso !!!', MB_ICONEXCLAMATION)
-  else
-      Mensagem('Rotina ainda não disponível nesta versão!' + #13 + 'Recurso em homologação.', 'Informação', MB_ICONINFORMATION);
+//  begin
+//    iConfiguracao := TControllerFactory.Configuracao;
+//    iConfiguracao.DAO.Get;
+//
+//    if not iConfiguracao.ValidarConfiguracao then
+//      Mensagem('Verifique as pendências informadas a seguir:' + #13#13 +
+//               iConfiguracao.Erros + #13 +
+//               'Antes de Executar essa Operação verifique as configurações do sistema.',
+//               'Validação', MB_ICONERROR)
+//    else
 //    begin
 //      Screen.Cursor := crSQLWait;
-//      dmPrincipal.SConPrincipal.ExecuteDirect('execute procedure SP_ESOCIAL_EVENTOS_PEND_PERIODICO');
+//      dmPrincipal.SConPrincipal.ExecuteDirect('execute procedure SP_ESOCIAL_EVENTOS_PEND_TABELAS');
 //      Screen.Cursor := crDefault;
 //
-//      EventoPeriodicoEnviar(Self);
+//      EventoTabelaEnviar(Self);
 //    end;
-//    try
-//      frmEnvioEventoPeriodico := TfrmEnvioEventoPeriodico.Create(Self);
-//      frmEnvioEventoPeriodico.ShowModal;
-//    finally
-//      FreeAndNil(frmEnvioEventoPeriodico);
-//    end;
+//  end;
 end;
 
 procedure TfrmPrincipal.imEventoTabelaClick(Sender: TObject);
@@ -286,6 +307,7 @@ begin
   begin
     iConfiguracao := TControllerFactory.Configuracao;
     iConfiguracao.DAO.Get;
+
     if not iConfiguracao.ValidarConfiguracao then
       Mensagem('Verifique as pendências informadas a seguir:' + #13#13 +
                iConfiguracao.Erros + #13 +

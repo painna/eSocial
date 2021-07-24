@@ -56,9 +56,9 @@ inherited frmConfigurarESocial: TfrmConfigurarESocial
           668
           341)
         object lblID_UNID_GESTORA: TcxLabel
-          Left = 17
+          Left = 10
           Top = 41
-          Caption = 'Unidade Gestora Prncipal:'
+          Caption = '* Unidade Gestora Prncipal:'
           FocusControl = dbeID_UNID_GESTORA
           ParentFont = False
           Style.StyleController = dmPrincipal.cxLabelStyleNormal
@@ -94,9 +94,9 @@ inherited frmConfigurarESocial: TfrmConfigurarESocial
           Width = 431
         end
         object lblNAT_JURIDICA: TcxLabel
-          Left = 55
+          Left = 48
           Top = 65
-          Caption = 'Natureza Jur'#237'dica:'
+          Caption = '* Natureza Jur'#237'dica:'
           FocusControl = dbeNAT_JURIDICA
           ParentFont = False
           Style.StyleController = dmPrincipal.cxLabelStyleNormal
@@ -148,9 +148,9 @@ inherited frmConfigurarESocial: TfrmConfigurarESocial
           Width = 121
         end
         object lblNRO_SIAFI: TcxLabel
-          Left = 74
+          Left = 67
           Top = 17
-          Caption = 'N'#250'mero SIAFI:'
+          Caption = '* N'#250'mero SIAFI:'
           FocusControl = dbeNRO_SIAFI
           ParentFont = False
           Style.StyleController = dmPrincipal.cxLabelStyleNormal
@@ -159,9 +159,9 @@ inherited frmConfigurarESocial: TfrmConfigurarESocial
           AnchorX = 146
         end
         object lblSUBTETO_VENCTO_VALOR: TcxLabel
-          Left = 35
+          Left = 28
           Top = 114
-          Caption = 'Valor do Subteto (R$):'
+          Caption = '* Valor do Subteto (R$):'
           FocusControl = dbeSUBTETO_VENCTO_VALOR
           ParentFont = False
           Style.StyleController = dmPrincipal.cxLabelStyleNormal
@@ -208,9 +208,9 @@ inherited frmConfigurarESocial: TfrmConfigurarESocial
           Width = 121
         end
         object lblSUBTETO_VENCTO_TIPO: TcxLabel
-          Left = 64
+          Left = 57
           Top = 89
-          Caption = 'Tipo do Subteto:'
+          Caption = '* Tipo do Subteto:'
           FocusControl = dbeSUBTETO_VENCTO_TIPO
           ParentFont = False
           Style.StyleController = dmPrincipal.cxLabelStyleNormal
@@ -318,9 +318,9 @@ inherited frmConfigurarESocial: TfrmConfigurarESocial
         Caption = '&2 - Respons'#225'vel eSocial'
         ImageIndex = 2
         object cxLabel1: TcxLabel
-          Left = 66
+          Left = 59
           Top = 17
-          Caption = 'Nome Completo:'
+          Caption = '* Nome Completo:'
           FocusControl = dbeRESPONSAVEL_NOME
           ParentFont = False
           Style.StyleController = dmPrincipal.cxLabelStyleNormal
@@ -345,9 +345,9 @@ inherited frmConfigurarESocial: TfrmConfigurarESocial
           Width = 439
         end
         object cxLabel2: TcxLabel
-          Left = 121
+          Left = 114
           Top = 41
-          Caption = 'CPF:'
+          Caption = '* CPF:'
           FocusControl = dbeRESPONSAVEL_CPF
           ParentFont = False
           Style.StyleController = dmPrincipal.cxLabelStyleNormal
@@ -401,9 +401,9 @@ inherited frmConfigurarESocial: TfrmConfigurarESocial
           Width = 121
         end
         object cxLabel4: TcxLabel
-          Left = 63
+          Left = 56
           Top = 89
-          Caption = 'Telefone Celular:'
+          Caption = '* Telefone Celular:'
           FocusControl = dbeRESPONSAVEL_FONECELULAR
           ParentFont = False
           Style.StyleController = dmPrincipal.cxLabelStyleNormal
@@ -429,9 +429,9 @@ inherited frmConfigurarESocial: TfrmConfigurarESocial
           Width = 121
         end
         object cxLabel5: TcxLabel
-          Left = 112
+          Left = 105
           Top = 113
-          Caption = 'E-mail:'
+          Caption = '* E-mail:'
           FocusControl = dbeRESPONSAVEL_EMAIL
           ParentFont = False
           Style.StyleController = dmPrincipal.cxLabelStyleNormal

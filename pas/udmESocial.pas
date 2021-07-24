@@ -547,6 +547,7 @@ var
         aRegistro := SplitString(aLinha, '|');
 
         // Gravar LOGs
+        // Executar stored procedure SET_ESOCIAL_LOG_EVENTO
         with setLogEvento do
         begin
           StrValores := Trim(aRegistro[3]);
@@ -558,6 +559,7 @@ var
           ParamByName('OPERACAO').AsString  := aRegistro[2];
           ParamByName('ID').AsString        := aRegistro[3];
           ParamByName('CAMPO').AsString     := aRegistro[4];
+          ParamByName('ID_EVENTO').AsString := aRegistro[5];
 
           if (Pos(';', StrValores) > 0) then
           begin
@@ -572,9 +574,9 @@ var
         end;
 
         if (aEventoTemp <> aRegistro[0]) then
-          SetEventoESocial(aRegistro[0]
+          SetEventoESocial(aRegistro[0] // Evento
             , IntToStr(aCompetencia.ID)
-            , aRegistro[2] // Operação
+            , aRegistro[2]              // Operação
             , aProtocolo.Numero
             , gUsuarioLogin
             , aProtocolo.DataHora
@@ -655,6 +657,7 @@ begin
       ProcessarFileLOG('.\log\eS1299.txt', flOperacao_eS1299);
   finally
     // Processar LOGs
+    // Executar stored procedure SP_ESOCIAL_LOG_EVENTO
     spLogEvento.Close;
     spLogEvento.ParamByName('PROTOCOLO').AsString := aProtocolo.Numero;
     spLogEvento.ExecProc;
@@ -4281,6 +4284,7 @@ var
   ok   : Boolean;
   aEventoID,
   I    : Integer;
+  aDataBaseOperacao,
   aDataInicial,
   aDataFinal  : TDateTime;
   aInforme      ,
@@ -4292,6 +4296,7 @@ begin
   AssignFile(flOperacao_eS2200, aFileProcesso);
   Rewrite(flOperacao_eS2200);
 
+  aDataBaseOperacao := aCompetencia.DataInicial - 1;
   aDataInicial := aCompetencia.DataInicial; // StrToDate('01/' + Copy(aCompetencia, 6, 2) + '/' + Copy(aCompetencia, 1, 4));
   aDataFinal   := aCompetencia.DataFinal;   // StrToDate(FormatFloat('00', DaysInMonth(aDataInicial)) + FormatDateTime('/mm/yyyy', aDataInicial));
 
@@ -4330,17 +4335,14 @@ begin
     aSQL.Add('  , s.observacao');
     aSQL.Add('  , coalesce(nullif(trim(s.pis_pasep_pf), ''''), nullif(trim(p.pis_pasep), ''''), ''00000000000'') as nis_trabalhador');
 
-    aSQL.Add('  , coalesce(s.dt_readmissao, s.dt_admissao, current_date) as dt_nomeacao');
-    aSQL.Add('  , coalesce(s.dt_readmissao, s.dt_admissao, current_date) as dt_posse');
-    aSQL.Add('  , coalesce(s.dt_readmissao, s.dt_admissao, current_date) as dt_exercicio');
+    aSQL.Add('  , coalesce(s.dt_readmissao, s.dt_admissao,   current_date)  as dt_nomeacao');
+    aSQL.Add('  , coalesce(s.dt_readmissao, s.dt_admissao,   current_date)  as dt_posse');
+    aSQL.Add('  , coalesce(s.dt_readmissao, s.dt_admissao,   current_date)  as dt_exercicio');
+    aSQL.Add('  , coalesce(s.data_operacao, s.dt_readmissao, s.dt_admissao) as dt_operacao');
 
     aSQL.Add('  , coalesce(n.id_esocial, ''105'') as id_pais_nascimento   ');
     aSQL.Add('  , coalesce(n.id_esocial, ''105'') as id_pais_naturalidade ');
     aSQL.Add('  , coalesce(p.ender_tipo, ''IND'') as ender_tipo_lograd');
-
-    aSQL.Add('  , null as ctps_num ');
-    aSQL.Add('  , null as ctps_serie ');
-    aSQL.Add('  , null as ctps_uf ');
 
     aSQL.Add('  , null as rne_num ');
     aSQL.Add('  , null as rne_orgao ');
@@ -4367,8 +4369,14 @@ begin
     aSQL.Add('  left join ENTID_SINDICAL a on (a.id = s.id_entid_sindical)');
     aSQL.Add('  left join TAB_HORARIO h on (h.id = s.id_horario)');
     aSQL.Add('where (s.id > 0)   ');
-    aSQL.Add('  and (p.dt_nascimento is not null)');                // Sem Data de Nascimento
-    aSQL.Add('  and (coalesce(trim(p.ender_cep), '''') <> '''')');  // Sem Número de CEP
+    aSQL.Add('  and ((p.dt_nascimento is not null) and (p.dt_nascimento != ''1899.12.30''))'); // Sem Data de Nascimento
+    aSQL.Add('  and (coalesce(trim(p.ender_cep), '''') != '''')');                             // Sem Número de CEP
+
+    case aModoLancamento of
+      mlInclusao  : aSQL.Add('  and (s.tipo_operacao = ' + QuotedStr(FLAG_OPERACAO_INSERIR) + ')');
+      mlAlteracao : aSQL.Add('  and (s.tipo_operacao = ' + QuotedStr(FLAG_OPERACAO_ALTERAR) + ')');
+      mlExclusao  : aSQL.Add('  and (s.tipo_operacao = ' + QuotedStr(FLAG_OPERACAO_EXCLUIR) + ')');
+    end;
 
     if ( StrToIntDef(OnlyNumber(aCompetencia.Codigo), 0) < (StrToInt(FormatDateTime('YYYYMM', Date)) - 1) ) then
       // Carga inicial
@@ -4377,11 +4385,12 @@ begin
       // Admissões do mês
       aSQL.Add('  and (coalesce(s.dt_readmissao, s.dt_admissao) between ' + QuotedStr(FormatDateTime('yyyy.mm.dd', aDataInicial)) + ' and ' + QuotedStr(FormatDateTime('yyyy.mm.dd', aDataFinal)) + ')');
 
-    case aModoLancamento of
-      mlInclusao  : aSQL.Add('  and s.tipo_operacao = ' + QuotedStr(FLAG_OPERACAO_INSERIR));
-      mlAlteracao : aSQL.Add('  and s.tipo_operacao = ' + QuotedStr(FLAG_OPERACAO_ALTERAR));
-      mlExclusao  : aSQL.Add('  and s.tipo_operacao = ' + QuotedStr(FLAG_OPERACAO_EXCLUIR));
-    end;
+
+//  and (( (coalesce(s.dt_readmissao, s.dt_admissao) < '2021.07.01') and (s.data_operacao <= dateadd(month, -1, cast('2021.07.31' as date))) )
+//    or ( (coalesce(s.dt_readmissao, s.dt_admissao) between '2021.07.01' and '2021.07.31') and (s.data_operacao > dateadd(month, -1, cast('2021.07.31' as date))) )
+//  )
+
+
 
     aSQL.EndUpdate;
     aSQL.SaveToFile('.\log\eS2200.sql');
@@ -4419,12 +4428,6 @@ begin
 
         with ACBrESocial.Configuracoes do
           Geral.IdEmpregador := EvtAdmissao.IdeEmpregador.NrInsc;
-
-//        ModoLancamento := aModoLancamento;
-//
-//        infoAmbiente.ideAmbiente.codAmb   := Trim(cdsTabela.FieldByName('id').AsString);
-//        infoAmbiente.ideAmbiente.IniValid := aCompetencia;
-//        infoAmbiente.ideAmbiente.FimValid := '2099-12';
 
         with Trabalhador do
         begin
@@ -4563,6 +4566,7 @@ begin
           aSQL.Add('from SERVIDOR_DEPENDENTE d');
           aSQL.Add('  inner join PESSOA_FISICA_DEPENDENTE p on (p.id = d.id)');
           aSQL.Add('where (d.id_servidor   = ' + Trim(cdsTabela.FieldByName('id_servidor').AsString) + ') ');
+          aSQL.Add('  and (d.dt_nascimento != ''1899.12.30'')');
           aSQL.Add('  and (d.dt_nascimento < current_date)');
           aSQL.Add('order by');
           aSQL.Add('    d.nome');
@@ -4613,10 +4617,15 @@ begin
 
           NrRecInfPrelim := EmptyStr;
 
-          if ( StrToIntDef(OnlyNumber(aCompetencia.Codigo), 0) < (StrToInt(FormatDateTime('YYYYMM', Date)) - 1) ) then
-            cadIni := tpSimNao.tpSim
+//          if ( StrToIntDef(OnlyNumber(aCompetencia.Codigo), 0) < (StrToInt(FormatDateTime('YYYYMM', Date)) - 1) ) then
+//            cadIni := tpSimNao.tpSim  // Carga inicial
+//          else
+//            cadIni := tpSimNao.tpNao; // Admissão do mês
+//
+          if (cdsTabela.FieldByName('dt_nomeacao').AsDateTime < aDataBaseOperacao) then
+            cadIni := tpSimNao.tpSim  // Carga inicial
           else
-            cadIni := tpSimNao.tpNao;
+            cadIni := tpSimNao.tpNao; // Admissão do mês
 
           with InfoRegimeTrab do
           begin

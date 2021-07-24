@@ -547,14 +547,15 @@ begin
     end
     else
     begin
-      VerificarOperacoes;
-      VerificarEventos;
       gagProcesso.Progress := gagProcesso.MaxValue;
 
       if (FSucesso = 0) then
         Mensagem('Nenhum evento foi gerado.' + #13 + 'Informe ao suporte para que este analise os dados da base', 'Erro!', MB_ICONERROR)
       else
         Mensagem('Arquivo(s) de evento(s) gerado(s) e enviado(s) com sucesso.', 'Sucesso!', MB_ICONINFORMATION);
+
+      VerificarOperacoes;
+      VerificarEventos;
     end;
   finally
     LimparPainelProcesso(False);
