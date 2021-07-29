@@ -11,7 +11,7 @@ AS
 begin
   if (inserting) then
     -- Inserir registro no eSocial
-    new.tipo_operacao = 'I';
+    -- new.tipo_operacao = 'I'; <-- Controle passou a ser feito pelo registro do SERVIDOR
     if (new.data_operacao is null) then
       new.data_operacao = current_date;
   else
@@ -22,16 +22,6 @@ begin
       new.tipo_operacao = 'A';
     if ((old.data_operacao is null) and (new.data_operacao is null)) then
       new.data_operacao = current_date;
-
-    -- Replicar operacao para o cadastro do servidor
-    if (coalesce(new.tipo_operacao, 'P') != 'P') then
-    begin
-      Update SERVIDOR s Set
-          s.tipo_operacao = 'A'
-        , s.data_operacao = current_date
-      where (s.id_pessoa_fisica = new.id)
-        and (s.tipo_operacao = 'P');
-    end
   end
 end
 ^

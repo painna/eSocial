@@ -2178,3 +2178,584 @@ expression evaluation not supported.
 Invalid data type in addition of part to DATE/TIME/TIMESTAMP in DATEADD.
 
 */
+
+
+/*------ GERASYS.TI 29/07/2021 11:31:07 --------*/
+
+SET TERM ^ ;
+
+CREATE OR ALTER trigger tg_servidor_esocial_oper for servidor
+active before insert or update position 0
+AS
+begin
+  if (inserting) then
+    -- Inserir registro no eSocial
+    new.tipo_operacao = 'I';
+    if (new.data_operacao is null) then
+      new.data_operacao = current_date;
+  else
+  if (updating) then
+  begin
+    -- Atualizar registro no eSocial, caso sua insercao ou edicao anterior ja tenham sidos processados
+    if (coalesce(old.tipo_operacao, 'P') = 'P') then
+      new.tipo_operacao = 'A';
+    if ((old.data_operacao is null) and (new.data_operacao is null)) then
+      new.data_operacao = current_date;
+  end
+end^
+
+SET TERM ; ^
+
+
+
+
+/*------ GERASYS.TI 29/07/2021 11:33:54 --------*/
+
+SET TERM ^ ;
+
+CREATE OR ALTER trigger tg_servidor_eventoesocial for servidor
+active after insert or update position 1
+AS
+  declare variable competencia "VARCHAR(6)";
+begin
+  Select first 1
+    c.competencia
+  from GET_ESOCIAL_COMPETENCIA_ATIVA c
+  Into
+    competencia;
+
+  if (new.tipo_operacao = 'I') then
+    execute procedure SET_ESOCIAL_GERAR_EVENTOS('S2200'
+      , :competencia
+      , 'I'
+      , 'S'
+      , 'Cadastro de Pessoa Fisica/Servidor'
+    );
+  else
+  if (new.tipo_operacao = 'A') then
+    execute procedure SET_ESOCIAL_GERAR_EVENTOS('S2206'
+      , :competencia
+      , 'A'
+      , 'S'
+      , 'Alteracao de Contrato de Trabalho/ Relacao Estatutaria'
+    );
+end^
+
+SET TERM ; ^
+
+COMMENT ON TRIGGER TG_SERVIDOR_EVENTOESOCIAL IS 'Trigger Gerar Evento S2200 e S2206 (eSocial - Cadastramento Inicial do Vínculo e
+Admissao/Ingresso de Trabalhador, Alteracao de Contrato de Trabalho/ Relacao
+Estatutaria)
+
+    Autor   :   Isaque M. Ribeiro
+    Data    :   06/07/2021
+
+Trigger responsavel por gerar a necessidade de processamento dos eventos "S2200"
+e "S2206" no eSocial.
+
+
+Historico:
+
+    Legendas:
+        + Novo objeto de banco (Campos, Triggers)
+        - Remocao de objeto de banco
+        * Modificacao no objeto de banco
+
+    29/07/2021 - IMR :
+        * Inclusao do evento S2206.
+    23/07/2021 - IMR :
+        + Criacao da trigger na base de dados.';
+
+
+
+
+/*------ GERASYS.TI 29/07/2021 11:34:00 --------*/
+
+SET TERM ^ ;
+
+CREATE OR ALTER trigger tg_servidor_eventoesocial for servidor
+active after insert or update position 1
+AS
+  declare variable competencia "VARCHAR(6)";
+begin
+  Select first 1
+    c.competencia
+  from GET_ESOCIAL_COMPETENCIA_ATIVA c
+  Into
+    competencia;
+
+  if (new.tipo_operacao = 'I') then
+    execute procedure SET_ESOCIAL_GERAR_EVENTOS('S2200'
+      , :competencia
+      , 'I'
+      , 'S'
+      , 'Cadastro de Pessoa Fisica/Servidor'
+    );
+  else
+  if (new.tipo_operacao = 'A') then
+    execute procedure SET_ESOCIAL_GERAR_EVENTOS('S2206'
+      , :competencia
+      , 'A'
+      , 'S'
+      , 'Alteracao de Contrato de Trabalho/ Relacao Estatutaria'
+    );
+end^
+
+SET TERM ; ^
+
+
+
+
+/*------ GERASYS.TI 29/07/2021 11:34:30 --------*/
+
+SET TERM ^ ;
+
+CREATE OR ALTER trigger tg_servidor_eventoesocial for servidor
+active after insert or update position 1
+AS
+  declare variable competencia "VARCHAR(6)";
+begin
+  Select first 1
+    c.competencia
+  from GET_ESOCIAL_COMPETENCIA_ATIVA c
+  Into
+    competencia;
+
+  if (new.tipo_operacao = 'I') then
+    execute procedure SET_ESOCIAL_GERAR_EVENTOS('S2200'
+      , :competencia
+      , 'I'
+      , 'S'
+      , 'Cadastro de Pessoa Fisica/Servidor'
+    );
+  else
+  if (new.tipo_operacao = 'A') then
+    execute procedure SET_ESOCIAL_GERAR_EVENTOS('S2206'
+      , :competencia
+      , 'A'
+      , 'S'
+      , 'Alteracao de Contrato de Trabalho/ Relacao Estatutaria'
+    );
+end^
+
+SET TERM ; ^
+
+
+
+
+/*------ GERASYS.TI 29/07/2021 11:38:42 --------*/
+
+SET TERM ^ ;
+
+CREATE OR ALTER trigger tg_pessoa_fisica_esocial_oper for pessoa_fisica
+active before insert or update position 0
+AS
+begin
+  if (inserting) then
+    -- Inserir registro no eSocial
+    -- new.tipo_operacao = 'I'; <-- Controle passou a ser feito pelo registro do SERVIDOR
+    if (new.data_operacao is null) then
+      new.data_operacao = current_date;
+  else
+  if (updating) then
+  begin
+    -- Atualizar registro no eSocial, caso sua insercao ou edicao anterior ja tenham sidos processados
+    if (coalesce(old.tipo_operacao, 'P') = 'P') then
+      new.tipo_operacao = 'A';
+    if ((old.data_operacao is null) and (new.data_operacao is null)) then
+      new.data_operacao = current_date;
+  end
+end^
+
+SET TERM ; ^
+
+
+
+
+/*------ GERASYS.TI 29/07/2021 11:43:27 --------*/
+
+SET TERM ^ ;
+
+CREATE trigger tg_pessoa_fisica_eventoesocial for pessoa_fisica
+active after update position 1
+AS
+  declare variable competencia "VARCHAR(6)";
+begin
+  Select first 1
+    c.competencia
+  from GET_ESOCIAL_COMPETENCIA_ATIVA c
+  Into
+    competencia;
+
+  if (new.tipo_operacao = 'A') then
+    execute procedure SET_ESOCIAL_GERAR_EVENTOS('S2205'
+      , :competencia
+      , 'A'
+      , 'S'
+      , 'Alteracao de Dados Cadastrais do Servidor'
+    );
+end^
+
+SET TERM ; ^
+
+
+
+
+/*------ GERASYS.TI 29/07/2021 11:44:50 --------*/
+
+SET TERM ^ ;
+
+CREATE OR ALTER trigger tg_pessoa_fisica_eventoesocial for pessoa_fisica
+active after update position 1
+AS
+  declare variable competencia "VARCHAR(6)";
+begin
+  Select first 1
+    c.competencia
+  from GET_ESOCIAL_COMPETENCIA_ATIVA c
+  Into
+    competencia;
+
+  if (new.tipo_operacao = 'A') then
+    execute procedure SET_ESOCIAL_GERAR_EVENTOS('S2205'
+      , :competencia
+      , 'A'
+      , 'S'
+      , 'Alteracao de Dados Cadastrais do Servidor'
+    );
+end^
+
+SET TERM ; ^
+
+COMMENT ON TRIGGER TG_PESSOA_FISICA_EVENTOESOCIAL IS 'Trigger Gerar Evento S2205 (eSocial - Alteracao de Contrato de Trabalho/Relacao
+Estatutaria)
+
+    Autor   :   Isaque M. Ribeiro
+    Data    :   29/07/2021
+
+Trigger responsavel por gerar a necessidade de processamento do evento "S2205"
+no eSocial.
+
+
+Historico:
+
+    Legendas:
+        + Novo objeto de banco (Campos, Triggers)
+        - Remocao de objeto de banco
+        * Modificacao no objeto de banco
+
+    29/07/2021 - IMR :
+        + Criacao da trigger na base de dados.';
+
+
+
+
+/*------ GERASYS.TI 29/07/2021 11:47:54 --------*/
+
+ALTER TABLE PESSOA_FISICA
+    ADD ID_EVENTO "VARCHAR(40)";
+
+COMMENT ON COLUMN PESSOA_FISICA.ID_EVENTO IS
+'eSocial - ID atual do registro no portal eSocial, no evento S2205';
+
+
+
+
+/*------ GERASYS.TI 29/07/2021 11:48:46 --------*/
+
+ALTER TABLE SERVIDOR
+    ADD ID_EVENTO "VARCHAR(40)";
+
+COMMENT ON COLUMN SERVIDOR.ID_EVENTO IS
+'eSocial - ID atual do registro no portal eSocial, no evento S2200 ou S2206';
+
+
+
+/*------ GERASYS.TI 29/07/2021 11:53:54 --------*/
+
+/*!!! Error occured !!!
+Invalid token.
+Dynamic SQL Error.
+SQL error code = -104.
+Token unknown - line 8, column 13.
+Case.
+
+*/
+
+/*------ GERASYS.TI 29/07/2021 11:54:19 --------*/
+
+/*!!! Error occured !!!
+Invalid token.
+Dynamic SQL Error.
+SQL error code = -104.
+Token unknown - line 8, column 13.
+Case.
+
+*/
+
+/*------ GERASYS.TI 29/07/2021 11:54:28 --------*/
+
+/*!!! Error occured !!!
+Invalid token.
+Dynamic SQL Error.
+SQL error code = -104.
+Token unknown - line 8, column 13.
+Case.
+
+*/
+
+/*------ GERASYS.TI 29/07/2021 11:54:38 --------*/
+
+/*!!! Error occured !!!
+Invalid token.
+Dynamic SQL Error.
+SQL error code = -104.
+Token unknown - line 8, column 13.
+Case.
+
+*/
+
+
+/*------ GERASYS.TI 29/07/2021 12:01:16 --------*/
+
+SET TERM ^ ;
+
+create or alter procedure SP_ESOCIAL_EVENTOS_PEND_NAO_PER
+as
+declare variable COMPETENCIA "CHAR(6)";
+declare variable EVENTO "VARCHAR(10)";
+declare variable OPERACAO ESOCIAL_OPERACAO;
+declare variable FLAG SIM_NAO;
+declare variable INFORMACAO "VARCHAR(250)";
+begin
+  Select
+    g.competencia
+  from GET_ESOCIAL_COMPETENCIA_ATIVA g
+  Into
+    competencia;
+
+  for
+    Select distinct
+        x.evento
+      , x.operacao
+      , x.flag
+      , x.informacao
+    from (
+        Select
+            Case s.tipo_operacao
+              when 'I' then 'S2200'
+              when 'A' then 'S2206'
+            end as evento
+          , s.tipo_operacao as operacao
+          , 'S' as flag
+          , Case s.tipo_operacao
+              when 'I' then 'Cadastro de Pessoa Fisica/Servidor'
+              when 'A' then 'Alteracao de Contrato de Trabalho/Relacao Estatutaria'
+            end as informacao
+        from SERVIDOR s
+          inner join PESSOA_FISICA p on (p.id = s.id_pessoa_fisica)
+        where s.tipo_operacao != 'P'
+        group by s.tipo_operacao
+
+        union
+
+        Select
+            'S2205' as evento
+          , p.tipo_operacao as operacao
+          , 'S' as flag
+          , 'Alteracao de Dados Cadastrais do Trabalhador' as informacao
+        from PESSOA_FISICA p
+          inner join SERVIDOR s on (s.id_pessoa_fisica = p.id)
+        where p.tipo_operacao = 'A'
+        group by p.tipo_operacao
+    ) x
+    Into
+        evento
+      , operacao
+      , flag
+      , informacao
+  do
+  begin
+    execute procedure SET_ESOCIAL_GERAR_EVENTOS(
+        :evento
+      , :competencia
+      , :operacao
+      , :flag
+      , :informacao
+    );
+  end
+end^
+
+SET TERM ; ^
+
+
+
+
+/*------ GERASYS.TI 29/07/2021 12:03:19 --------*/
+
+SET TERM ^ ;
+
+CREATE OR ALTER procedure SP_ESOCIAL_EVENTOS_PEND_NAO_PER
+as
+declare variable COMPETENCIA "CHAR(6)";
+declare variable EVENTO "VARCHAR(10)";
+declare variable OPERACAO ESOCIAL_OPERACAO;
+declare variable FLAG SIM_NAO;
+declare variable INFORMACAO "VARCHAR(250)";
+begin
+  Select
+    g.competencia
+  from GET_ESOCIAL_COMPETENCIA_ATIVA g
+  Into
+    competencia;
+
+  for
+    Select distinct
+        x.evento
+      , x.operacao
+      , x.flag
+      , x.informacao
+    from (
+        Select
+            Case s.tipo_operacao
+              when 'I' then 'S2200'
+              when 'A' then 'S2206'
+            end as evento
+          , s.tipo_operacao as operacao
+          , 'S' as flag
+          , Case s.tipo_operacao
+              when 'I' then 'Cadastro de Pessoa Fisica/Servidor'
+              when 'A' then 'Alteracao de Contrato de Trabalho/Relacao Estatutaria'
+            end as informacao
+        from SERVIDOR s
+          inner join PESSOA_FISICA p on (p.id = s.id_pessoa_fisica)
+        where s.tipo_operacao != 'P'
+        group by s.tipo_operacao
+
+        union
+
+        Select
+            'S2205' as evento
+          , p.tipo_operacao as operacao
+          , 'S' as flag
+          , 'Alteracao de Dados Cadastrais do Trabalhador' as informacao
+        from PESSOA_FISICA p
+          inner join SERVIDOR s on (s.id_pessoa_fisica = p.id)
+        where p.tipo_operacao = 'A'
+        group by p.tipo_operacao
+    ) x
+    Into
+        evento
+      , operacao
+      , flag
+      , informacao
+  do
+  begin
+    execute procedure SET_ESOCIAL_GERAR_EVENTOS(
+        :evento
+      , :competencia
+      , :operacao
+      , :flag
+      , :informacao
+    );
+  end
+end^
+
+SET TERM ; ^
+
+COMMENT ON PROCEDURE SP_ESOCIAL_EVENTOS_PEND_NAO_PER IS 'Procedure SP Gerar Eventos Nao Periodicos (Eventos de Cadastros)
+
+    Autor   :   Isaque Marinho Ribeiro
+    Data    :   29/07/2021
+
+Stored procedure responsavel verificar a pendencia de envio dos eventos nao periodicos
+no eSocial de acordo com os dados que ainda nao foram enviados e assim sinalizar
+ao sistema a necessidade de envio dos eventos 2200, 2205 e 2206.
+
+
+Historico:
+
+    Legendas:
+        + Novo objeto de banco (Campos, Triggers)
+        - Remocao de objeto de banco
+        * Modificacao no objeto de banco
+
+    07/07/2021 - IMR :
+        + Criacao da store procedure na base de dados.';
+
+
+
+
+/*------ GERASYS.TI 29/07/2021 13:10:38 --------*/
+
+alter table SITUACAO_TCM
+alter column ID position 1;
+
+
+/*------ GERASYS.TI 29/07/2021 13:10:38 --------*/
+
+alter table SITUACAO_TCM
+alter column NOVO_COD position 2;
+
+
+/*------ GERASYS.TI 29/07/2021 13:10:38 --------*/
+
+alter table SITUACAO_TCM
+alter column DESCRICAO position 3;
+
+
+/*------ GERASYS.TI 29/07/2021 13:10:38 --------*/
+
+alter table SITUACAO_TCM
+alter column ID_SYS_ANTER position 4;
+
+
+/*------ GERASYS.TI 29/07/2021 13:15:17 --------*/
+
+CREATE DOMAIN "VARCHAR(2)" AS
+VARCHAR(2);
+
+
+
+/*------ GERASYS.TI 29/07/2021 13:18:51 --------*/
+
+ALTER TABLE SITUACAO_TCM
+    ADD ID_ESOCIAL "VARCHAR(2)";
+
+COMMENT ON COLUMN SITUACAO_TCM.ID_ESOCIAL IS
+'eSocial - Tipo de Provimento:
+
+ 1 - Nomeação em cargo efetivo
+ 2 - Nomeação exclusivamente em cargo em comissão
+ 3 - Incorporação, matrícula ou nomeação (militar)
+ 5 - Redistribuição
+ 6 - Diplomação
+ 7 - Contratação por tempo determinado
+ 8 - Remoção (em caso de alteração do órgão declarante)
+ 9 - Designação
+10 - Mudança de CPF 99 - Outros não relacionados acima
+     Validação:
+        Os valores [3, 5, 6, 7, 8, 9] só são permitidos se a natureza jurídica do declarante for Administração Pública (grupo [1]). Se {codCateg} = [302], deve ser preenchido com [2].
+99 - Outros';
+
+
+
+
+/*------ GERASYS.TI 29/07/2021 13:30:28 --------*/
+
+COMMENT ON COLUMN ESCOLARIDADE.ID_ESOCIAL IS
+'eSocial - Escolaridade:
+
+01 - Analfabeto, inclusive o que, embora tenha recebido instrução, não se alfabetizou
+02 - Até o 5º ano incompleto do ensino fundamental (antiga 4ª série) ou que se tenha alfabetizado sem ter frequentado escola regular
+03 - 5º ano completo do ensino fundamental
+04 - Do 6º ao 9º ano do ensino fundamental incompleto antiga 5ª a 8ª série)
+05 - Ensino fundamental completo
+06 - Ensino médio incompleto
+07 - Ensino médio completo
+08 - Educação superior incompleta
+09 - Educação superior completa
+10 - Pós-graduação completa
+11 - Mestrado completo
+12 - Doutorado completo';
+

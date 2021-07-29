@@ -22,15 +22,6 @@ begin
       new.tipo_operacao = 'A';
     if ((old.data_operacao is null) and (new.data_operacao is null)) then
       new.data_operacao = current_date;
-
-    -- Marcar como processado o registro da pessoa fisica do servidor
-    if (coalesce(new.tipo_operacao, 'P') = 'P') then
-    begin
-      Update PESSOA_FISICA p Set
-          p.tipo_operacao = 'P'
-      where p.id = new.id_pessoa_fisica
-        and p.tipo_operacao != 'P';
-    end
   end
 end
 ^

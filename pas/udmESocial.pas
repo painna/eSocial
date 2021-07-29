@@ -4306,7 +4306,7 @@ begin
   try
     aSQL.BeginUpdate;
     aSQL.Clear;
-    aSQL.Add('Select First 20');
+    aSQL.Add('Select First 50');
     aSQL.Add('    p.* ');
     aSQL.Add('  , s.id as id_servidor ');
     aSQL.Add('  , coalesce(p.cnh_categ, ''B'') as cnh_categoria');
@@ -4357,6 +4357,7 @@ begin
 
     aSQL.Add('  , coalesce(s.id_horario, 0) as id_horario');
     aSQL.Add('  , (cast(coalesce(cast(nullif(trim(h.duracao_jornada), '''') as integer), 0) / 60 as integer) * 5) as jornada_semanal');
+    aSQL.Add('  , coalesce(tcm.id_esocial, ''99'') as tipo_provimento');
 
     aSQL.Add('from SERVIDOR s');
     aSQL.Add('  inner join PESSOA_FISICA p on (p.id = s.id_pessoa_fisica)');
@@ -4368,9 +4369,8 @@ begin
     aSQL.Add('  left join CARGO_FUNCAO f on (f.id = coalesce(s.id_cargo_origem, s.id_cargo_atual))');
     aSQL.Add('  left join ENTID_SINDICAL a on (a.id = s.id_entid_sindical)');
     aSQL.Add('  left join TAB_HORARIO h on (h.id = s.id_horario)');
+    aSQL.Add('  left join SITUACAO_TCM tcm on (tcm.id = s.id_situacao_tcm)');
     aSQL.Add('where (s.id > 0)   ');
-    aSQL.Add('  and ((p.dt_nascimento is not null) and (p.dt_nascimento != ''1899.12.30''))'); // Sem Data de Nascimento
-    aSQL.Add('  and (coalesce(trim(p.ender_cep), '''') != '''')');                             // Sem Número de CEP
 
     case aModoLancamento of
       mlInclusao  : aSQL.Add('  and (s.tipo_operacao = ' + QuotedStr(FLAG_OPERACAO_INSERIR) + ')');
@@ -4384,13 +4384,6 @@ begin
     else
       // Admissões do mês
       aSQL.Add('  and (coalesce(s.dt_readmissao, s.dt_admissao) between ' + QuotedStr(FormatDateTime('yyyy.mm.dd', aDataInicial)) + ' and ' + QuotedStr(FormatDateTime('yyyy.mm.dd', aDataFinal)) + ')');
-
-
-//  and (( (coalesce(s.dt_readmissao, s.dt_admissao) < '2021.07.01') and (s.data_operacao <= dateadd(month, -1, cast('2021.07.31' as date))) )
-//    or ( (coalesce(s.dt_readmissao, s.dt_admissao) between '2021.07.01' and '2021.07.31') and (s.data_operacao > dateadd(month, -1, cast('2021.07.31' as date))) )
-//  )
-
-
 
     aSQL.EndUpdate;
     aSQL.SaveToFile('.\log\eS2200.sql');
@@ -4407,6 +4400,19 @@ begin
     cdsTabela.First;
     while not cdsTabela.Eof do
     begin
+      // VALIDAR DADOS :
+      // 1. Data de Nascimento
+      if cdsTabela.FieldByName('dt_nascimento').IsNull or (cdsTabela.FieldByName('dt_nascimento').AsDateTime = EncodeDate(1899, 12, 30))  then
+        raise Exception.Create(Format('Servidor %s com data de nascimento inválida', [cdsTabela.FieldByName('id_servidor').AsString]));
+
+      // 2. CEP
+      if (Trim(cdsTabela.FieldByName('ender_cep').AsString) = EmptyStr)  then
+        raise Exception.Create(Format('Servidor %s sem CEP no endereço', [cdsTabela.FieldByName('id_servidor').AsString]));
+
+      // 3. CPF
+      if (not ValidarCPF(OnlyNumber(Trim(cdsTabela.FieldByName('cpf').AsString))))  then
+        raise Exception.Create(Format('Servidor %s com CPF inválido', [cdsTabela.FieldByName('id_servidor').AsString]));
+
       with ACBrESocial.Eventos.NaoPeriodicos.S2200.New, EvtAdmissao do
       begin
         aEventoID := StrToInt(IncrementGenerator('GEN_ESOCIAL_EVENTO_S2200', 1));
@@ -4670,16 +4676,19 @@ begin
             with InfoEstatutario do
             begin
               IndProvim := ipNormal;
+              TpProv    := eSStrToTpProv(ok, Trim(cdsTabela.FieldByName('tipo_provimento').AsString));
+              if not ok then
+                TpProv := tpTpProv.tpOutros;
 
-              Case cdsTabela.FieldByName('id_situacao_tcm').AsInteger of
-                10:
-                  TpProv := tpTpProv.tpOutros;
-                20..35:
-                  TpProv := tpTpProv.tpNomeacaoCargoEfetivo;
-                else
-                  TpProv := tpTpProv.tpOutros;
-              end;
-
+//              Case cdsTabela.FieldByName('id_situacao_tcm').AsInteger of
+//                10:
+//                  TpProv := tpTpProv.tpOutros;
+//                20..35:
+//                  TpProv := tpTpProv.tpNomeacaoCargoEfetivo;
+//                else
+//                  TpProv := tpTpProv.tpOutros;
+//              end;
+//
               DtNomeacao  := cdsTabela.FieldByName('dt_nomeacao').AsDateTime;  // StrToDate(EMPTY_DATE);
               DtPosse     := cdsTabela.FieldByName('dt_posse').AsDateTime;     // StrToDate(EMPTY_DATE);
               DtExercicio := cdsTabela.FieldByName('dt_exercicio').AsDateTime; // StrToDate(EMPTY_DATE);
@@ -4908,15 +4917,10 @@ begin
     aSQL.Add('  , coalesce(n.id_esocial, ''105'') as id_pais_naturalidade ');
     aSQL.Add('  , coalesce(p.ender_tipo, ''IND'') as ender_tipo_lograd');
 
-    aSQL.Add('  , null as ctps_num ');
-    aSQL.Add('  , null as ctps_serie ');
-    aSQL.Add('  , null as ctps_uf ');
-
     aSQL.Add('  , null as rne_num ');
     aSQL.Add('  , null as rne_orgao ');
     aSQL.Add('  , null as rne_uf ');
     aSQL.Add('  , null as rne_dt_emissao ');
-
 
     aSQL.Add('  , s.conselho_registro ');
     aSQL.Add('  , s.conselho_orgao    ');
@@ -4938,8 +4942,12 @@ begin
     aSQL.Add('  left join ENTID_SINDICAL a on (a.id = s.id_entid_sindical)');
     aSQL.Add('  left join TAB_HORARIO h on (h.id = s.id_horario)');
     aSQL.Add('where (s.id > 0)   ');
-    aSQL.Add('  and (p.dt_nascimento is not null)');                // Sem Data de Nascimento
-    aSQL.Add('  and (coalesce(trim(p.ender_cep), '''') <> '''')');  // Sem Número de CEP
+
+    case aModoLancamento of
+      mlInclusao  : aSQL.Add('  and (p.tipo_operacao = ' + QuotedStr(FLAG_OPERACAO_INSERIR) + ')');
+      mlAlteracao : aSQL.Add('  and (p.tipo_operacao = ' + QuotedStr(FLAG_OPERACAO_ALTERAR) + ')');
+      mlExclusao  : aSQL.Add('  and (p.tipo_operacao = ' + QuotedStr(FLAG_OPERACAO_EXCLUIR) + ')');
+    end;
 
     if ( StrToIntDef(OnlyNumber(aCompetencia.Codigo), 0) < (StrToInt(FormatDateTime('YYYYMM', Date)) - 1) ) then
       // Carga inicial
@@ -4947,12 +4955,6 @@ begin
     else
       // Aletrações do mês
       aSQL.Add('  and (p.data_operacao between ' + QuotedStr(FormatDateTime('yyyy.mm.dd', aDataInicial)) + ' and ' + QuotedStr(FormatDateTime('yyyy.mm.dd', aDataFinal)) + ')');
-
-    case aModoLancamento of
-      mlInclusao  : aSQL.Add('  and p.tipo_operacao = ' + QuotedStr(FLAG_OPERACAO_INSERIR));
-      mlAlteracao : aSQL.Add('  and p.tipo_operacao = ' + QuotedStr(FLAG_OPERACAO_ALTERAR));
-      mlExclusao  : aSQL.Add('  and p.tipo_operacao = ' + QuotedStr(FLAG_OPERACAO_EXCLUIR));
-    end;
 
     aSQL.EndUpdate;
     aSQL.SaveToFile('.\log\eS2205.sql');
@@ -4969,6 +4971,19 @@ begin
     cdsTabela.First;
     while not cdsTabela.Eof do
     begin
+      // VALIDAR DADOS :
+      // 1. Data de Nascimento
+      if cdsTabela.FieldByName('dt_nascimento').IsNull or (cdsTabela.FieldByName('dt_nascimento').AsDateTime = EncodeDate(1899, 12, 30))  then
+        raise Exception.Create(Format('Servidor %s com data de nascimento inválida', [cdsTabela.FieldByName('id_servidor').AsString]));
+
+      // 2. CEP
+      if (Trim(cdsTabela.FieldByName('ender_cep').AsString) = EmptyStr)  then
+        raise Exception.Create(Format('Servidor %s sem CEP no endereço', [cdsTabela.FieldByName('id_servidor').AsString]));
+
+      // 3. CPF
+      if (not ValidarCPF(OnlyNumber(Trim(cdsTabela.FieldByName('cpf').AsString))))  then
+        raise Exception.Create(Format('Servidor %s com CPF inválido', [cdsTabela.FieldByName('id_servidor').AsString]));
+
       with ACBrESocial.Eventos.NaoPeriodicos.S2205.New, EvtAltCadastral do
       begin
         aEventoID   := StrToInt(IncrementGenerator('GEN_ESOCIAL_EVENTO_S2205', 1));
@@ -5272,10 +5287,6 @@ begin
     aSQL.Add('  , coalesce(n.id_esocial, ''105'') as id_pais_naturalidade ');
     aSQL.Add('  , coalesce(p.ender_tipo, ''IND'') as ender_tipo_lograd');
 
-    aSQL.Add('  , null as ctps_num ');
-    aSQL.Add('  , null as ctps_serie ');
-    aSQL.Add('  , null as ctps_uf ');
-
     aSQL.Add('  , null as rne_num ');
     aSQL.Add('  , null as rne_orgao ');
     aSQL.Add('  , null as rne_uf ');
@@ -5289,6 +5300,8 @@ begin
 
     aSQL.Add('  , coalesce(s.id_horario, 0) as id_horario');
     aSQL.Add('  , (cast(coalesce(cast(nullif(trim(h.duracao_jornada), '''') as integer), 0) / 60 as integer) * 5) as jornada_semanal');
+    aSQL.Add('  , coalesce(tcm.id_esocial, ''99'') as tipo_provimento');
+
     aSQL.Add('from SERVIDOR s');
     aSQL.Add('  inner join PESSOA_FISICA p on (p.id = s.id_pessoa_fisica)');
     aSQL.Add('  left join TAB_RACA_COR r on (r.id = p.id_raca_cor)');
@@ -5299,9 +5312,14 @@ begin
     aSQL.Add('  left join CARGO_FUNCAO f on (f.id = coalesce(s.id_cargo_origem, s.id_cargo_atual))');
     aSQL.Add('  left join ENTID_SINDICAL a on (a.id = s.id_entid_sindical)');
     aSQL.Add('  left join TAB_HORARIO h on (h.id = s.id_horario)');
+    aSQL.Add('  left join SITUACAO_TCM tcm on (tcm.id = s.id_situacao_tcm)');
     aSQL.Add('where (s.id > 0)   ');
-    aSQL.Add('  and (p.dt_nascimento is not null)');                // Sem Data de Nascimento
-    aSQL.Add('  and (coalesce(trim(p.ender_cep), '''') <> '''')');  // Sem Número de CEP
+
+    case aModoLancamento of
+      mlInclusao  : aSQL.Add('  and (s.tipo_operacao = ' + QuotedStr(FLAG_OPERACAO_INSERIR) + ')');
+      mlAlteracao : aSQL.Add('  and (s.tipo_operacao = ' + QuotedStr(FLAG_OPERACAO_ALTERAR) + ')');
+      mlExclusao  : aSQL.Add('  and (s.tipo_operacao = ' + QuotedStr(FLAG_OPERACAO_EXCLUIR) + ')');
+    end;
 
     if ( StrToIntDef(OnlyNumber(aCompetencia.Codigo), 0) < (StrToInt(FormatDateTime('YYYYMM', Date)) - 1) ) then
       // Carga inicial
@@ -5309,12 +5327,6 @@ begin
     else
       // Aletrações do mês
       aSQL.Add('  and (s.data_operacao between ' + QuotedStr(FormatDateTime('yyyy.mm.dd', aDataInicial)) + ' and ' + QuotedStr(FormatDateTime('yyyy.mm.dd', aDataFinal)) + ')');
-
-    case aModoLancamento of
-      mlInclusao  : aSQL.Add('  and s.tipo_operacao = ' + QuotedStr(FLAG_OPERACAO_INSERIR));
-      mlAlteracao : aSQL.Add('  and s.tipo_operacao = ' + QuotedStr(FLAG_OPERACAO_ALTERAR));
-      mlExclusao  : aSQL.Add('  and s.tipo_operacao = ' + QuotedStr(FLAG_OPERACAO_EXCLUIR));
-    end;
 
     aSQL.EndUpdate;
     aSQL.SaveToFile('.\log\eS2206.sql');
@@ -5331,6 +5343,11 @@ begin
     cdsTabela.First;
     while not cdsTabela.Eof do
     begin
+      // VALIDAR DADOS :
+      // 1. CPF
+      if (not ValidarCPF(OnlyNumber(Trim(cdsTabela.FieldByName('cpf').AsString))))  then
+        raise Exception.Create(Format('Servidor %s com CPF inválido', [cdsTabela.FieldByName('id_servidor').AsString]));
+
       with ACBrESocial.Eventos.NaoPeriodicos.S2206.New, EvtAltContratual, AltContratual do
       begin
         aEventoID := StrToInt(IncrementGenerator('GEN_ESOCIAL_EVENTO_S2206', 1));
@@ -5338,7 +5355,7 @@ begin
 
         AltContratual.dtAlteracao := Date;
         AltContratual.dtEf        := Now;
-        AltContratual.dscAlt      := 'ALTERAÇÕES CONTRATUAIS DE ' + aCompetencia.Descricao;
+        AltContratual.dscAlt      := 'ALTERAÇÕES CONTRATUAIS EM ' + aCompetencia.Descricao;
 
         IdeEvento.indRetif := ireOriginal; // (ireOriginal, ireRetificacao);
 
@@ -5415,16 +5432,19 @@ begin
           with InfoEstatutario do
           begin
             IndProvim := ipNormal;
+            TpProv    := eSStrToTpProv(ok, Trim(cdsTabela.FieldByName('tipo_provimento').AsString));
+            if not ok then
+              TpProv := tpTpProv.tpOutros;
 
-            Case cdsTabela.FieldByName('id_situacao_tcm').AsInteger of
-              10:
-                TpProv := tpTpProv.tpOutros;
-              20..35:
-                TpProv := tpTpProv.tpNomeacaoCargoEfetivo;
-              else
-                TpProv := tpTpProv.tpOutros;
-            end;
-
+//            Case cdsTabela.FieldByName('id_situacao_tcm').AsInteger of
+//              10:
+//                TpProv := tpTpProv.tpOutros;
+//              20..35:
+//                TpProv := tpTpProv.tpNomeacaoCargoEfetivo;
+//              else
+//                TpProv := tpTpProv.tpOutros;
+//            end;
+//
             DtNomeacao  := cdsTabela.FieldByName('dt_nomeacao').AsDateTime;  // StrToDate(EMPTY_DATE);
             DtPosse     := cdsTabela.FieldByName('dt_posse').AsDateTime;     // StrToDate(EMPTY_DATE);
             DtExercicio := cdsTabela.FieldByName('dt_exercicio').AsDateTime; // StrToDate(EMPTY_DATE);

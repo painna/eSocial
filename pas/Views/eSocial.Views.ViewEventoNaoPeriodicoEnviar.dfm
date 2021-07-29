@@ -473,8 +473,8 @@ inherited ViewEventoNaoPeriodicoEnviar: TViewEventoNaoPeriodicoEnviar
               Align = alClient
               AutoSize = False
               Caption = 
-                'S2206 - Altera'#231#245'es no Cadastro de Servidores (Altera'#231#227'o de Contr' +
-                'ato de Trabalho)'
+                'S2206 - Altera'#231#245'es na rela'#231#227'o estatu'#225'ria de Servidores (Altera'#231#227 +
+                'o de Contrato de Trabalho/Rela'#231#227'o Estatut'#225'ria)'
               Font.Charset = ANSI_CHARSET
               Font.Color = clWindowText
               Font.Height = -11
